@@ -1,0 +1,62 @@
+name: perairan_ngale
+description: "Perairan Air Desa Ngale"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.3 <4.0.0'
+
+dependencies:
+  another_flushbar: ^1.12.30
+  auto_route: ^8.1.3
+  bloc: ^8.1.3
+  cloud_firestore: ^4.17.2
+  dotted_border: ^2.1.0
+  easy_debounce: ^2.0.3
+  file_picker: ^8.0.3
+  firebase_auth: ^4.19.4
+  firebase_core: ^2.30.1
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^8.1.4
+  flutter_gen: ^5.4.0
+  flutter_localizations:
+    sdk: flutter
+  flutter_svg: ^2.0.10+1
+  flutter_svg_provider: ^1.0.7
+  freezed_annotation: ^2.4.1
+  get_it: ^7.7.0
+  google_fonts: ^6.2.1
+  iconsax_plus: ^1.0.0
+  intl: ^0.18.1
+  json_annotation: ^4.9.0
+  just_audio: ^0.9.37
+  logger: ^2.2.0
+  path: ^1.9.0
+  percent_indicator: ^4.2.3
+  shared_preferences: ^2.2.3
+  sizer: ^2.0.15
+  skeletonizer: ^1.1.2+1
+  smooth_page_indicator: ^1.1.0
+  sqflite: ^2.3.3
+  unicons: ^2.1.1
+
+
+
+dev_dependencies:
+  auto_route_generator: ^8.0.0
+  bloc_test: ^9.1.6
+  build_runner: ^2.4.9
+  flutter_test:
+    sdk: flutter
+  freezed: ^2.5.2
+  json_serializable: ^6.8.0
+  mocktail: ^1.0.3
+  very_good_analysis: ^5.1.0
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+  assets:
+    - assets/
