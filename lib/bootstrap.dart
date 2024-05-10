@@ -4,7 +4,6 @@ import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/widgets.dart';
 import 'package:perairan_ngale/database/shared_preferences_service.dart';
-import 'package:perairan_ngale/injector/injector.dart';
 
 class AppBlocObserver extends BlocObserver {
   const AppBlocObserver();
@@ -31,9 +30,9 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
 
   // Add cross-flavor configuration here
 
-  Injector.init();
+  // Injector.init();
 
-  await Injector.instance.allReady();
+  // await Injector.instance.allReady();
 
   WidgetsFlutterBinding.ensureInitialized();
   await SharedPreferencesService.init();

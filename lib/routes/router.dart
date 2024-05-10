@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:perairan_ngale/features/customer/customer.dart';
 
 part 'router.gr.dart';
 
@@ -13,7 +14,7 @@ class AppRouter extends _$AppRouter {
           transitionsBuilder: TransitionsBuilders.fadeIn,
         ),
         CustomRoute(
-          page: CustomerHomepage.page,
+          page: CustomerHomeRoute.page,
           path: '/customer-homepage',
           transitionsBuilder: TransitionsBuilders.fadeIn,
         ),
