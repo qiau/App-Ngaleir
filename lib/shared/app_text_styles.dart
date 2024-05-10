@@ -233,6 +233,12 @@ class AppTextStyles extends TextTheme {
         fontWeight: _regular,
       );
 
+  TextStyle get bodySmallGrey => GoogleFonts.plusJakartaSans(
+    color: ColorValues.grey50,
+    fontSize: _smallFontSize,
+    fontWeight: _regular,
+  );
+
   @override
   TextStyle get labelLarge => GoogleFonts.plusJakartaSans(
         color: ColorValues.text50,
