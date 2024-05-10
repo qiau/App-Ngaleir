@@ -1,4 +1,6 @@
 class Styles {
+  static const double smallerPadding = 8;
+  static const double smallPadding = 12;
   static const double defaultPadding = 16;
   static const double biggerPadding = 24;
   static const double bigPadding = 32;
@@ -20,4 +22,6 @@ class Styles {
   static const double iconBorder = 28;
   static const double iconPadding = 5;
   static const double iconPadding2 = 12;
+  static const double defaultIcon = 24;
+  static const double bigIcon = 40;
 }
