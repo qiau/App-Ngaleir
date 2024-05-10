@@ -1,7 +1,4 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
-import 'package:perairan_ngale/features/home/homepage.dart';
-import  'package:perairan_ngale/features/bill/billpage.dart';
 
 part 'router.gr.dart';
 
@@ -11,17 +8,24 @@ class AppRouter extends _$AppRouter {
   @override
   List<AutoRoute> get routes => [
         CustomRoute(
-          page: HomeRoute.page,
-          path: '/',
+          page: CustomerFormRoute.page,
+          path: '/customer-form',
           transitionsBuilder: TransitionsBuilders.fadeIn,
-          durationInMilliseconds: 700,
-          initial: true,
         ),
         CustomRoute(
-          page: BillRoute.page,
-          path: '/billpage',
+          page: CustomerHomepage.page,
+          path: '/customer-homepage',
           transitionsBuilder: TransitionsBuilders.fadeIn,
-          durationInMilliseconds: 700,
+        ),
+        CustomRoute(
+          page: CustomerProfileRoute.page,
+          path: '/customer-profile',
+          transitionsBuilder: TransitionsBuilders.fadeIn,
+        ),
+        CustomRoute(
+          page: CustomerRecordDetailRoute.page,
+          path: '/customer-record-detail',
+          transitionsBuilder: TransitionsBuilders.fadeIn,
         ),
       ];
 }
