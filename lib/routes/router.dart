@@ -1,5 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:perairan_ngale/features/customer/customer.dart';
+import 'package:perairan_ngale/features/admin/admin.dart';
+import 'package:perairan_ngale/features/authentication/authentication.dart';
+import 'package:perairan_ngale/features/employee/employee.dart';
+
 
 part 'router.gr.dart';
 
@@ -10,22 +14,22 @@ class AppRouter extends _$AppRouter {
   List<AutoRoute> get routes => [
         CustomRoute(
           page: CustomerFormRoute.page,
-          path: '/customer-form',
+          path: '/customer_list-form',
           transitionsBuilder: TransitionsBuilders.fadeIn,
         ),
         CustomRoute(
           page: CustomerHomeRoute.page,
-          path: '/customer-homepage',
+          path: '/customer_list-homepage',
           transitionsBuilder: TransitionsBuilders.fadeIn,
         ),
         CustomRoute(
           page: CustomerProfileRoute.page,
-          path: '/customer-profile',
+          path: '/customer_list-profile',
           transitionsBuilder: TransitionsBuilders.fadeIn,
         ),
         CustomRoute(
           page: CustomerRecordDetailRoute.page,
-          path: '/customer-record-detail',
+          path: '/customer_list-record-detail',
           transitionsBuilder: TransitionsBuilders.fadeIn,
         ),
       ];
