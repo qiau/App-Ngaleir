@@ -4,7 +4,6 @@ import 'package:perairan_ngale/features/admin/admin.dart';
 import 'package:perairan_ngale/features/authentication/authentication.dart';
 import 'package:perairan_ngale/features/employee/employee.dart';
 
-
 part 'router.gr.dart';
 
 // generate with dart run build_runner build
@@ -16,7 +15,6 @@ class AppRouter extends _$AppRouter {
           page: CustomerFormRoute.page,
           path: '/customer_list-form',
           transitionsBuilder: TransitionsBuilders.fadeIn,
-          initial: true,
         ),
         CustomRoute(
           page: CustomerHomeRoute.page,
@@ -33,5 +31,11 @@ class AppRouter extends _$AppRouter {
           path: '/customer_list-record-detail',
           transitionsBuilder: TransitionsBuilders.fadeIn,
         ),
+        CustomRoute(
+          page: EmployeeHomeRoute.page,
+          path: '/employee_homepage',
+          transitionsBuilder: TransitionsBuilders.fadeIn,
+          initial: true,
+        )
       ];
 }
