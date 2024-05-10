@@ -16,6 +16,7 @@ class AppRouter extends _$AppRouter {
           page: CustomerFormRoute.page,
           path: '/customer_list-form',
           transitionsBuilder: TransitionsBuilders.fadeIn,
+          initial: true,
         ),
         CustomRoute(
           page: CustomerHomeRoute.page,

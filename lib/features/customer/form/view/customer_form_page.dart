@@ -12,6 +12,16 @@ class CustomerFormPage extends StatefulWidget {
 class _CustomerFormPageState extends State<CustomerFormPage> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return SafeArea(
+      child: Scaffold(
+        body: Column(
+          children: [
+            Text(
+              "This is customer form page",
+            )
+          ],
+        ),
+      ),
+    );
   }
 }
