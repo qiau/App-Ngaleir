@@ -35,7 +35,17 @@ class AppRouter extends _$AppRouter {
           page: EmployeeHomeRoute.page,
           path: '/employee_homepage',
           transitionsBuilder: TransitionsBuilders.fadeIn,
+        ),
+        CustomRoute(
+          page: LoginRoute.page,
+          path: '/authentication_login-page',
+          transitionsBuilder: TransitionsBuilders.fadeIn,
+        ),
+        CustomRoute(
+          page: RegisterRoute.page,
+          path: '/authentication_register-page',
+          transitionsBuilder: TransitionsBuilders.fadeIn,
           initial: true,
-        )
+        ),
       ];
 }
