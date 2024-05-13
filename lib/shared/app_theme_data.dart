@@ -77,7 +77,7 @@ ThemeData larasThemeData(BuildContext context) {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: ColorValues.primary50,
+        backgroundColor: Colors.blue,
         foregroundColor: ColorValues.secondaryText50,
         elevation: 0,
         padding: const EdgeInsets.all(Styles.contentPadding),

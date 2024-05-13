@@ -1,10 +1,10 @@
 name: perairan_ngale
-description: 'Perairan Air Desa Ngale'
-publish_to: 'none'
+description: "Perairan Air Desa Ngale"
+publish_to: "none"
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.3.3 <4.0.0'
+  sdk: ">=3.3.3 <4.0.0"
 
 dependencies:
   another_flushbar: ^1.12.30
@@ -57,4 +57,4 @@ flutter:
   generate: true
 
   assets:
-    - assets/
+    - assets/default.jpg

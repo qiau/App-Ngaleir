@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
 import 'package:perairan_ngale/shared/styles.dart';
 import 'package:perairan_ngale/utils/extensions.dart';
@@ -18,6 +19,8 @@ class CustomTextField extends StatelessWidget {
     this.onChanged,
     this.maxCharacter,
     this.maxLines = 1,
+    this.inputFormatters,
+    this.keyboardType,
   });
 
   final TextEditingController controller;
@@ -31,6 +34,8 @@ class CustomTextField extends StatelessWidget {
   final void Function(String?)? onChanged;
   final int? maxCharacter;
   final int? maxLines;
+  final List<TextInputFormatter>? inputFormatters;
+  final TextInputType? keyboardType;
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +69,8 @@ class CustomTextField extends StatelessWidget {
               ? (validator ?? Validator(context: context).emptyValidator)
               : validator,
           style: context.textTheme.bodyMedium,
+          keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
           decoration: InputDecoration(
             isDense: true,
             hintText: hintText,
