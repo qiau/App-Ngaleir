@@ -16,8 +16,6 @@ class EmployeeHomePage extends StatefulWidget {
 }
 
 class _EmployeeHomePageState extends State<EmployeeHomePage> {
-  late TextEditingController _searchController = TextEditingController();
-
   @override
   void initState() {
     super.initState();
