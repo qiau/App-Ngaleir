@@ -2,15 +2,15 @@ import 'dart:ui';
 
 class ColorValues {
   static const lightGrey = Color(0xFFFAFAFA);
-  static const primary90 = Color(0xFF140831);
-  static const primary80 = Color(0xFF281063);
-  static const primary70 = Color(0xFF3D1894);
-  static const primary60 = Color(0xFF5120C6);
-  static const primary50 = Color(0xFF6528F7);
-  static const primary40 = Color(0xFF8453F9);
-  static const primary30 = Color(0xFFA37EFA);
-  static const primary20 = Color(0xFFC1A9FC);
-  static const primary10 = Color(0xFFE0D4FD);
+  static const primary90 = Color(0xFF031F32);
+  static const primary80 = Color(0xFF053F63);
+  static const primary70 = Color(0xFF085E95);
+  static const primary60 = Color(0xFF0A7EC6);
+  static const primary50 = Color(0xFF0D9DF8);
+  static const primary40 = Color(0xFF3DB1F9);
+  static const primary30 = Color(0xFF6EC4FB);
+  static const primary20 = Color(0xFF9ED8FC);
+  static const primary10 = Color(0xFFCFEBFE);
 
   static const grey90 = Color(0xFF131414);
   static const grey80 = Color(0xFF262728);
