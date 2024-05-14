@@ -57,4 +57,4 @@ flutter:
   generate: true
 
   assets:
-    - assets/default.jpg
+    - assets/

@@ -76,7 +76,7 @@ class CustomTextField extends StatelessWidget {
             hintText: hintText,
             filled: fillColor != null,
             fillColor: fillColor,
-            hintStyle: context.textTheme.labelSmallThin,
+            hintStyle: context.textTheme.bodySmallGrey,
             border: border,
             enabledBorder: border,
             focusedErrorBorder: border,
@@ -93,7 +93,7 @@ class CustomTextField extends StatelessWidget {
                 : Icon(
                     prefixIcon,
                     size: 24,
-                    color: ColorValues.grey90,
+                    color: ColorValues.grey50,
                   ),
             prefixIconColor: MaterialStateColor.resolveWith(
               (states) => states.contains(MaterialState.focused)
