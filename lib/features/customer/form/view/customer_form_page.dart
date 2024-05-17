@@ -1,4 +1,6 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:perairan_ngale/routes/router.dart';
@@ -111,8 +113,30 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
       text: "Lanjutkan",
       width: double.infinity,
       onPressed: () {
+        _saveUserDataToFirestore();
         AutoRouter.of(context).replace(CustomerHomeRoute());
       },
     );
   }
+
+  Future<void> _saveUserDataToFirestore() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        String userId = user.uid;
+        await FirebaseFirestore.instance.collection('Customer').doc(userId).set({
+          'name': _nameController.text,
+          'address': _addressController.text,
+          'rt': _rtController.text,
+          'rw': _rwController.text,
+        });
+        print('Data pelanggan berhasil disimpan di Firestore.');
+      } else {
+        print('Tidak ada pengguna yang sedang login.');
+      }
+    } catch (error) {
+      print("Error: $error");
+    }
+  }
+
 }

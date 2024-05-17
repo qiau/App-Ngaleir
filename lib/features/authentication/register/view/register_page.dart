@@ -22,31 +22,23 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  String? errorMessage = '';
-  bool isLogin = true;
 
   TextEditingController _controllerEmail = TextEditingController();
   TextEditingController _controllerPassword = TextEditingController();
 
-  Future<void> signInWIthEmailAndPassword() async {
+  Future<void> _register() async {
     try {
-      await Auth().signInWIthEmailAndPassword(
-          email: _controllerEmail.text, password: _controllerPassword.text);
-    } on FirebaseAuthException catch (e) {
-      setState(() {
-        errorMessage = e.message;
-      });
-    }
-  }
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _controllerEmail.text,
+        password: _controllerPassword.text,
+      );
 
-  Future<void> createUserWithEmailAndPassword() async {
-    try {
-      await Auth().createUserWithEmailAndPassword(
-          email: _controllerEmail.text, password: _controllerPassword.text);
-    } on FirebaseAuthException catch (e) {
-      setState(() {
-        errorMessage = e.message;
-      });
+      if (userCredential != null) {
+        AutoRouter.of(context).replace(CustomerFormRoute());
+        return;
+      }
+    } catch (error) {
+      print("Error: $error");
     }
   }
 
@@ -147,7 +139,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 backgroundColor: ColorValues.primary50,
                 textColor: ColorValues.white,
                 width: double.infinity,
-                onPressed: () {},
+                onPressed: _register,
               ),
             ),
             Padding(
