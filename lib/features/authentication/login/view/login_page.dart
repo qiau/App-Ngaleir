@@ -21,13 +21,14 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  late bool _isObscure = true;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   Future<void> _login() async {
     try {
       UserCredential userCredential =
-          await FirebaseAuth.instance.signInWithEmailAndPassword(
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
       );
@@ -42,8 +43,8 @@ class _LoginPageState extends State<LoginPage> {
             AutoRouter.of(context).replace(EmployeeHomeRoute());
             return;
           } else if (await isCustomer(user.uid)) {
-              AutoRouter.of(context).replace(CustomerHomeRoute());
-              return;
+            AutoRouter.of(context).replace(CustomerHomeRoute());
+            return;
           }
         }
         ScaffoldMessenger.of(context).showSnackBar(
@@ -52,9 +53,17 @@ class _LoginPageState extends State<LoginPage> {
       }
     } catch (error) {
       print("Error: $error");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Email atau kata sandi salah. Silakan coba lagi.")),
+      );
     }
   }
 
+  void _toggleObscureText() {
+    setState(() {
+      _isObscure = !_isObscure;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -99,7 +108,7 @@ class _LoginPageState extends State<LoginPage> {
                     style: AppTextStyles.style(context).titleLarger,
                   ),
                   Text(
-                    "Masukkan nomor telepon atau email untuk masuk ke akunmu!",
+                    "Masukkan email untuk masuk ke akunmu!",
                     style: AppTextStyles.style(context).bodyMedium,
                   ),
                 ],
@@ -136,7 +145,17 @@ class _LoginPageState extends State<LoginPage> {
                     hintText: "Kata sandi",
                     fillColor: ColorValues.white,
                     prefixIcon: IconsaxPlusLinear.key,
-                    obscureText: true,
+                    suffixIcon: _isObscure ? IconsaxPlusLinear.eye : IconsaxPlusLinear.eye_slash,
+                    obscureText: _isObscure,
+                    suffixIconOnPressed: _toggleObscureText,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Kata sandi tidak boleh kosong';
+                      } else if (value.length < 6) {
+                        return 'Kata sandi harus minimal 6 karakter';
+                      }
+                      return null;
+                    },
                   ),
                 ],
               ),

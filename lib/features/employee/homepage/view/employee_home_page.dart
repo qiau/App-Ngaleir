@@ -80,6 +80,7 @@ class _Header extends StatelessWidget {
                     IconsaxPlusBold.profile_circle,
                     size: 40,
                   ),
+                  onTap: () {},
                 ),
               ],
             ),

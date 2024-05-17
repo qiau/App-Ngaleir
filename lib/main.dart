@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:perairan_ngale/app/view/app.dart';
-import 'package:perairan_ngale/bootstrap.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 

@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
+import 'package:perairan_ngale/models/customer.dart';
 import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
 import 'package:perairan_ngale/shared/styles.dart';
@@ -30,9 +31,9 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: ColorValues.grey10,
+        backgroundColor: Colors.grey.shade200,
         appBar: AppBar(
-          backgroundColor: ColorValues.grey10,
+          backgroundColor: Colors.grey.shade200,
           title: Padding(
             padding: EdgeInsets.only(left: Styles.smallerPadding),
             child: Text(
@@ -134,7 +135,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
       width: double.infinity,
       onPressed: () {
         _saveUserDataToFirestore();
-        AutoRouter.of(context).replace(CustomerHomeRoute());
+        AutoRouter.of(context).replace(HomeWrapperRoute());
       },
     );
   }

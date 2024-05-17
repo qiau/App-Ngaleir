@@ -22,12 +22,15 @@ class CustomTextField extends StatelessWidget {
     this.inputFormatters,
     this.keyboardType,
     this.obscureText = false,
+    this.suffixIcon,
+    this.suffixIconOnPressed,
   });
 
   final TextEditingController controller;
   final String? hintText;
   final String? label;
   final IconData? prefixIcon;
+  final IconData? suffixIcon;
   final Color? fillColor;
   final double borderWidth;
   final bool isRequired;
@@ -38,6 +41,7 @@ class CustomTextField extends StatelessWidget {
   final List<TextInputFormatter>? inputFormatters;
   final TextInputType? keyboardType;
   final bool obscureText;
+  final VoidCallback? suffixIconOnPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -99,6 +103,21 @@ class CustomTextField extends StatelessWidget {
               color: ColorValues.grey50,
             ),
             prefixIconColor: MaterialStateColor.resolveWith(
+                  (states) => states.contains(MaterialState.focused)
+                  ? Theme.of(context).primaryColor
+                  : ColorValues.grey50,
+            ),
+            suffixIcon: suffixIcon == null
+                ? null
+                : IconButton(
+              icon: Icon(
+                suffixIcon,
+                size: 24,
+                color: ColorValues.grey50,
+              ),
+              onPressed: suffixIconOnPressed,
+            ),
+            suffixIconColor: MaterialStateColor.resolveWith(
                   (states) => states.contains(MaterialState.focused)
                   ? Theme.of(context).primaryColor
                   : ColorValues.grey50,
