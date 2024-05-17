@@ -111,7 +111,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
       text: "Lanjutkan",
       width: double.infinity,
       onPressed: () {
-        AutoRouter.of(context).push(CustomerHomeRoute());
+        AutoRouter.of(context).replace(CustomerHomeRoute());
       },
     );
   }

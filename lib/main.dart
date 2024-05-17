@@ -9,5 +9,6 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  bootstrap(() => const App());
+  runApp(App());
+  // bootstrap(() => const App());
 }

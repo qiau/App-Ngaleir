@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
@@ -148,9 +149,12 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text(
-                "Mei 2024",
-                style: context.textTheme.bodyMediumBold,
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Text(
+                  "Mei 2024",
+                  style: context.textTheme.bodyMediumBold,
+                ),
               ),
               _buildHistoryItemWidget(),
             ],
@@ -201,9 +205,14 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
                 ],
               ),
             ),
-            Icon(
-              IconsaxPlusLinear.arrow_right_3,
-              size: Styles.defaultIcon,
+            GestureDetector(
+              child: Icon(
+                IconsaxPlusLinear.arrow_right_3,
+                size: Styles.defaultIcon,
+              ),
+              onTap: () {
+                AutoRouter.of(context).push(CustomerProfileRoute());
+              },
             ),
           ],
         ),

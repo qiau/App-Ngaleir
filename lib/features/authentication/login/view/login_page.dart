@@ -1,12 +1,16 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart' as svg;
 import 'package:iconsax_plus/iconsax_plus.dart';
+import 'package:perairan_ngale/models/auth.dart';
 import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/app_text_styles.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
+import 'package:perairan_ngale/utils/auth_utils.dart';
 import 'package:perairan_ngale/widgets/custom_button.dart';
 import 'package:perairan_ngale/widgets/custom_text_field.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 @RoutePage()
 class LoginPage extends StatefulWidget {
@@ -17,19 +21,56 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  Future<void> _login() async {
+    try {
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+
+      if (userCredential != null) {
+        User? user = userCredential.user;
+        if (user != null) {
+          if (await isAdmin(user.uid)) {
+            // AutoRouter.of(context).replace(());
+            return;
+          } else if (await isEmployee(user.uid)) {
+            AutoRouter.of(context).replace(EmployeeHomeRoute());
+            return;
+          } else if (await isCustomer(user.uid)) {
+              AutoRouter.of(context).replace(CustomerHomeRoute());
+              return;
+          }
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Login gagal. Silakan coba lagi.")),
+        );
+      }
+    } catch (error) {
+      print("Error: $error");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: svg.Svg('assets/bg_loginregis.svg'),
-            fit: BoxFit.fill,
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        child: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: svg.Svg('assets/bg_loginregis.svg'),
+              fit: BoxFit.fill,
+            ),
           ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.only(top: 140.0),
-          child: _buildLoginForm(),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 140.0),
+            child: _buildLoginForm(),
+          ),
         ),
       ),
     );
@@ -68,16 +109,15 @@ class _LoginPageState extends State<LoginPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Nomor telepon",
+                  "Email",
                   style: AppTextStyles.style(context).titleSmall,
                 ),
                 SizedBox(height: 8.0),
                 CustomTextField(
-                  controller: TextEditingController(),
-                  hintText: "Nomor telepon atau Email",
+                  controller: _emailController,
+                  hintText: "Email",
                   fillColor: ColorValues.white,
-                  prefixIcon: IconsaxPlusLinear.call,
-                  onChanged: (s) {},
+                  prefixIcon: IconsaxPlusLinear.sms,
                 ),
               ],
             ),
@@ -92,25 +132,24 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   SizedBox(height: 8.0),
                   CustomTextField(
-                    controller: TextEditingController(),
+                    controller: _passwordController,
                     hintText: "Kata sandi",
                     fillColor: ColorValues.white,
                     prefixIcon: IconsaxPlusLinear.key,
-                    onChanged: (s) {},
+                    obscureText: true,
                   ),
                 ],
               ),
             ),
             Container(
               alignment: AlignmentDirectional.center,
-              padding: const EdgeInsets.symmetric(
-              ),
+              padding: const EdgeInsets.symmetric(),
               child: CustomButton(
                 text: "Masuk",
                 backgroundColor: ColorValues.primary50,
                 textColor: ColorValues.white,
                 width: double.infinity,
-                onPressed: () {},
+                onPressed: _login,
               ),
             ),
             Padding(
@@ -123,7 +162,7 @@ class _LoginPageState extends State<LoginPage> {
                     style: AppTextStyles.style(context).bodySmall,
                   ),
                   TextButton(
-                    onPressed: (){
+                    onPressed: () {
                       AutoRouter.of(context).replace(RegisterRoute());
                     },
                     child: Text("Daftar!"),

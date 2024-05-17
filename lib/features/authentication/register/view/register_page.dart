@@ -10,6 +10,8 @@ import 'package:perairan_ngale/shared/color_values.dart';
 import 'package:perairan_ngale/shared/styles.dart';
 import 'package:perairan_ngale/widgets/custom_button.dart';
 import 'package:perairan_ngale/widgets/custom_text_field.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:perairan_ngale/models/auth.dart';
 
 @RoutePage()
 class RegisterPage extends StatefulWidget {
@@ -20,19 +22,50 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  String? errorMessage = '';
+  bool isLogin = true;
+
+  TextEditingController _controllerEmail = TextEditingController();
+  TextEditingController _controllerPassword = TextEditingController();
+
+  Future<void> signInWIthEmailAndPassword() async {
+    try {
+      await Auth().signInWIthEmailAndPassword(
+          email: _controllerEmail.text, password: _controllerPassword.text);
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        errorMessage = e.message;
+      });
+    }
+  }
+
+  Future<void> createUserWithEmailAndPassword() async {
+    try {
+      await Auth().createUserWithEmailAndPassword(
+          email: _controllerEmail.text, password: _controllerPassword.text);
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        errorMessage = e.message;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: svg.Svg('assets/bg_loginregis.svg'),
-            fit: BoxFit.fill,
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        child: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: svg.Svg('assets/bg_loginregis.svg'),
+              fit: BoxFit.fill,
+            ),
           ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.only(top: 140.0),
-          child: _buildRegisterForm(),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 140.0),
+            child: _buildRegisterForm(),
+          ),
         ),
       ),
     );
@@ -71,15 +104,15 @@ class _RegisterPageState extends State<RegisterPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Nomor telepon",
+                  "Email",
                   style: AppTextStyles.style(context).titleSmall,
                 ),
                 SizedBox(height: 8.0),
                 CustomTextField(
-                  controller: TextEditingController(),
-                  hintText: "Nomor telepon atau Email",
+                  controller: _controllerEmail,
+                  hintText: "Email",
                   fillColor: ColorValues.white,
-                  prefixIcon: IconsaxPlusLinear.call,
+                  prefixIcon: IconsaxPlusLinear.sms,
                   onChanged: (s) {},
                 ),
               ],
@@ -95,10 +128,11 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   SizedBox(height: 8.0),
                   CustomTextField(
-                    controller: TextEditingController(),
+                    controller: _controllerPassword,
                     hintText: "Kata sandi",
                     fillColor: ColorValues.white,
                     prefixIcon: IconsaxPlusLinear.key,
+                    obscureText: true,
                     onChanged: (s) {},
                   ),
                 ],

@@ -21,6 +21,7 @@ class CustomTextField extends StatelessWidget {
     this.maxLines = 1,
     this.inputFormatters,
     this.keyboardType,
+    this.obscureText = false,
   });
 
   final TextEditingController controller;
@@ -36,6 +37,7 @@ class CustomTextField extends StatelessWidget {
   final int? maxLines;
   final List<TextInputFormatter>? inputFormatters;
   final TextInputType? keyboardType;
+  final bool obscureText;
 
   @override
   Widget build(BuildContext context) {
@@ -71,6 +73,7 @@ class CustomTextField extends StatelessWidget {
           style: context.textTheme.bodyMedium,
           keyboardType: keyboardType,
           inputFormatters: inputFormatters,
+          obscureText: obscureText,
           decoration: InputDecoration(
             isDense: true,
             hintText: hintText,
@@ -86,17 +89,17 @@ class CustomTextField extends StatelessWidget {
             prefixIconConstraints: prefixIcon == null
                 ? null
                 : const BoxConstraints(
-                    minWidth: 58,
-                  ),
+              minWidth: 58,
+            ),
             prefixIcon: prefixIcon == null
                 ? null
                 : Icon(
-                    prefixIcon,
-                    size: 24,
-                    color: ColorValues.grey50,
-                  ),
+              prefixIcon,
+              size: 24,
+              color: ColorValues.grey50,
+            ),
             prefixIconColor: MaterialStateColor.resolveWith(
-              (states) => states.contains(MaterialState.focused)
+                  (states) => states.contains(MaterialState.focused)
                   ? Theme.of(context).primaryColor
                   : ColorValues.grey50,
             ),

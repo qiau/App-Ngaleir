@@ -40,12 +40,12 @@ class AppRouter extends _$AppRouter {
           page: LoginRoute.page,
           path: '/authentication_login-page',
           transitionsBuilder: TransitionsBuilders.fadeIn,
+          initial: true,
         ),
         CustomRoute(
           page: RegisterRoute.page,
           path: '/authentication_register-page',
           transitionsBuilder: TransitionsBuilders.fadeIn,
-          initial: true,
         ),
         CustomRoute(
           page: EmployeeAddCustomerRecordRoute.page,
