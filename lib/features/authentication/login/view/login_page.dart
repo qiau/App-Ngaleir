@@ -20,16 +20,19 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: svg.Svg('assets/bg_loginregis.svg'),
-            fit: BoxFit.fill,
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        child: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: svg.Svg('assets/bg_loginregis.svg'),
+              fit: BoxFit.fill,
+            ),
           ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.only(top: 140.0),
-          child: _buildLoginForm(),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 140.0),
+            child: _buildLoginForm(),
+          ),
         ),
       ),
     );
@@ -96,6 +99,7 @@ class _LoginPageState extends State<LoginPage> {
                     hintText: "Kata sandi",
                     fillColor: ColorValues.white,
                     prefixIcon: IconsaxPlusLinear.key,
+                    obscureText: true,
                     onChanged: (s) {},
                   ),
                 ],
@@ -103,8 +107,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
             Container(
               alignment: AlignmentDirectional.center,
-              padding: const EdgeInsets.symmetric(
-              ),
+              padding: const EdgeInsets.symmetric(),
               child: CustomButton(
                 text: "Masuk",
                 backgroundColor: ColorValues.primary50,
@@ -123,7 +126,7 @@ class _LoginPageState extends State<LoginPage> {
                     style: AppTextStyles.style(context).bodySmall,
                   ),
                   TextButton(
-                    onPressed: (){
+                    onPressed: () {
                       AutoRouter.of(context).replace(RegisterRoute());
                     },
                     child: Text("Daftar!"),

@@ -23,16 +23,19 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: svg.Svg('assets/bg_loginregis.svg'),
-            fit: BoxFit.fill,
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        child: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: svg.Svg('assets/bg_loginregis.svg'),
+              fit: BoxFit.fill,
+            ),
           ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.only(top: 140.0),
-          child: _buildRegisterForm(),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 140.0),
+            child: _buildRegisterForm(),
+          ),
         ),
       ),
     );
@@ -99,6 +102,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     hintText: "Kata sandi",
                     fillColor: ColorValues.white,
                     prefixIcon: IconsaxPlusLinear.key,
+                    obscureText: true,
                     onChanged: (s) {},
                   ),
                 ],
@@ -106,8 +110,7 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
             Container(
               alignment: AlignmentDirectional.center,
-              padding: const EdgeInsets.symmetric(
-              ),
+              padding: const EdgeInsets.symmetric(),
               child: CustomButton(
                 text: "Daftar",
                 backgroundColor: ColorValues.primary50,
@@ -126,7 +129,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     style: AppTextStyles.style(context).bodySmall,
                   ),
                   TextButton(
-                    onPressed: (){
+                    onPressed: () {
                       AutoRouter.of(context).replace(LoginRoute());
                     },
                     child: Text("Masuk!"),
