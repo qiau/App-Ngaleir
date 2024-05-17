@@ -1,8 +1,10 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/foundation.dart';
 import 'package:perairan_ngale/features/customer/customer.dart';
 import 'package:perairan_ngale/features/admin/admin.dart';
 import 'package:perairan_ngale/features/authentication/authentication.dart';
 import 'package:perairan_ngale/features/employee/employee.dart';
+import 'package:perairan_ngale/models/customer.dart';
 
 part 'router.gr.dart';
 

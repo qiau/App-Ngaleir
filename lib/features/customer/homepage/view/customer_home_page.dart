@@ -1,7 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
+import 'package:perairan_ngale/database/db_constants.dart';
+import 'package:flutter_svg_provider/flutter_svg_provider.dart' as svg;
+import 'package:perairan_ngale/models/customer.dart';
 import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
 import 'package:perairan_ngale/shared/styles.dart';
@@ -16,18 +21,47 @@ class CustomerHomePage extends StatefulWidget {
 }
 
 class _CustomerHomePageState extends State<CustomerHomePage> {
+  User? user = FirebaseAuth.instance.currentUser;
+  Customer? _customer;
+  Future<Customer> getCustomer(String userId) async {
+    final doc = await FirebaseFirestore.instance
+        .collection('Customer')
+        .doc(userId)
+        .get();
+
+    final customer = Customer.fromFirestore(doc);
+    return customer;
+  }
+
+  Future<void> _getCustomer() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please log in to view this page')),
+      );
+      return;
+    }
+    final customer = await getCustomer(user.uid);
+    setState(() {
+      _customer = customer;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getCustomer();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorValues.grey10,
+      backgroundColor: ColorValues.white,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildTopBarWidget(),
-            const SizedBox(
-              height: Styles.biggerSpacing,
-            ),
             _buildRecordsWidget(),
           ],
         ),
@@ -39,15 +73,10 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
     return Container(
       width: MediaQuery.of(context).size.width,
       height: 150,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment(0.71, -0.71),
-          end: Alignment(-0.71, 0.71),
-          colors: [Colors.blue, Colors.lightBlue],
-        ),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(Styles.defaultBorder),
-          bottomRight: Radius.circular(Styles.defaultBorder),
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: svg.Svg('assets/Frame 6.svg'),
+          fit: BoxFit.fill,
         ),
       ),
       child: Stack(
@@ -74,22 +103,23 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
             ),
             Expanded(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Nama Pelanggan",
-                    style: context.textTheme.bodyMediumBoldBright,
-                  ),
-                  const SizedBox(
-                    height: Styles.smallSpacing,
-                  ),
-                  Text(
-                    "Nomor Pelangggan",
-                    style: context.textTheme.bodySmallBright,
-                  ),
-                ],
-              ),
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (_customer != null)
+                      Text(
+                        _customer!.nama,
+                        style: context.textTheme.bodyMediumBoldBright,
+                      ),
+                    const SizedBox(
+                      height: Styles.smallSpacing,
+                    ),
+                    if (_customer != null)
+                      Text(
+                        _customer!.customerNo,
+                        style: context.textTheme.bodySmallBright,
+                      ),
+                  ]),
             ),
             IconButton(
               icon: const Icon(
@@ -98,7 +128,8 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
                 color: Colors.white,
               ),
               onPressed: () {
-                AutoRouter.of(context).push(CustomerProfileRoute());
+                AutoRouter.of(context)
+                    .push(CustomerProfileRoute(customer: _customer!));
               },
             ),
           ],
@@ -113,10 +144,6 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
       height: MediaQuery.of(context).size.height,
       decoration: const BoxDecoration(
         color: ColorValues.white,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(Styles.defaultBorder),
-          topRight: Radius.circular(Styles.defaultBorder),
-        ),
       ),
       child: Padding(
         padding: const EdgeInsets.all(Styles.defaultPadding),
@@ -210,9 +237,7 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
                 IconsaxPlusLinear.arrow_right_3,
                 size: Styles.defaultIcon,
               ),
-              onTap: () {
-                AutoRouter.of(context).push(CustomerProfileRoute());
-              },
+              onTap: () {},
             ),
           ],
         ),

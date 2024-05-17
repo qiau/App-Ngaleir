@@ -153,7 +153,8 @@ class _CustomerListState extends State<_CustomerList> {
                       alamat: customer.alamat,
                     ),
                     onTap: () {
-                      AutoRouter.of(context).push(EmployeeCustomerDetailRoute());
+                      AutoRouter.of(context)
+                          .push(EmployeeCustomerDetailRoute());
                     },
                   );
                 },

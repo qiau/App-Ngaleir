@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
+import 'package:perairan_ngale/models/customer.dart';
 import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/app_text_styles.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
@@ -9,7 +10,8 @@ import 'package:perairan_ngale/shared/styles.dart';
 
 @RoutePage()
 class CustomerProfilePage extends StatelessWidget {
-  const CustomerProfilePage({super.key});
+  const CustomerProfilePage({super.key, required this.customer});
+  final Customer customer;
 
   @override
   Widget build(BuildContext context) {
@@ -39,18 +41,20 @@ class CustomerProfilePage extends StatelessWidget {
             children: [
               Container(
                 padding: EdgeInsets.only(bottom: Styles.biggerPadding),
-                child:
-                Icon(IconsaxPlusBold.profile_circle, size: Styles.bigIcon, color: Colors.black),
+                child: Icon(IconsaxPlusBold.profile_circle,
+                    size: Styles.bigIcon, color: Colors.black),
               ),
               Container(
                 child: Column(
                   children: [
-                    customerIdentity(context, "Nama", "Pelanggan A"),
-                    customerIdentity(context, "Nomor Pelanggan", "01238922"),
-                    customerIdentity(context, "Nomor Telepon", "08975672384"),
-                    customerIdentity(context, "Alamat", "Jl. Kenangan"),
-                    customerIdentity(context, "RT", "01"),
-                    customerIdentity(context, "RW", "07"),
+                    customerIdentity(context, "Nama", customer.nama),
+                    customerIdentity(
+                        context, "Nomor Pelanggan", customer.customerNo),
+                    customerIdentity(
+                        context, "Nomor Telepon", customer.noTelpon),
+                    customerIdentity(context, "Alamat", customer.alamat),
+                    customerIdentity(context, "RT", customer.rt),
+                    customerIdentity(context, "RW", customer.rw),
                   ],
                 ),
               ),
@@ -68,7 +72,8 @@ class CustomerProfilePage extends StatelessWidget {
                   ),
                   onPressed: () {
                     FirebaseAuth.instance.signOut();
-                    AutoRouter.of(context).pushAndPopUntil(LoginRoute(), predicate: (route) => false);
+                    AutoRouter.of(context).pushAndPopUntil(LoginRoute(),
+                        predicate: (route) => false);
                   },
                   child: Text('Keluar'),
                 ),
