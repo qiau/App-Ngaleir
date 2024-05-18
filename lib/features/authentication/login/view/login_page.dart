@@ -7,10 +7,12 @@ import 'package:perairan_ngale/models/auth.dart';
 import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/app_text_styles.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
+import 'package:perairan_ngale/shared/styles.dart';
 import 'package:perairan_ngale/utils/auth_utils.dart';
 import 'package:perairan_ngale/widgets/custom_button.dart';
 import 'package:perairan_ngale/widgets/custom_text_field.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 @RoutePage()
 class LoginPage extends StatefulWidget {
@@ -27,8 +29,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _login() async {
     try {
-      UserCredential userCredential =
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
       );
@@ -37,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
         User? user = userCredential.user;
         if (user != null) {
           if (await isAdmin(user.uid)) {
-            // AutoRouter.of(context).replace(());
+            // AutoRouter.of(context).replace(AdminHomeRoute());
             return;
           } else if (await isEmployee(user.uid)) {
             AutoRouter.of(context).replace(EmployeeHomeRoute());
@@ -59,11 +60,58 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  Future<void> _googleSignIn() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) {
+        return;
+      }
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      User? user = userCredential.user;
+
+      if (user != null) {
+        // Check if the user is new
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('Customer')
+            .doc(user.uid)
+            .get();
+
+        if (!userDoc.exists) {
+          AutoRouter.of(context).replace(CustomerFormRoute());
+        } else {
+          if (await isAdmin(user.uid)) {
+            // AutoRouter.of(context).replace(AdminHomeRoute());
+            return;
+          } else if (await isEmployee(user.uid)) {
+            AutoRouter.of(context).replace(EmployeeHomeRoute());
+            return;
+          } else if (await isCustomer(user.uid)) {
+            AutoRouter.of(context).replace(CustomerHomeRoute());
+            return;
+          }
+        }
+      }
+    } catch (error) {
+      print("Error: $error");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Login dengan Google gagal. Silakan coba lagi.")),
+      );
+    }
+  }
+
+
   void _toggleObscureText() {
     setState(() {
       _isObscure = !_isObscure;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -169,6 +217,29 @@ class _LoginPageState extends State<LoginPage> {
                 textColor: ColorValues.white,
                 width: double.infinity,
                 onPressed: _login,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: Styles.defaultPadding),
+              child: Column(
+                children: [
+                  Text(
+                    "Atau masuk dengan",
+                    style: AppTextStyles.style(context).bodySmall,
+                  ),
+                  SizedBox(height: 8.0),
+                  GestureDetector(
+                    onTap: _googleSignIn,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: Styles.defaultPadding),
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        child: Image.asset('assets/google_logo.png'),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             Padding(
