@@ -54,7 +54,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
         body: SingleChildScrollView(
           child: Padding(
             padding:
-                const EdgeInsets.symmetric(horizontal: Styles.defaultPadding),
+            const EdgeInsets.symmetric(horizontal: Styles.defaultPadding),
             child: Column(
               children: [
                 _buildNameField(),
