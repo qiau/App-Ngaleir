@@ -1,8 +1,11 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/foundation.dart';
 import 'package:perairan_ngale/features/customer/customer.dart';
 import 'package:perairan_ngale/features/admin/admin.dart';
 import 'package:perairan_ngale/features/authentication/authentication.dart';
 import 'package:perairan_ngale/features/employee/employee.dart';
+import 'package:perairan_ngale/models/customer.dart';
+import 'package:perairan_ngale/home_wrapper.dart';
 
 part 'router.gr.dart';
 
@@ -45,12 +48,17 @@ class AppRouter extends _$AppRouter {
           page: RegisterRoute.page,
           path: '/authentication_register-page',
           transitionsBuilder: TransitionsBuilders.fadeIn,
-          initial: true,
         ),
         CustomRoute(
           page: EmployeeAddCustomerRecordRoute.page,
           path: '/employee_add_record',
           transitionsBuilder: TransitionsBuilders.fadeIn,
+        ),
+        CustomRoute(
+          page: HomeWrapperRoute.page,
+          path: '/',
+          transitionsBuilder: TransitionsBuilders.fadeIn,
+          initial: true,
         )
       ];
 }

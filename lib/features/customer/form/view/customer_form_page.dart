@@ -1,6 +1,10 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
+import 'package:perairan_ngale/models/customer.dart';
 import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
 import 'package:perairan_ngale/shared/styles.dart';
@@ -21,14 +25,15 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _rtController = TextEditingController();
   final TextEditingController _rwController = TextEditingController();
+  final TextEditingController _noTelponController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: ColorValues.grey10,
+        backgroundColor: Colors.grey.shade200,
         appBar: AppBar(
-          backgroundColor: ColorValues.grey10,
+          backgroundColor: Colors.grey.shade200,
           title: Padding(
             padding: EdgeInsets.only(left: Styles.smallerPadding),
             child: Text(
@@ -48,10 +53,12 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
         ),
         body: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: Styles.defaultPadding),
+            padding:
+                const EdgeInsets.symmetric(horizontal: Styles.defaultPadding),
             child: Column(
               children: [
                 _buildNameField(),
+                _buildNomorTelpon(),
                 _buildAlamatField(),
                 _buildRTField(),
                 _buildRWField(),
@@ -65,7 +72,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
     );
   }
 
-  Widget _buildNameField(){
+  Widget _buildNameField() {
     return CustomTextField(
       maxCharacter: 50,
       controller: _nameController,
@@ -75,7 +82,19 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
     );
   }
 
-  Widget _buildAlamatField(){
+  Widget _buildNomorTelpon() {
+    return CustomTextField(
+      maxCharacter: 13,
+      controller: _noTelponController,
+      hintText: "Masukkan Nomor Telpon Anda",
+      fillColor: ColorValues.white,
+      label: "Nomor Telpon",
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      keyboardType: TextInputType.number,
+    );
+  }
+
+  Widget _buildAlamatField() {
     return CustomTextField(
       maxCharacter: 50,
       controller: _addressController,
@@ -85,23 +104,27 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
     );
   }
 
-  Widget _buildRTField(){
+  Widget _buildRTField() {
     return CustomTextField(
       maxCharacter: 2,
       controller: _rtController,
       hintText: "Masukkan RT Anda",
       fillColor: ColorValues.white,
       label: "RT",
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      keyboardType: TextInputType.number,
     );
   }
 
-  Widget _buildRWField(){
+  Widget _buildRWField() {
     return CustomTextField(
       maxCharacter: 2,
       controller: _rwController,
       hintText: "Masukkan RW Anda",
       fillColor: ColorValues.white,
       label: "RW",
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      keyboardType: TextInputType.number,
     );
   }
 
@@ -111,8 +134,38 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
       text: "Lanjutkan",
       width: double.infinity,
       onPressed: () {
-        AutoRouter.of(context).push(CustomerHomeRoute());
+        _saveUserDataToFirestore();
+        AutoRouter.of(context).replace(HomeWrapperRoute());
       },
     );
+  }
+
+  Future<void> _saveUserDataToFirestore() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      final collectionRef = FirebaseFirestore.instance.collection('Customer');
+      final count = await collectionRef.count().get();
+      final countValue = count.count;
+      String counts = '$countValue';
+      if (user != null) {
+        String userId = user.uid;
+        await FirebaseFirestore.instance
+            .collection('Customer')
+            .doc(userId)
+            .set({
+          'nama': _nameController.text,
+          'alamat': _addressController.text,
+          'rt': _rtController.text,
+          'rw': _rwController.text,
+          'noTelpon': _noTelponController.text,
+          'customer_no': _rtController.text + _rwController.text + counts
+        });
+        print('Data pelanggan berhasil disimpan di Firestore.');
+      } else {
+        print('Tidak ada pengguna yang sedang login.');
+      }
+    } catch (error) {
+      print("Error: $error");
+    }
   }
 }

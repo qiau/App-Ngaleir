@@ -1,7 +1,11 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
+import 'package:perairan_ngale/routes/router.dart';
+import 'package:perairan_ngale/shared/color_values.dart';
+import 'package:perairan_ngale/shared/styles.dart';
 import 'package:perairan_ngale/utils/extensions.dart';
 
 class CustomerCard extends StatelessWidget {
@@ -16,64 +20,58 @@ class CustomerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        GestureDetector(
-          child: Container(
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, Styles.smallPadding, 0, 0),
+      child: Column(
+        children: [
+          Container(
             decoration: BoxDecoration(
-              color: Colors.transparent,
+              color: ColorValues.white,
+              borderRadius: BorderRadius.circular(Styles.defaultBorder),
               border: Border.all(
-                color: Colors.black,
+                color: ColorValues.grey30,
                 width: 1,
               ),
-              borderRadius: BorderRadius.circular(12),
             ),
-            child: SizedBox(
-              width: double.infinity,
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Row(
-                  children: [
-                    Flexible(
-                      child: Row(
-                        children: [
-                          Icon(
+            child: Padding(
+              padding: const EdgeInsets.all(Styles.defaultPadding),
+              child: Row(
+                children: [
+                  Flexible(
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(right: Styles.defaultPadding),
+                          child: Icon(
                             IconsaxPlusBold.profile_circle,
-                            size: 35,
+                            size: Styles.bigIcon,
                           ),
-                          SizedBox(
-                            width: 16,
+                        ),
+                        Flexible(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                nama,
+                                style: context.textTheme.bodyMediumBold,
+                              ),
+                              Text(noPelanggan, style: context.textTheme.bodySmallGrey),
+                              Text(
+                                alamat, style: context.textTheme.bodySmallGrey,
+                              )
+                            ],
                           ),
-                          Flexible(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  nama,
-                                  style: context.textTheme.bodyMediumBold,
-                                ),
-                                Text(noPelanggan),
-                                Text(
-                                  alamat,
-                                )
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    Icon(Icons.chevron_right)
-                  ],
-                ),
+                  ),
+                  Icon(IconsaxPlusLinear.arrow_right_3)
+                ],
               ),
             ),
           ),
-        ),
-        SizedBox(
-          height: 12,
-        )
-      ],
+        ],
+      ),
     );
   }
 }

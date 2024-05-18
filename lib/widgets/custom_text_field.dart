@@ -21,13 +21,16 @@ class CustomTextField extends StatelessWidget {
     this.maxLines = 1,
     this.inputFormatters,
     this.keyboardType,
-    this.obscureText,
+    this.obscureText = false,
+    this.suffixIcon,
+    this.suffixIconOnPressed,
   });
 
   final TextEditingController controller;
   final String? hintText;
   final String? label;
   final IconData? prefixIcon;
+  final IconData? suffixIcon;
   final Color? fillColor;
   final double borderWidth;
   final bool isRequired;
@@ -37,7 +40,8 @@ class CustomTextField extends StatelessWidget {
   final int? maxLines;
   final List<TextInputFormatter>? inputFormatters;
   final TextInputType? keyboardType;
-  final bool? obscureText;
+  final bool obscureText;
+  final VoidCallback? suffixIconOnPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +77,7 @@ class CustomTextField extends StatelessWidget {
           style: context.textTheme.bodyMedium,
           keyboardType: keyboardType,
           inputFormatters: inputFormatters,
-          obscureText: obscureText != null,
+          obscureText: obscureText,
           decoration: InputDecoration(
             isDense: true,
             hintText: hintText,
@@ -89,17 +93,32 @@ class CustomTextField extends StatelessWidget {
             prefixIconConstraints: prefixIcon == null
                 ? null
                 : const BoxConstraints(
-                    minWidth: 58,
-                  ),
+              minWidth: 58,
+            ),
             prefixIcon: prefixIcon == null
                 ? null
                 : Icon(
-                    prefixIcon,
-                    size: 24,
-                    color: ColorValues.grey50,
-                  ),
+              prefixIcon,
+              size: 24,
+              color: ColorValues.grey50,
+            ),
             prefixIconColor: MaterialStateColor.resolveWith(
-              (states) => states.contains(MaterialState.focused)
+                  (states) => states.contains(MaterialState.focused)
+                  ? Theme.of(context).primaryColor
+                  : ColorValues.grey50,
+            ),
+            suffixIcon: suffixIcon == null
+                ? null
+                : IconButton(
+              icon: Icon(
+                suffixIcon,
+                size: 24,
+                color: ColorValues.grey50,
+              ),
+              onPressed: suffixIconOnPressed,
+            ),
+            suffixIconColor: MaterialStateColor.resolveWith(
+                  (states) => states.contains(MaterialState.focused)
                   ? Theme.of(context).primaryColor
                   : ColorValues.grey50,
             ),

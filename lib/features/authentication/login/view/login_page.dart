@@ -1,12 +1,16 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart' as svg;
 import 'package:iconsax_plus/iconsax_plus.dart';
+import 'package:perairan_ngale/models/auth.dart';
 import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/app_text_styles.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
+import 'package:perairan_ngale/utils/auth_utils.dart';
 import 'package:perairan_ngale/widgets/custom_button.dart';
 import 'package:perairan_ngale/widgets/custom_text_field.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 @RoutePage()
 class LoginPage extends StatefulWidget {
@@ -17,6 +21,49 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  late bool _isObscure = true;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  Future<void> _login() async {
+    try {
+      UserCredential userCredential =
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+
+      if (userCredential != null) {
+        User? user = userCredential.user;
+        if (user != null) {
+          if (await isAdmin(user.uid)) {
+            // AutoRouter.of(context).replace(());
+            return;
+          } else if (await isEmployee(user.uid)) {
+            AutoRouter.of(context).replace(EmployeeHomeRoute());
+            return;
+          } else if (await isCustomer(user.uid)) {
+            AutoRouter.of(context).replace(CustomerHomeRoute());
+            return;
+          }
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Login gagal. Silakan coba lagi.")),
+        );
+      }
+    } catch (error) {
+      print("Error: $error");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Email atau kata sandi salah. Silakan coba lagi.")),
+      );
+    }
+  }
+
+  void _toggleObscureText() {
+    setState(() {
+      _isObscure = !_isObscure;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,7 +108,7 @@ class _LoginPageState extends State<LoginPage> {
                     style: AppTextStyles.style(context).titleLarger,
                   ),
                   Text(
-                    "Masukkan nomor telepon atau email untuk masuk ke akunmu!",
+                    "Masukkan email untuk masuk ke akunmu!",
                     style: AppTextStyles.style(context).bodyMedium,
                   ),
                 ],
@@ -71,16 +118,15 @@ class _LoginPageState extends State<LoginPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Nomor telepon",
+                  "Email",
                   style: AppTextStyles.style(context).titleSmall,
                 ),
                 SizedBox(height: 8.0),
                 CustomTextField(
-                  controller: TextEditingController(),
-                  hintText: "Nomor telepon atau Email",
+                  controller: _emailController,
+                  hintText: "Email",
                   fillColor: ColorValues.white,
-                  prefixIcon: IconsaxPlusLinear.call,
-                  onChanged: (s) {},
+                  prefixIcon: IconsaxPlusLinear.sms,
                 ),
               ],
             ),
@@ -95,12 +141,21 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   SizedBox(height: 8.0),
                   CustomTextField(
-                    controller: TextEditingController(),
+                    controller: _passwordController,
                     hintText: "Kata sandi",
                     fillColor: ColorValues.white,
                     prefixIcon: IconsaxPlusLinear.key,
-                    obscureText: true,
-                    onChanged: (s) {},
+                    suffixIcon: _isObscure ? IconsaxPlusLinear.eye : IconsaxPlusLinear.eye_slash,
+                    obscureText: _isObscure,
+                    suffixIconOnPressed: _toggleObscureText,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Kata sandi tidak boleh kosong';
+                      } else if (value.length < 6) {
+                        return 'Kata sandi harus minimal 6 karakter';
+                      }
+                      return null;
+                    },
                   ),
                 ],
               ),
@@ -113,7 +168,7 @@ class _LoginPageState extends State<LoginPage> {
                 backgroundColor: ColorValues.primary50,
                 textColor: ColorValues.white,
                 width: double.infinity,
-                onPressed: () {},
+                onPressed: _login,
               ),
             ),
             Padding(

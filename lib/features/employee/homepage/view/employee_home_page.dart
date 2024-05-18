@@ -1,11 +1,16 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
+import 'package:perairan_ngale/features/employee/customer_list/customer_new_record/view/employee_add_record_page.dart';
 import 'package:perairan_ngale/features/employee/homepage/customer_dummy.dart';
 import 'package:perairan_ngale/features/employee/homepage/view/customer_list_card.dart';
+import 'package:perairan_ngale/models/auth.dart';
+import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/app_text_styles.dart';
 import 'package:perairan_ngale/utils/extensions.dart';
+import 'package:perairan_ngale/widgets/custom_text_field.dart';
 
 @RoutePage()
 class EmployeeHomePage extends StatefulWidget {
@@ -16,6 +21,12 @@ class EmployeeHomePage extends StatefulWidget {
 }
 
 class _EmployeeHomePageState extends State<EmployeeHomePage> {
+  final User? user = Auth().currentUser;
+
+  Future<void> signOut() async {
+    await Auth().signOut();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -69,6 +80,7 @@ class _Header extends StatelessWidget {
                     IconsaxPlusBold.profile_circle,
                     size: 40,
                   ),
+                  onTap: () {},
                 ),
               ],
             ),
@@ -114,25 +126,19 @@ class _CustomerListState extends State<_CustomerList> {
                 ),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: TextField(
+              child: CustomTextField(
+                hintText: 'Cari pelanggan',
+                prefixIcon: IconsaxPlusLinear.search_normal,
                 controller: _searchController,
                 onChanged: (value) {
                   setState(() {
                     filteredCustomer = listCustomer.where((customer) {
                       return customer.nama
                           .toLowerCase()
-                          .contains(value.toLowerCase());
+                          .contains(value!.toLowerCase());
                     }).toList();
                   });
                 },
-                decoration: InputDecoration(
-                  labelText: 'Cari pelanggan',
-                  prefixIcon: Icon(
-                    IconsaxPlusLinear.search_normal,
-                    color: Colors.grey,
-                  ),
-                  border: InputBorder.none,
-                ),
               ),
             ),
             SizedBox(height: 16),
@@ -147,6 +153,10 @@ class _CustomerListState extends State<_CustomerList> {
                       noPelanggan: customer.noPelanggan,
                       alamat: customer.alamat,
                     ),
+                    onTap: () {
+                      AutoRouter.of(context)
+                          .push(EmployeeCustomerDetailRoute());
+                    },
                   );
                 },
               ),
