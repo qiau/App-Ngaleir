@@ -29,7 +29,8 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _login() async {
     try {
-      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
       );
@@ -55,7 +56,8 @@ class _LoginPageState extends State<LoginPage> {
     } catch (error) {
       print("Error: $error");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Email atau kata sandi salah. Silakan coba lagi.")),
+        SnackBar(
+            content: Text("Email atau kata sandi salah. Silakan coba lagi.")),
       );
     }
   }
@@ -66,13 +68,15 @@ class _LoginPageState extends State<LoginPage> {
       if (googleUser == null) {
         return;
       }
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
       final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithCredential(credential);
       User? user = userCredential.user;
 
       if (user != null) {
@@ -100,11 +104,11 @@ class _LoginPageState extends State<LoginPage> {
     } catch (error) {
       print("Error: $error");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Login dengan Google gagal. Silakan coba lagi.")),
+        SnackBar(
+            content: Text("Login dengan Google gagal. Silakan coba lagi.")),
       );
     }
   }
-
 
   void _toggleObscureText() {
     setState(() {
@@ -193,7 +197,9 @@ class _LoginPageState extends State<LoginPage> {
                     hintText: "Kata sandi",
                     fillColor: ColorValues.white,
                     prefixIcon: IconsaxPlusLinear.key,
-                    suffixIcon: _isObscure ? IconsaxPlusLinear.eye : IconsaxPlusLinear.eye_slash,
+                    suffixIcon: _isObscure
+                        ? IconsaxPlusLinear.eye
+                        : IconsaxPlusLinear.eye_slash,
                     obscureText: _isObscure,
                     suffixIconOnPressed: _toggleObscureText,
                     validator: (value) {
@@ -231,7 +237,8 @@ class _LoginPageState extends State<LoginPage> {
                   GestureDetector(
                     onTap: _googleSignIn,
                     child: Padding(
-                      padding: const EdgeInsets.only(top: Styles.defaultPadding),
+                      padding:
+                          const EdgeInsets.only(top: Styles.defaultPadding),
                       child: Container(
                         width: 50,
                         height: 50,
