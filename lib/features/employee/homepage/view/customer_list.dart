@@ -5,6 +5,7 @@ import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:paginate_firestore/bloc/pagination_listeners.dart';
 import 'package:paginate_firestore/paginate_firestore.dart';
 import 'package:perairan_ngale/features/employee/homepage/view/customer_list_card.dart';
+import 'package:perairan_ngale/models/customer.dart';
 import 'package:perairan_ngale/models/employee.dart';
 import 'package:firebase_ui_firestore/firebase_ui_firestore.dart';
 import 'package:perairan_ngale/widgets/custom_text_field.dart';
@@ -109,12 +110,11 @@ class _CustomerListState extends State<CustomerList> {
               .where('alamatTower', isEqualTo: widget.employee.alamatTower)
               .orderBy('nama'),
           itemBuilder: (context, snapshot) {
-            Map<String, dynamic> user = snapshot.data();
+            var doc = snapshot.data();
+            final customer = Customer.fromFirestore(snapshot);
 
             return CustomerCard(
-              nama: user['nama'],
-              alamat: user['alamat'],
-              noPelanggan: user['customer_no'],
+              customer: customer,
             );
           },
         ));
@@ -143,10 +143,8 @@ class _CustomerListState extends State<CustomerList> {
               itemCount: snapshot.data!.docs.length,
               itemBuilder: (context, index) {
                 var data = snapshot.data!.docs[index];
-                return CustomerCard(
-                    nama: data['nama'],
-                    alamat: data['alamat'],
-                    noPelanggan: data['customer_no']);
+                final customer = Customer.fromFirestore(data);
+                return CustomerCard(customer: customer);
               },
             );
           }),

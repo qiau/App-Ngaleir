@@ -59,6 +59,11 @@ class AppRouter extends _$AppRouter {
           path: '/',
           transitionsBuilder: TransitionsBuilders.fadeIn,
           initial: true,
+        ),
+        CustomRoute(
+          page: EmployeeCustomerDetailRoute.page,
+          path: '/employee_detail_customer',
+          transitionsBuilder: TransitionsBuilders.fadeIn,
         )
       ];
 }

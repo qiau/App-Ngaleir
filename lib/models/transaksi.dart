@@ -9,6 +9,7 @@ class Transaksi with _$Transaksi {
     required String tanggal,
     required String status,
     required int saldo,
+    required int meteran,
     required String userId,
   }) = _Transaksi;
 

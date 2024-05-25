@@ -8,7 +8,9 @@ import 'package:perairan_ngale/widgets/custom_text_field.dart';
 
 @RoutePage()
 class EmployeeAddCustomerRecordPage extends StatefulWidget {
-  const EmployeeAddCustomerRecordPage({super.key});
+  const EmployeeAddCustomerRecordPage(
+      {super.key, required this.meteranTerakhir});
+  final int meteranTerakhir;
 
   @override
   State<EmployeeAddCustomerRecordPage> createState() =>
