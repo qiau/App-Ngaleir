@@ -1,11 +1,13 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:paginate_firestore/paginate_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:perairan_ngale/features/employee/customer_list/customer_new_record/view/employee_add_record_page.dart';
 import 'package:perairan_ngale/features/employee/homepage/customer_dummy.dart';
+import 'package:perairan_ngale/features/employee/homepage/view/customer_list.dart';
 import 'package:perairan_ngale/features/employee/homepage/view/customer_list_card.dart';
 import 'package:perairan_ngale/models/auth.dart';
 import 'package:perairan_ngale/models/employee.dart';
@@ -69,7 +71,12 @@ class _EmployeeHomePageState extends State<EmployeeHomePage> {
         children: [
           _buildTopBarWidget(),
           SizedBox(height: 16),
-          Expanded(child: _CustomerList()),
+          Expanded(
+              child: _employee != null
+                  ? CustomerList(
+                      employee: _employee!,
+                    )
+                  : Text('Apalah')),
         ],
       ),
     );
@@ -136,82 +143,6 @@ class _EmployeeHomePageState extends State<EmployeeHomePage> {
                 FirebaseAuth.instance.signOut();
                 AutoRouter.of(context).push(LoginRoute());
               },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _CustomerList extends StatefulWidget {
-  @override
-  _CustomerListState createState() => _CustomerListState();
-}
-
-class _CustomerListState extends State<_CustomerList> {
-  late List<Customer> listCustomer = generateDummyCustomers();
-  late List<Customer> filteredCustomer = [];
-  late TextEditingController _searchController;
-
-  @override
-  void initState() {
-    super.initState();
-    _searchController = TextEditingController();
-    filteredCustomer = listCustomer;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        child: Column(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                border: Border.all(
-                  color: Colors.grey,
-                  width: 1,
-                ),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: CustomTextField(
-                hintText: 'Cari pelanggan',
-                prefixIcon: IconsaxPlusLinear.search_normal,
-                controller: _searchController,
-                onChanged: (value) {
-                  setState(() {
-                    filteredCustomer = listCustomer.where((customer) {
-                      return customer.nama
-                          .toLowerCase()
-                          .contains(value!.toLowerCase());
-                    }).toList();
-                  });
-                },
-              ),
-            ),
-            SizedBox(height: 16),
-            Expanded(
-              child: ListView.builder(
-                itemCount: filteredCustomer.length,
-                itemBuilder: (BuildContext context, int index) {
-                  Customer customer = filteredCustomer[index];
-                  return GestureDetector(
-                    child: CustomerCard(
-                      nama: customer.nama,
-                      noPelanggan: customer.noPelanggan,
-                      alamat: customer.alamat,
-                    ),
-                    onTap: () {
-                      AutoRouter.of(context)
-                          .push(EmployeeCustomerDetailRoute());
-                    },
-                  );
-                },
-              ),
             ),
           ],
         ),

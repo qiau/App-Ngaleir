@@ -81,7 +81,8 @@ class TransactionCard extends StatelessWidget {
                         height: Styles.smallSpacing,
                       ),
                       Text(
-                        "24/04/2024 13:00",
+                        DateHelper.formatDateToDayMonthYearTime(
+                            transaksi.tanggal),
                         style: context.textTheme.bodySmallGrey,
                       ),
                     ],
