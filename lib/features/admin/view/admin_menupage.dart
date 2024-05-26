@@ -1,7 +1,10 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
+import 'package:perairan_ngale/models/admin.dart';
+import 'package:perairan_ngale/models/auth.dart';
 import 'package:perairan_ngale/routes/router.dart';
 
 @RoutePage()
@@ -13,6 +16,38 @@ class AdminMenuPage extends StatefulWidget {
 }
 
 class _AdminMenuPageState extends State<AdminMenuPage> {
+  final User? user = Auth().currentUser;
+  Admin? _admin;
+  Future<Admin> getAdmin(String userId) async {
+    final doc = await FirebaseFirestore.instance
+        .collection('Admin')
+        .doc(userId)
+        .get();
+
+    final admin = Admin.fromFirestore(doc);
+    return admin;
+  }
+
+  Future<void> _getAdmin() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please log in to view this page')),
+      );
+      return;
+    }
+    final admin = await getAdmin(user.uid);
+    setState(() {
+      _admin = admin;
+    });
+    print(admin.nama);
+  }
+
+  @override
+  void initState() {
+    _getAdmin();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return AutoTabsScaffold(

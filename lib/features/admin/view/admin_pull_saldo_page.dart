@@ -1,8 +1,13 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:perairan_ngale/models/transaksi.dart';
+import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
 import 'package:perairan_ngale/shared/styles.dart';
 import 'package:perairan_ngale/utils/extensions.dart';
+import 'package:perairan_ngale/widgets/custom_button.dart';
 import 'package:perairan_ngale/widgets/custom_text_field.dart';
 import 'package:sizer/sizer.dart';
 
@@ -17,6 +22,31 @@ class AdminWithdrawalPage extends StatefulWidget {
 class _AdminWithdrawalPageState extends State<AdminWithdrawalPage> {
   final _saldoController = TextEditingController();
   final _deskripsiController = TextEditingController();
+
+  Future<void> _tarikSaldo(BuildContext context) async {
+    try {
+      final transaksi = Transaksi(
+        deskripsi: _deskripsiController.text,
+        saldo: int.parse(_saldoController.text),
+        status: 'pengeluaran',
+        tanggal: Timestamp.now().toDate().toString(),
+        userId: FirebaseAuth.instance.currentUser!.uid,
+      );
+
+      await FirebaseFirestore.instance
+          .collection('Transaksi')
+          .add(transaksi.toJson());
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Tarik saldo berhasil')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Terjadi kesalahan: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,8 +77,24 @@ class _AdminWithdrawalPageState extends State<AdminWithdrawalPage> {
               _buildTitleSection(context),
               SizedBox(height: Styles.defaultPadding),
               _buildSaldoTextField(context),
-              SizedBox(height: Styles.bigPadding),
+              SizedBox(height: Styles.defaultPadding),
               _buildDeskripsiTextField(context),
+              SizedBox(height: Styles.bigPadding),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: Styles.defaultPadding),
+                child: CustomButton(
+                  onPressed: () {
+                    _tarikSaldo(context);
+                    AutoRouter.of(context).pushAndPopUntil(HomeWrapperRoute(),
+                        predicate: (route) => false);
+                  },
+                  text: 'Tarik Saldo',
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  width: double.infinity,
+                ),
+              ),
             ],
           ),
         ),
