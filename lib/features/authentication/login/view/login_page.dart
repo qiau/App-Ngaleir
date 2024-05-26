@@ -39,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
         User? user = userCredential.user;
         if (user != null) {
           if (await isAdmin(user.uid)) {
-            // AutoRouter.of(context).replace(AdminHomeRoute());
+            AutoRouter.of(context).replace(AdminMenuRoute());
             return;
           } else if (await isEmployee(user.uid)) {
             AutoRouter.of(context).replace(EmployeeHomeRoute());

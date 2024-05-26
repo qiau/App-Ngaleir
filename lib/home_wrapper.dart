@@ -24,7 +24,7 @@ class _HomeWrapperPageState extends State<HomeWrapperPage> {
 
     if (user != null) {
       if (await isAdmin(user.uid)) {
-        // AutoRouter.of(context).replace(AdminHomeRoute());
+        AutoRouter.of(context).replace(AdminMenuRoute());
       } else if (await isEmployee(user.uid)) {
         AutoRouter.of(context).replace(EmployeeHomeRoute());
       } else if (await isCustomer(user.uid)) {

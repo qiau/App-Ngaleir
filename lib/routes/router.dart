@@ -59,6 +59,40 @@ class AppRouter extends _$AppRouter {
           path: '/',
           transitionsBuilder: TransitionsBuilders.fadeIn,
           initial: true,
-        )
+        ),
+        CustomRoute(
+          page: AdminMenuRoute.page,
+          path: '/admin',
+          transitionsBuilder: TransitionsBuilders.fadeIn,
+          children: [
+            CustomRoute(
+              page: AdminHomeRoute.page,
+              path: 'admin-homepage',
+              transitionsBuilder: TransitionsBuilders.fadeIn,
+            ),
+            CustomRoute(
+              page: AdminCustomerRoute.page,
+              path: 'admin-customer',
+              transitionsBuilder: TransitionsBuilders.fadeIn,
+            ),
+            CustomRoute(
+              page: AdminTabsRoute.page,
+              path: 'admin-tabs',
+              transitionsBuilder: TransitionsBuilders.fadeIn,
+              children: [
+                CustomRoute(
+                  page: AdminTransactionRoute.page,
+                  path: 'admin-transaction',
+                  transitionsBuilder: TransitionsBuilders.fadeIn,
+                ),
+                CustomRoute(
+                  page: AdminIncomeRoute.page,
+                  path: 'admin-income',
+                  transitionsBuilder: TransitionsBuilders.fadeIn,
+                ),
+              ],
+            ),
+          ],
+        ),
       ];
 }
