@@ -14,4 +14,9 @@ class Transaksi with _$Transaksi {
 
   factory Transaksi.fromJson(Map<String, dynamic> json) =>
       _$TransaksiFromJson(json);
+
+  factory Transaksi.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return Transaksi.fromJson(data);
+  }
 }

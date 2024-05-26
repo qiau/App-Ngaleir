@@ -60,7 +60,7 @@ class _AdminTabsPageState extends State<AdminTabsPage> {
       tabs: [
         Tab(
           child: Text(
-            "Tagihan",
+            "Pemasukan",
             style: tabsRouter.activeIndex == 0
                 ? context.textTheme.bodyMediumBold
                 : context.textTheme.bodyMediumBold.copyWith(
@@ -70,7 +70,7 @@ class _AdminTabsPageState extends State<AdminTabsPage> {
         ),
         Tab(
           child: Text(
-            "Non-Tagihan",
+            "Pengeluaran",
             style: tabsRouter.activeIndex == 1
                 ? context.textTheme.bodyMediumBold
                 : context.textTheme.bodyMediumBold.copyWith(

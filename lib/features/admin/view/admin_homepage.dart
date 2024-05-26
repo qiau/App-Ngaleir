@@ -1,11 +1,13 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:perairan_ngale/models/admin.dart';
 import 'package:perairan_ngale/models/auth.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart' as svg;
+import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
 import 'package:perairan_ngale/shared/styles.dart';
 import 'package:perairan_ngale/utils/extensions.dart';
@@ -70,32 +72,44 @@ class _AdminHomePageState extends State<AdminHomePage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        Container(
-          child: Icon(IconsaxPlusLinear.card_receive, size: 44, color: ColorValues.white,),
-          width: 64,
-          height: 64,
-          decoration: BoxDecoration(
-            color: ColorValues.success50,
-            borderRadius: BorderRadius.circular(100)
-          ),
+        Column(
+          children: [
+            GestureDetector(
+              onTap: () {
+                AutoRouter.of(context).push(AdminWithdrawalRoute());
+              },
+              child: Container(
+                child: Icon(
+                  IconsaxPlusLinear.card_send,
+                  size: 44,
+                  color: ColorValues.white,
+                ),
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                    color: ColorValues.danger50,
+                    borderRadius: BorderRadius.circular(100)),
+              ),
+            ),
+            Text('Ambil', style: context.textTheme.bodySmallBold),
+          ],
         ),
-        Container(
-          child: Icon(IconsaxPlusLinear.card_send, size: 44, color: ColorValues.white,),
-          width: 64,
-          height: 64,
-          decoration: BoxDecoration(
-              color: ColorValues.danger50,
-              borderRadius: BorderRadius.circular(100)
-          ),
-        ),
-        Container(
-          child: Icon(IconsaxPlusLinear.printer, size: 44, color: ColorValues.white,),
-          width: 64,
-          height: 64,
-          decoration: BoxDecoration(
-              color: ColorValues.primary50,
-              borderRadius: BorderRadius.circular(100)
-          ),
+        Column(
+          children: [
+            Container(
+              child: Icon(
+                IconsaxPlusLinear.printer,
+                size: 44,
+                color: ColorValues.white,
+              ),
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                  color: ColorValues.primary50,
+                  borderRadius: BorderRadius.circular(100)),
+            ),
+            Text('Cetak', style: context.textTheme.bodySmallBold),
+          ],
         ),
       ],
     );
@@ -116,24 +130,26 @@ class _AdminHomePageState extends State<AdminHomePage> {
             child: Container(
               decoration: BoxDecoration(
                   color: ColorValues.primary60,
-                  borderRadius: BorderRadius.circular(Styles.defaultBorder)
-              ),
+                  borderRadius: BorderRadius.circular(Styles.defaultBorder)),
               child: Padding(
                 padding: const EdgeInsets.all(Styles.defaultPadding),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Total Saldo', style: context.textTheme.bodySmallSemiBoldBright),
-                    Text('Rp $totalSaldo', style: context.textTheme.titleLargeBright),
+                    Text('Total Saldo',
+                        style: context.textTheme.bodySmallSemiBoldBright),
+                    Text('Rp $totalSaldo',
+                        style: context.textTheme.titleLargeBright),
                     Padding(
-                      padding: const EdgeInsets.only(top: Styles.bigPadding),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _saldoMasuk(),
-                          _saldoKeluar(),
-                        ],
-                      ),
+                      padding: const EdgeInsets.only(top: Styles.defaultPadding),
+                      child: Text("Transaksi Terakhir:", style: context.textTheme.bodySmallSemiBoldBright),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _saldoMasuk(),
+                        _saldoKeluar(),
+                      ],
                     )
                   ],
                 ),
@@ -148,7 +164,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
   Future<double> _getTotalSaldo() async {
     double totalSaldo = 0;
     final QuerySnapshot<Map<String, dynamic>> snapshot =
-    await FirebaseFirestore.instance.collection('Transaksi').get();
+        await FirebaseFirestore.instance.collection('Transaksi').get();
 
     snapshot.docs.forEach((doc) {
       if (doc['status'] == 'pembayaran') {
@@ -161,11 +177,49 @@ class _AdminHomePageState extends State<AdminHomePage> {
     return totalSaldo;
   }
 
+  Future<Map<String, dynamic>> _getLastTransactions() async {
+    Map<String, dynamic> lastTransactions = {
+      'saldoMasuk': 0,
+      'saldoKeluar': 0,
+    };
+
+    final QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
+        .instance
+        .collection('Transaksi')
+        .orderBy('tanggal', descending: true)
+        .limit(1)
+        .get();
+
+    if (snapshot.docs.isNotEmpty) {
+      final doc = snapshot.docs.first;
+      if (doc['status'] == 'pembayaran') {
+        lastTransactions['saldoMasuk'] = doc['saldo'];
+      } else if (doc['status'] == 'pengeluaran') {
+        lastTransactions['saldoKeluar'] = doc['saldo'];
+      }
+    }
+
+    return lastTransactions;
+  }
+
   Widget _saldoMasuk() {
     return Column(
       children: [
         Text('Saldo Masuk', style: context.textTheme.bodySmallSemiBoldBright),
-        Text('Rp 1.000.000', style: context.textTheme.bodyMediumBoldBright),
+        FutureBuilder<Map<String, dynamic>>(
+          future: _getLastTransactions(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            } else if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else {
+              final lastSaldoMasuk = snapshot.data!['saldoMasuk'];
+              return Text('Rp $lastSaldoMasuk',
+                  style: context.textTheme.bodyMediumBoldBright);
+            }
+          },
+        ),
       ],
     );
   }
@@ -174,7 +228,20 @@ class _AdminHomePageState extends State<AdminHomePage> {
     return Column(
       children: [
         Text('Saldo Keluar', style: context.textTheme.bodySmallSemiBoldBright),
-        Text('Rp 1.000.000', style: context.textTheme.bodyMediumBoldBright),
+        FutureBuilder<Map<String, dynamic>>(
+          future: _getLastTransactions(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            } else if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else {
+              final lastSaldoKeluar = snapshot.data!['saldoKeluar'];
+              return Text('Rp $lastSaldoKeluar',
+                  style: context.textTheme.bodyMediumBoldBright);
+            }
+          },
+        ),
       ],
     );
   }
@@ -237,3 +304,5 @@ class _AdminHomePageState extends State<AdminHomePage> {
     );
   }
 }
+
+// TODO: saldo masuk dan saldo keluar logic

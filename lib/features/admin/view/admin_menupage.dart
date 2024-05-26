@@ -39,7 +39,7 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
             ),
             NavigationDestination(
               icon: Icon(IconsaxPlusBold.profile_2user),
-              label: 'Pengguna',
+              label: 'Pelanggan',
             ),
             NavigationDestination(
               icon: Icon(IconsaxPlusBold.receipt_text),
