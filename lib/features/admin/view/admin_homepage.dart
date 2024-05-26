@@ -1,7 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:perairan_ngale/models/admin.dart';
@@ -125,6 +124,9 @@ class _AdminHomePageState extends State<AdminHomePage> {
           return Text('Error: ${snapshot.error}');
         } else {
           final totalSaldo = snapshot.data!;
+          FirebaseFirestore.instance.collection('Admin').doc(user?.uid).update({
+            'saldo': totalSaldo,
+          });
           return Padding(
             padding: const EdgeInsets.all(Styles.defaultPadding),
             child: Container(
@@ -304,5 +306,3 @@ class _AdminHomePageState extends State<AdminHomePage> {
     );
   }
 }
-
-// TODO: saldo masuk dan saldo keluar logic
