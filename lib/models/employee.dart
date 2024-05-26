@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:perairan_ngale/models/customer.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
