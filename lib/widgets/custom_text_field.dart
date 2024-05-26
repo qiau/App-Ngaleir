@@ -24,6 +24,7 @@ class CustomTextField extends StatelessWidget {
     this.obscureText = false,
     this.suffixIcon,
     this.suffixIconOnPressed,
+    this.onFieldSubmitted,
   });
 
   final TextEditingController controller;
@@ -33,6 +34,7 @@ class CustomTextField extends StatelessWidget {
   final IconData? suffixIcon;
   final Color? fillColor;
   final double borderWidth;
+  final void Function(String)? onFieldSubmitted;
   final bool isRequired;
   final String? Function(String?)? validator;
   final void Function(String?)? onChanged;
@@ -71,6 +73,7 @@ class CustomTextField extends StatelessWidget {
           controller: controller,
           onChanged: onChanged,
           maxLines: maxLines,
+          onFieldSubmitted: onFieldSubmitted,
           validator: isRequired
               ? (validator ?? Validator(context: context).emptyValidator)
               : validator,
@@ -93,32 +96,32 @@ class CustomTextField extends StatelessWidget {
             prefixIconConstraints: prefixIcon == null
                 ? null
                 : const BoxConstraints(
-              minWidth: 58,
-            ),
+                    minWidth: 58,
+                  ),
             prefixIcon: prefixIcon == null
                 ? null
                 : Icon(
-              prefixIcon,
-              size: 24,
-              color: ColorValues.grey50,
-            ),
+                    prefixIcon,
+                    size: 24,
+                    color: ColorValues.grey50,
+                  ),
             prefixIconColor: MaterialStateColor.resolveWith(
-                  (states) => states.contains(MaterialState.focused)
+              (states) => states.contains(MaterialState.focused)
                   ? Theme.of(context).primaryColor
                   : ColorValues.grey50,
             ),
             suffixIcon: suffixIcon == null
                 ? null
                 : IconButton(
-              icon: Icon(
-                suffixIcon,
-                size: 24,
-                color: ColorValues.grey50,
-              ),
-              onPressed: suffixIconOnPressed,
-            ),
+                    icon: Icon(
+                      suffixIcon,
+                      size: 24,
+                      color: ColorValues.grey50,
+                    ),
+                    onPressed: suffixIconOnPressed,
+                  ),
             suffixIconColor: MaterialStateColor.resolveWith(
-                  (states) => states.contains(MaterialState.focused)
+              (states) => states.contains(MaterialState.focused)
                   ? Theme.of(context).primaryColor
                   : ColorValues.grey50,
             ),

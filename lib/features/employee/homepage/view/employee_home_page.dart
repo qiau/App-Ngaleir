@@ -1,14 +1,20 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:paginate_firestore/paginate_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:perairan_ngale/features/employee/customer_list/customer_new_record/view/employee_add_record_page.dart';
 import 'package:perairan_ngale/features/employee/homepage/customer_dummy.dart';
+import 'package:perairan_ngale/features/employee/homepage/view/customer_list.dart';
 import 'package:perairan_ngale/features/employee/homepage/view/customer_list_card.dart';
 import 'package:perairan_ngale/models/auth.dart';
+import 'package:perairan_ngale/models/employee.dart';
 import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/app_text_styles.dart';
+import 'package:flutter_svg_provider/flutter_svg_provider.dart' as svg;
+import 'package:perairan_ngale/shared/styles.dart';
 import 'package:perairan_ngale/utils/extensions.dart';
 import 'package:perairan_ngale/widgets/custom_text_field.dart';
 
@@ -22,6 +28,31 @@ class EmployeeHomePage extends StatefulWidget {
 
 class _EmployeeHomePageState extends State<EmployeeHomePage> {
   final User? user = Auth().currentUser;
+  Employee? _employee;
+  Future<Employee> getEmployee(String userId) async {
+    final doc = await FirebaseFirestore.instance
+        .collection('Employee')
+        .doc(userId)
+        .get();
+
+    final employee = Employee.fromFirestore(doc);
+    return employee;
+  }
+
+  Future<void> _getEmployee() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please log in to view this page')),
+      );
+      return;
+    }
+    final employee = await getEmployee(user.uid);
+    setState(() {
+      _employee = employee;
+    });
+    print(employee.nama);
+  }
 
   Future<void> signOut() async {
     await Auth().signOut();
@@ -30,136 +61,88 @@ class _EmployeeHomePageState extends State<EmployeeHomePage> {
   @override
   void initState() {
     super.initState();
+    _getEmployee();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            _Header(),
-            SizedBox(height: 16),
-            Expanded(child: _CustomerList()),
-          ],
-        ),
+      body: Column(
+        children: [
+          _buildTopBarWidget(),
+          SizedBox(height: 16),
+          Expanded(
+              child: _employee != null
+                  ? CustomerList(
+                      employee: _employee!,
+                    )
+                  : Text('Apalah')),
+        ],
       ),
     );
   }
-}
 
-class _Header extends StatelessWidget {
-  const _Header({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildTopBarWidget() {
     return Container(
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 16, bottom: 8, right: 16, left: 16),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Halo,',
-                      style: TextStyle(fontSize: 20),
-                    ),
-                    Text(
-                      'Petugas 1',
-                      style: context.textTheme.displayLarge,
-                    ),
-                  ],
-                ),
-                GestureDetector(
-                  child: Icon(
-                    IconsaxPlusBold.profile_circle,
-                    size: 40,
-                  ),
-                  onTap: () {},
-                ),
-              ],
-            ),
-            SizedBox(height: 16),
-          ],
+      width: MediaQuery.of(context).size.width,
+      height: 150,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: svg.Svg('assets/Frame 6.svg'),
+          fit: BoxFit.fill,
         ),
+      ),
+      child: Stack(
+        children: [
+          _buildTopBarContentWidget(),
+        ],
       ),
     );
   }
-}
 
-class _CustomerList extends StatefulWidget {
-  @override
-  _CustomerListState createState() => _CustomerListState();
-}
-
-class _CustomerListState extends State<_CustomerList> {
-  late List<Customer> listCustomer = generateDummyCustomers();
-  late List<Customer> filteredCustomer = [];
-  late TextEditingController _searchController;
-
-  @override
-  void initState() {
-    super.initState();
-    _searchController = TextEditingController();
-    filteredCustomer = listCustomer;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
+  Widget _buildTopBarContentWidget() {
+    return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        child: Column(
+        padding: const EdgeInsets.all(Styles.defaultPadding),
+        child: Row(
           children: [
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                border: Border.all(
-                  color: Colors.grey,
-                  width: 1,
-                ),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: CustomTextField(
-                hintText: 'Cari pelanggan',
-                prefixIcon: IconsaxPlusLinear.search_normal,
-                controller: _searchController,
-                onChanged: (value) {
-                  setState(() {
-                    filteredCustomer = listCustomer.where((customer) {
-                      return customer.nama
-                          .toLowerCase()
-                          .contains(value!.toLowerCase());
-                    }).toList();
-                  });
-                },
+            Padding(
+              padding: const EdgeInsets.only(right: Styles.defaultPadding),
+              child: Icon(
+                IconsaxPlusLinear.profile_circle,
+                size: Styles.bigIcon,
+                color: Colors.white,
               ),
             ),
-            SizedBox(height: 16),
             Expanded(
-              child: ListView.builder(
-                itemCount: filteredCustomer.length,
-                itemBuilder: (context, index) {
-                  Customer customer = filteredCustomer[index];
-                  return GestureDetector(
-                    child: CustomerCard(
-                      nama: customer.nama,
-                      noPelanggan: customer.noPelanggan,
-                      alamat: customer.alamat,
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (_employee != null)
+                      Text(
+                        _employee!.nama,
+                        style: context.textTheme.bodyMediumBoldBright,
+                      ),
+                    const SizedBox(
+                      height: Styles.smallSpacing,
                     ),
-                    onTap: () {
-                      AutoRouter.of(context)
-                          .push(EmployeeCustomerDetailRoute());
-                    },
-                  );
-                },
+                    Text(
+                      'coba',
+                      style: context.textTheme.bodySmallBright,
+                    ),
+                  ]),
+            ),
+            IconButton(
+              icon: const Icon(
+                IconsaxPlusLinear.setting,
+                size: Styles.bigIcon,
+                color: Colors.white,
               ),
+              onPressed: () {
+                FirebaseAuth.instance.signOut();
+                AutoRouter.of(context).push(LoginRoute());
+              },
             ),
           ],
         ),

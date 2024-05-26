@@ -1,12 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
-import 'package:perairan_ngale/database/db_constants.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart' as svg;
+import 'package:perairan_ngale/features/transaction_card.dart';
 import 'package:perairan_ngale/models/customer.dart';
+import 'package:perairan_ngale/models/transaksi.dart';
 import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
 import 'package:perairan_ngale/shared/styles.dart';
@@ -23,6 +24,8 @@ class CustomerHomePage extends StatefulWidget {
 class _CustomerHomePageState extends State<CustomerHomePage> {
   User? user = FirebaseAuth.instance.currentUser;
   Customer? _customer;
+  List<Transaksi> listTransaksi = [];
+
   Future<Customer> getCustomer(String userId) async {
     final doc = await FirebaseFirestore.instance
         .collection('Customer')
@@ -45,6 +48,35 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
     setState(() {
       _customer = customer;
     });
+    getTransaksiByUserIdAndYear(user.uid);
+  }
+
+  Future<void> getTransaksiByUserIdAndYear(String userId) async {
+    final tahun = DateTime.now().year;
+    final collection = FirebaseFirestore.instance.collection('Transaksi');
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please log in to view this page')),
+      );
+      return;
+    }
+
+    final startOfYear = DateTime(tahun, 1, 1).toIso8601String();
+    final endOfYear = DateTime(tahun + 1, 1, 1).toIso8601String();
+
+    final querySnapshot = await collection
+        .where('userId', isEqualTo: userId)
+        .where('tanggal', isGreaterThanOrEqualTo: startOfYear)
+        .where('tanggal', isLessThan: endOfYear)
+        .orderBy('tanggal', descending: true)
+        .get();
+
+    setState(() {
+      listTransaksi = querySnapshot.docs
+          .map((doc) => Transaksi.fromJson(doc.data()))
+          .toList();
+    });
   }
 
   @override
@@ -60,10 +92,7 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildTopBarWidget(),
-            _buildRecordsWidget(),
-          ],
+          children: [_buildTopBarWidget(), _buildRecordsWidget()],
         ),
       ),
     );
@@ -88,6 +117,7 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
   }
 
   Widget _buildTopBarContentWidget() {
+    print(listTransaksi.length.toString() + 'mantap');
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(Styles.defaultPadding),
@@ -155,43 +185,27 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
                 style: context.textTheme.bodyMediumBold,
               ),
             ),
-            _buildHistoryWidget(),
-            _buildHistoryWidget(),
-            _buildHistoryWidget(),
+            Expanded(
+              child: ListView.builder(
+                itemCount: listTransaksi.length,
+                itemBuilder: (context, index) {
+                  Transaksi transaksi = listTransaksi[index];
+                  return TransactionCard(
+                    transaksi: transaksi,
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHistoryWidget() {
-    return GestureDetector(
-      onTap: () {
-        AutoRouter.of(context).push(CustomerRecordDetailRoute());
-      },
-      child: Container(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: Styles.smallerPadding),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Text(
-                  "Mei 2024",
-                  style: context.textTheme.bodyMediumBold,
-                ),
-              ),
-              _buildHistoryItemWidget(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _buildHistoryItemWidget() {
+    final saldo =
+        NumberFormat.currency(locale: 'id_ID', symbol: 'Rp').format(123456);
     return Container(
       decoration: BoxDecoration(
         color: ColorValues.white,
@@ -214,20 +228,24 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
               ),
             ),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
+              child: Row(
                 children: [
-                  Text(
-                    "Nama Pelanggan",
-                    style: context.textTheme.bodyMediumBold,
-                  ),
-                  const SizedBox(
-                    height: Styles.smallSpacing,
-                  ),
-                  Text(
-                    "24/04/2024 13:00",
-                    style: context.textTheme.bodySmallGrey,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        saldo,
+                        style: context.textTheme.bodyMediumBold,
+                      ),
+                      const SizedBox(
+                        height: Styles.smallSpacing,
+                      ),
+                      Text(
+                        "24/04/2024 13:00",
+                        style: context.textTheme.bodySmallGrey,
+                      ),
+                    ],
                   ),
                 ],
               ),
