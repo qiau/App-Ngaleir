@@ -25,13 +25,17 @@ class CustomTextField extends StatelessWidget {
     this.suffixIcon,
     this.suffixIconOnPressed,
     this.onFieldSubmitted,
+    this.initialValue,
+    this.enabled,
   });
 
   final TextEditingController controller;
   final String? hintText;
+  final bool? enabled;
   final String? label;
   final IconData? prefixIcon;
   final IconData? suffixIcon;
+  final String? initialValue;
   final Color? fillColor;
   final double borderWidth;
   final void Function(String)? onFieldSubmitted;
@@ -69,6 +73,8 @@ class CustomTextField extends StatelessWidget {
             height: Styles.defaultSpacing,
           ),
         TextFormField(
+          initialValue: initialValue,
+          enabled: enabled,
           maxLength: maxCharacter,
           controller: controller,
           onChanged: onChanged,

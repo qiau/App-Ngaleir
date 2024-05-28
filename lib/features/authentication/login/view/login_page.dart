@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import
+
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -39,7 +41,7 @@ class _LoginPageState extends State<LoginPage> {
         User? user = userCredential.user;
         if (user != null) {
           if (await isAdmin(user.uid)) {
-            // AutoRouter.of(context).replace(AdminHomeRoute());
+            AutoRouter.of(context).replace(AdminMenuRoute());
             return;
           } else if (await isEmployee(user.uid)) {
             AutoRouter.of(context).replace(EmployeeHomeRoute());

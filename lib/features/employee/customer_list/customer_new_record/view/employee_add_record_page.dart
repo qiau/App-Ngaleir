@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:perairan_ngale/models/transaksi.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
 import 'package:perairan_ngale/shared/styles.dart';
 import 'package:perairan_ngale/utils/extensions.dart';
@@ -9,8 +10,10 @@ import 'package:perairan_ngale/widgets/custom_text_field.dart';
 @RoutePage()
 class EmployeeAddCustomerRecordPage extends StatefulWidget {
   const EmployeeAddCustomerRecordPage(
-      {super.key, required this.meteranTerakhir});
-  final int meteranTerakhir;
+      {super.key, this.meteranTerakhir, this.transaksi, this.customerId});
+  final int? meteranTerakhir;
+  final Transaksi? transaksi;
+  final String? customerId;
 
   @override
   State<EmployeeAddCustomerRecordPage> createState() =>
@@ -23,14 +26,24 @@ class _EmployeeAddCustomerRecordPageState
   final TextEditingController _meteranSaatIniController =
       TextEditingController();
   late String _imageUrl = '';
+  bool isNotEmpty = false;
+  @override
+  void initState() {
+    super.initState();
+    setIsNotEmpty();
+  }
+
+  void setIsNotEmpty() {
+    if (widget.transaksi != null) {
+      isNotEmpty = true;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Center(
-          child: Text('Catat Meter'),
-        ),
+        title: Text('Catat Meter'),
       ),
       body: SafeArea(
           child: Padding(
@@ -73,26 +86,28 @@ class _EmployeeAddCustomerRecordPageState
                       )
                     : Image.network(_imageUrl)),
             SizedBox(height: 16),
-            Center(
-              child: SizedBox(
-                width: 343,
-                child: ElevatedButton(
-                  // onPressed: _imageUrl == '' ? null : () {},
-                  // style: ElevatedButton.styleFrom(
-                  //   backgroundColor: Color(0xFF0D9DF8),
-                  // ),
-                  onPressed: () {},
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Text(
-                      'Catat Tagihan',
-                      style: TextStyle(color: Colors.white, fontSize: 20),
+            !isNotEmpty
+                ? Center(
+                    child: SizedBox(
+                      width: 343,
+                      child: ElevatedButton(
+                        // onPressed: _imageUrl == '' ? null : () {},
+                        // style: ElevatedButton.styleFrom(
+                        //   backgroundColor: Color(0xFF0D9DF8),
+                        // ),
+                        onPressed: () {},
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          child: Text(
+                            'Catat Tagihan',
+                            style: TextStyle(color: Colors.white, fontSize: 20),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
-            ),
+                  )
+                : SizedBox(),
           ],
         ),
       )),
@@ -100,22 +115,36 @@ class _EmployeeAddCustomerRecordPageState
   }
 
   Widget _buildNomorTagihanField() {
+    if (widget.meteranTerakhir == 0) {
+      _nomorTagihanController.text = 'Tidak ada Data Meteran Bulan Lalu';
+    } else {
+      _nomorTagihanController.text = widget.meteranTerakhir.toString();
+    }
     return CustomTextField(
       maxCharacter: 50,
       controller: _nomorTagihanController,
+      enabled: false,
       fillColor: ColorValues.white,
-      label: "Nomor Tagihan",
-      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      label: "Meteran Bulan Lalu",
+      inputFormatters: [
+        widget.meteranTerakhir == 0
+            ? FilteringTextInputFormatter.singleLineFormatter
+            : FilteringTextInputFormatter.digitsOnly
+      ],
       keyboardType: TextInputType.number,
     );
   }
 
   Widget _buildMeteranSaatIniField() {
+    if (isNotEmpty) {
+      _meteranSaatIniController.text = widget.transaksi!.meteran.toString();
+    }
     return CustomTextField(
       maxCharacter: 50,
       controller: _meteranSaatIniController,
       fillColor: ColorValues.white,
       label: "Meteran saat ini (m³)",
+      enabled: isNotEmpty ? false : true,
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       keyboardType: TextInputType.number,
     );

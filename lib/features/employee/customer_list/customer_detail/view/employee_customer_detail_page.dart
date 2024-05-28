@@ -34,6 +34,7 @@ class _EmployeeCustomerDetailPageState
     final tahun = DateTime.now().year;
     final collection = FirebaseFirestore.instance.collection('Transaksi');
     final user = FirebaseAuth.instance.currentUser;
+
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Please log in to view this page')),
@@ -68,7 +69,7 @@ class _EmployeeCustomerDetailPageState
   Widget build(BuildContext context) {
     var meteranTerakhir = 0;
     if (listTransaksi.isNotEmpty) {
-      meteranTerakhir = listTransaksi[0].meteran;
+      meteranTerakhir = listTransaksi[0].meteran!;
     }
     return Scaffold(
       floatingActionButton: Container(
@@ -167,9 +168,14 @@ class _EmployeeCustomerDetailPageState
               child: ListView.builder(
                 itemCount: listTransaksi.length,
                 itemBuilder: (context, index) {
+                  int? meteranTerakhir = 0;
+                  if (index != listTransaksi.length - 1) {
+                    meteranTerakhir = listTransaksi[index + 1].meteran;
+                  }
                   Transaksi transaksi = listTransaksi[index];
                   return TransactionCard(
                     transaksi: transaksi,
+                    meteranTerakhir: meteranTerakhir,
                   );
                 },
               ),

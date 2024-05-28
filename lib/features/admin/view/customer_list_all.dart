@@ -1,26 +1,23 @@
-// ignore_for_file: unused_import
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:paginate_firestore/bloc/pagination_listeners.dart';
-import 'package:paginate_firestore/paginate_firestore.dart';
 import 'package:perairan_ngale/features/employee/homepage/view/customer_list_card.dart';
-import 'package:perairan_ngale/models/customer.dart';
-import 'package:perairan_ngale/models/employee.dart';
+import 'package:perairan_ngale/models/admin.dart';
 import 'package:firebase_ui_firestore/firebase_ui_firestore.dart';
+import 'package:perairan_ngale/models/customer.dart';
 import 'package:perairan_ngale/widgets/custom_text_field.dart';
 
-class CustomerList extends StatefulWidget {
-  const CustomerList({super.key, required this.employee});
-  final Employee employee;
+class CustomerListAll extends StatefulWidget {
+  const CustomerListAll({super.key, required this.admin});
+  final Admin admin;
 
   @override
-  State<CustomerList> createState() => _CustomerListState();
+  State<CustomerListAll> createState() => _CustomerListAllState();
 }
 
-class _CustomerListState extends State<CustomerList> {
+class _CustomerListAllState extends State<CustomerListAll> {
   late TextEditingController _searchController;
   final PaginateRefreshedChangeListener refreshChangeListener =
       PaginateRefreshedChangeListener();
@@ -107,10 +104,8 @@ class _CustomerListState extends State<CustomerList> {
         },
         child: FirestoreListView<Map<String, dynamic>>(
           pageSize: 3,
-          query: FirebaseFirestore.instance
-              .collection('Customer')
-              .where('alamatTower', isEqualTo: widget.employee.alamatTower)
-              .orderBy('nama'),
+          query:
+              FirebaseFirestore.instance.collection('Customer').orderBy('nama'),
           itemBuilder: (context, snapshot) {
             final customer = Customer.fromFirestore(snapshot);
 
@@ -129,7 +124,6 @@ class _CustomerListState extends State<CustomerList> {
       child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('Customer')
-              .where('alamatTower', isEqualTo: widget.employee.alamatTower)
               .orderBy('nama')
               .startAt([searchname]).endAt([searchname + "\uf8ff"]).snapshots(),
           builder: (context, snapshot) {
@@ -145,7 +139,9 @@ class _CustomerListState extends State<CustomerList> {
               itemBuilder: (context, index) {
                 var data = snapshot.data!.docs[index];
                 final customer = Customer.fromFirestore(data);
-                return CustomerCard(customer: customer);
+                return CustomerCard(
+                  customer: customer,
+                );
               },
             );
           }),

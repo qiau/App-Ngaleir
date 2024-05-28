@@ -1,67 +1,60 @@
-// ignore_for_file: unused_import
 
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:intl/intl.dart';
-import 'package:path/path.dart';
+import 'package:perairan_ngale/models/customer.dart';
 import 'package:perairan_ngale/models/transaksi.dart';
-import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
 import 'package:perairan_ngale/shared/date_helper.dart';
 import 'package:perairan_ngale/shared/styles.dart';
 import 'package:perairan_ngale/utils/extensions.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class TransactionCard extends StatelessWidget {
-  const TransactionCard(
-      {super.key,
-      required this.transaksi,
-      this.customerId,
-      this.meteranTerakhir});
+class PlusTransactionCard extends StatelessWidget {
+  const PlusTransactionCard({super.key, required this.transaksi});
   final Transaksi transaksi;
-  final String? customerId;
-  final int? meteranTerakhir;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        if (customerId == null) {
-          print('apalah');
-          AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
-            transaksi: transaksi,
-            meteranTerakhir: meteranTerakhir,
-          ));
-        } else {
-          AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
-            customerId: customerId,
-            meteranTerakhir: meteranTerakhir,
-          ));
-        }
-      },
-      child: Container(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: Styles.smallerPadding),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Text(
-                  DateHelper.formatDateToMonthYear(transaksi.tanggal),
-                  style: context.textTheme.bodyMediumBold,
-                ),
-              ),
-              _buildHistoryItemWidget(context),
-            ],
-          ),
+    return Container(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: Styles.smallerPadding),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            FutureBuilder<String>(
+              future: _getCustomerName(transaksi.userId),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  final customerName = snapshot.data!;
+                  return _buildHistoryItemWidget(context, customerName);
+                }
+              },
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildHistoryItemWidget(BuildContext context) {
+  Future<String> _getCustomerName(String userId) async {
+    final DocumentSnapshot<Map<String, dynamic>> snapshot =
+    await FirebaseFirestore.instance.collection('Customer').doc(userId).get();
+
+    if (snapshot.exists) {
+      final customer = Customer.fromFirestore(snapshot);
+      return customer.nama;
+    } else {
+      return 'Customer tidak ditemukan';
+    }
+  }
+
+  Widget _buildHistoryItemWidget(BuildContext context, String customerName) {
     final saldo = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp')
         .format(transaksi.saldo);
     return Container(
@@ -80,9 +73,9 @@ class TransactionCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(right: Styles.defaultPadding),
               child: Icon(
-                IconsaxPlusLinear.shopping_cart,
+                IconsaxPlusLinear.arrow_down_1,
                 size: Styles.bigIcon,
-                color: Colors.blue,
+                color: Colors.green,
               ),
             ),
             Expanded(
@@ -93,8 +86,12 @@ class TransactionCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        saldo,
-                        style: context.textTheme.bodyMediumBold,
+                        '${customerName.split(' ').take(2).join(' ')}',
+                        style: context.textTheme.bodyMediumBold, maxLines: 1,
+                      ),
+                      Text(
+                        '+ $saldo',
+                        style: context.textTheme.bodyMediumBold.copyWith(color: Colors.green),
                       ),
                       const SizedBox(
                         height: Styles.smallSpacing,
@@ -108,13 +105,6 @@ class TransactionCard extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
-            GestureDetector(
-              child: Icon(
-                IconsaxPlusLinear.arrow_right_3,
-                size: Styles.defaultIcon,
-              ),
-              onTap: () {},
             ),
           ],
         ),

@@ -1,13 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter/widgets.dart%20';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:intl/intl.dart';
-import 'package:perairan_ngale/database/db_constants.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart' as svg;
 import 'package:perairan_ngale/features/transaction_card.dart';
 import 'package:perairan_ngale/models/customer.dart';
@@ -29,6 +25,7 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
   User? user = FirebaseAuth.instance.currentUser;
   Customer? _customer;
   List<Transaksi> listTransaksi = [];
+
   Future<Customer> getCustomer(String userId) async {
     final doc = await FirebaseFirestore.instance
         .collection('Customer')
@@ -120,7 +117,6 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
   }
 
   Widget _buildTopBarContentWidget() {
-    print(listTransaksi.length.toString() + 'mantap');
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(Styles.defaultPadding),
@@ -193,40 +189,19 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
                 itemCount: listTransaksi.length,
                 itemBuilder: (context, index) {
                   Transaksi transaksi = listTransaksi[index];
+                  int? meteranTerakhir = 0;
+                  if (index != listTransaksi.length - 1) {
+                    meteranTerakhir = listTransaksi[index + 1].meteran;
+                  }
+
                   return TransactionCard(
                     transaksi: transaksi,
+                    meteranTerakhir: meteranTerakhir,
                   );
                 },
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHistoryWidget() {
-    return GestureDetector(
-      onTap: () {
-        AutoRouter.of(context).push(CustomerRecordDetailRoute());
-      },
-      child: Container(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: Styles.smallerPadding),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Text(
-                  "Mei 2024",
-                  style: context.textTheme.bodyMediumBold,
-                ),
-              ),
-              _buildHistoryItemWidget(),
-            ],
-          ),
         ),
       ),
     );

@@ -1,22 +1,18 @@
+// ignore_for_file: unnecessary_import
+
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:paginate_firestore/paginate_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
-import 'package:perairan_ngale/features/employee/customer_list/customer_new_record/view/employee_add_record_page.dart';
-import 'package:perairan_ngale/features/employee/homepage/customer_dummy.dart';
 import 'package:perairan_ngale/features/employee/homepage/view/customer_list.dart';
-import 'package:perairan_ngale/features/employee/homepage/view/customer_list_card.dart';
 import 'package:perairan_ngale/models/auth.dart';
 import 'package:perairan_ngale/models/employee.dart';
 import 'package:perairan_ngale/routes/router.dart';
-import 'package:perairan_ngale/shared/app_text_styles.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart' as svg;
 import 'package:perairan_ngale/shared/styles.dart';
 import 'package:perairan_ngale/utils/extensions.dart';
-import 'package:perairan_ngale/widgets/custom_text_field.dart';
 
 @RoutePage()
 class EmployeeHomePage extends StatefulWidget {
