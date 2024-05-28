@@ -4,8 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
-import 'package:paginate_firestore/bloc/pagination_listeners.dart';
-import 'package:paginate_firestore/paginate_firestore.dart';
+
 import 'package:perairan_ngale/features/employee/homepage/view/customer_list_card.dart';
 import 'package:perairan_ngale/models/customer.dart';
 import 'package:perairan_ngale/models/employee.dart';
@@ -22,8 +21,6 @@ class CustomerList extends StatefulWidget {
 
 class _CustomerListState extends State<CustomerList> {
   late TextEditingController _searchController;
-  final PaginateRefreshedChangeListener refreshChangeListener =
-      PaginateRefreshedChangeListener();
 
   final ValueNotifier<String> _searchQuery = ValueNotifier<String>('');
   var searchname = "";
@@ -50,7 +47,7 @@ class _CustomerListState extends State<CustomerList> {
   void _onSearchSubmitted(String value) {
     print("Search submitted: $value"); // Debug statement
     _searchQuery.value = value;
-    refreshChangeListener.refreshed = true;
+
     print("Refresh triggered"); // Debug statement
   }
 
@@ -101,54 +98,45 @@ class _CustomerListState extends State<CustomerList> {
   }
 
   Widget _buildListNoSearch() {
-    return RefreshIndicator(
-        onRefresh: () async {
-          refreshChangeListener.refreshed = true;
-        },
-        child: FirestoreListView<Map<String, dynamic>>(
-          pageSize: 3,
-          query: FirebaseFirestore.instance
-              .collection('Customer')
-              .where('alamatTower', isEqualTo: widget.employee.alamatTower)
-              .orderBy('nama'),
-          itemBuilder: (context, snapshot) {
-            final customer = Customer.fromFirestore(snapshot);
+    return FirestoreListView<Map<String, dynamic>>(
+      pageSize: 3,
+      query: FirebaseFirestore.instance
+          .collection('Customer')
+          .where('alamatTower', isEqualTo: widget.employee.alamatTower)
+          .orderBy('nama'),
+      itemBuilder: (context, snapshot) {
+        final customer = Customer.fromFirestore(snapshot);
 
-            return CustomerCard(
-              customer: customer,
-            );
-          },
-        ));
+        return CustomerCard(
+          customer: customer,
+        );
+      },
+    );
   }
 
   Widget _buildListWithSearch() {
-    return RefreshIndicator(
-      onRefresh: () async {
-        refreshChangeListener.refreshed = true;
-      },
-      child: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance
-              .collection('Customer')
-              .where('alamatTower', isEqualTo: widget.employee.alamatTower)
-              .orderBy('nama')
-              .startAt([searchname]).endAt([searchname + "\uf8ff"]).snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return Text('Something went wrong');
-            }
+    return StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('Customer')
+            .where('alamatTower', isEqualTo: widget.employee.alamatTower)
+            .orderBy('nama')
+            .startAt([searchname]).endAt([searchname + "\uf8ff"]).snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Text('Something went wrong');
+          }
 
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CupertinoActivityIndicator());
-            }
-            return ListView.builder(
-              itemCount: snapshot.data!.docs.length,
-              itemBuilder: (context, index) {
-                var data = snapshot.data!.docs[index];
-                final customer = Customer.fromFirestore(data);
-                return CustomerCard(customer: customer);
-              },
-            );
-          }),
-    );
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CupertinoActivityIndicator());
+          }
+          return ListView.builder(
+            itemCount: snapshot.data!.docs.length,
+            itemBuilder: (context, index) {
+              var data = snapshot.data!.docs[index];
+              final customer = Customer.fromFirestore(data);
+              return CustomerCard(customer: customer);
+            },
+          );
+        });
   }
 }

@@ -42,7 +42,7 @@ class _EmployeeCustomerDetailPageState
       return;
     }
 
-    final startOfYear = DateTime(tahun, 1, 1).toIso8601String();
+    final startOfYear = DateTime(tahun - 1, 12, 1).toIso8601String();
     final endOfYear = DateTime(tahun + 1, 1, 1).toIso8601String();
 
     final querySnapshot = await collection
@@ -68,8 +68,10 @@ class _EmployeeCustomerDetailPageState
   @override
   Widget build(BuildContext context) {
     var meteranTerakhir = 0;
+    var isThereTransaksi = false;
     if (listTransaksi.isNotEmpty) {
       meteranTerakhir = listTransaksi[0].meteran!;
+      isThereTransaksi = true;
     }
     return Scaffold(
       floatingActionButton: Container(
@@ -77,7 +79,9 @@ class _EmployeeCustomerDetailPageState
         child: ElevatedButton(
           onPressed: () {
             AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
-                meteranTerakhir: meteranTerakhir));
+              isThereTransaksi: isThereTransaksi,
+              meteranTerakhir: meteranTerakhir,
+            ));
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
