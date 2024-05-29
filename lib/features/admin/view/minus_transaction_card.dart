@@ -52,26 +52,17 @@ class MinusTransactionCard extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Admin",
+                        'Admin',
                         style: context.textTheme.bodyMediumBold,
                         maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        '- $saldo',
-                        style: context.textTheme.bodyMediumBold.copyWith(color: Colors.red),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(
-                        height: Styles.smallSpacing,
                       ),
                       Text(
                         DateHelper.formatDateToDayMonthYearTime(
@@ -79,6 +70,24 @@ class MinusTransactionCard extends StatelessWidget {
                         style: context.textTheme.bodySmallGrey,
                       ),
                     ],
+                  ),
+                  Text(
+                    '$saldo',
+                    style: context.textTheme.bodyMediumBold.copyWith(
+                      color: transaksi.status == 'pembayaran'
+                          ? Colors.green
+                          : transaksi.status == 'pengeluaran'
+                          ? Colors.red
+                          : Colors.black,
+                    ),
+                  ),
+                  Text(
+                    transaksi.deskripsi,
+                    style: context.textTheme.bodySmallGrey,
+                    maxLines: 1,
+                  ),
+                  const SizedBox(
+                    height: Styles.smallSpacing,
                   ),
                 ],
               ),

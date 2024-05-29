@@ -13,7 +13,7 @@ class Transaksi with _$Transaksi {
     int? meteran,
     required String userId,
     String? pathImage,
-    String? deskripsi,
+    required String deskripsi,
   }) = _Transaksi;
 
   factory Transaksi.fromJson(Map<String, dynamic> json) =>

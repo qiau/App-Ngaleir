@@ -28,7 +28,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
   final TextEditingController _rtController = TextEditingController();
   final TextEditingController _rwController = TextEditingController();
   final TextEditingController _noTelponController = TextEditingController();
-
+  final TextEditingController _alamatTowerController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -64,6 +64,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                 _buildAlamatField(),
                 _buildRTField(),
                 _buildRWField(),
+                _buildAlamatTowerField(),
                 const SizedBox(height: Styles.defaultSpacing),
                 _buildDoneButton(),
               ],
@@ -77,10 +78,20 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
   Widget _buildNameField() {
     return CustomTextField(
       maxCharacter: 50,
-      controller: _nameController,
+      controller: _alamatTowerController,
       hintText: "Masukkan nama Anda",
       fillColor: ColorValues.white,
       label: "Nama",
+    );
+  }
+
+  Widget _buildAlamatTowerField() {
+    return CustomTextField(
+      maxCharacter: 50,
+      controller: _nameController,
+      hintText: "Masukkan Alamat Tower anda",
+      fillColor: ColorValues.white,
+      label: "Alamat Tower",
     );
   }
 
@@ -156,6 +167,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
             .doc(userId)
             .set({
           'nama': _nameController.text,
+          'alamatTower': _alamatTowerController.text,
           'alamat': _addressController.text,
           'rt': _rtController.text,
           'rw': _rwController.text,

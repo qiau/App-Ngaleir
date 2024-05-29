@@ -81,11 +81,12 @@ class PlusTransactionCard extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         '${customerName.split(' ').take(2).join(' ')}',
@@ -93,19 +94,29 @@ class PlusTransactionCard extends StatelessWidget {
                         maxLines: 1,
                       ),
                       Text(
-                        '+ $saldo',
-                        style: context.textTheme.bodyMediumBold
-                            .copyWith(color: Colors.green),
-                      ),
-                      const SizedBox(
-                        height: Styles.smallSpacing,
-                      ),
-                      Text(
                         DateHelper.formatDateToDayMonthYearTime(
                             transaksi.tanggal),
                         style: context.textTheme.bodySmallGrey,
                       ),
                     ],
+                  ),
+                  Text(
+                    '$saldo',
+                    style: context.textTheme.bodyMediumBold.copyWith(
+                      color: transaksi.status == 'pembayaran'
+                          ? Colors.green
+                          : transaksi.status == 'pengeluaran'
+                              ? Colors.red
+                              : Colors.black,
+                    ),
+                  ),
+                  Text(
+                    transaksi.deskripsi,
+                    style: context.textTheme.bodySmallGrey,
+                    maxLines: 1,
+                  ),
+                  const SizedBox(
+                    height: Styles.smallSpacing,
                   ),
                 ],
               ),

@@ -70,8 +70,14 @@ class _AdminHomePageState extends State<AdminHomePage> {
           SizedBox(height: 8),
           _buildIconMenu(),
           SizedBox(height: 8),
-          _buildRecentTransaction(),
-          _buildCardTransaction(),
+          Expanded(
+            child: Column(
+              children: [
+                _buildRecentTransaction(),
+                _buildCardTransaction(),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -122,7 +128,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "Ringkasan Transaksi",
+                "Transaksi Terakhir",
                 style: context.textTheme.bodyMediumBold,
               ),
               GestureDetector(
