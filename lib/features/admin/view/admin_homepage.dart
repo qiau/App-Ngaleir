@@ -1,11 +1,16 @@
+import 'dart:async';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
+import 'package:perairan_ngale/features/admin/view/transaction_card.dart';
 import 'package:perairan_ngale/models/admin.dart';
 import 'package:perairan_ngale/models/auth.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart' as svg;
+import 'package:perairan_ngale/models/transaksi.dart';
 import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
 import 'package:perairan_ngale/shared/styles.dart';
@@ -22,10 +27,12 @@ class AdminHomePage extends StatefulWidget {
 class _AdminHomePageState extends State<AdminHomePage> {
   final User? user = Auth().currentUser;
   Admin? _admin;
+  List<Transaksi> listTransaksi = [];
+
 
   Future<Admin> getAdmin(String userId) async {
     final doc =
-        await FirebaseFirestore.instance.collection('Admin').doc(userId).get();
+    await FirebaseFirestore.instance.collection('Admin').doc(userId).get();
 
     final admin = Admin.fromFirestore(doc);
     return admin;
@@ -50,6 +57,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
   void initState() {
     super.initState();
     _getAdmin();
+    _fetchTransaction();
   }
 
   @override
@@ -58,10 +66,73 @@ class _AdminHomePageState extends State<AdminHomePage> {
       body: Column(
         children: [
           _buildTopBarWidget(),
-          SizedBox(height: 16),
+          SizedBox(height: 8),
           _buildSaldoCard(),
-          SizedBox(height: 16),
+          SizedBox(height: 8),
           _buildIconMenu(),
+          SizedBox(height: 8),
+          _buildRecentTransaction(),
+          _buildCardTransaction(),
+        ],
+      ),
+    );
+  }
+  Future<void>
+  _fetchTransaction() async {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('Transaksi')
+        .orderBy('tanggal', descending: true)
+    .limit(4)
+        .get();
+    setState(() {
+      listTransaksi = querySnapshot.docs.map((doc) => Transaksi.fromFirestore(doc)).toList();
+    });
+  }
+
+  Widget _buildCardTransaction() {
+    return Padding(
+      padding: const EdgeInsets.only(left: Styles.defaultPadding, right: Styles.defaultPadding, top: Styles.defaultPadding),
+      child: Container(
+        height: 244,
+        child: ListView.builder(
+          itemCount: listTransaksi.length,
+          itemBuilder: (context, index) {
+            return TransactionCardNormal(transaksi: listTransaksi[index]);
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRecentTransaction() {
+    return Padding(
+      padding: const EdgeInsets.only(top: Styles.defaultPadding, left: Styles.defaultPadding, right: Styles.defaultPadding),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Ringkasan Transaksi",
+                style: context.textTheme.bodyMediumBold,
+              ),
+              GestureDetector(
+                onTap: (){
+                  AutoRouter.of(context).navigate(AdminTabsRoute());
+                },
+                child: Text("Selengkapnya",
+                  style: context.textTheme.bodySmallBold.copyWith(
+                      color: Colors.blue),),
+              )
+            ],
+          ),
+          SizedBox(height: 4),
+          Text(
+            "Pantau pemasukan dan pengeluaran dengan mudah.",
+            style: context.textTheme.bodySmallGrey,
+          ),
         ],
       ),
     );
@@ -71,45 +142,58 @@ class _AdminHomePageState extends State<AdminHomePage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        Column(
-          children: [
-            GestureDetector(
-              onTap: () {
-                AutoRouter.of(context).push(AdminWithdrawalRoute());
-              },
-              child: Container(
-                child: Icon(
-                  IconsaxPlusLinear.card_send,
-                  size: 44,
-                  color: ColorValues.white,
-                ),
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                    color: ColorValues.danger50,
-                    borderRadius: BorderRadius.circular(100)),
-              ),
+        _buildTarikIcon(),
+        _buildAmbilIcon(),
+      ],
+    );
+  }
+
+  Column _buildTarikIcon() {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: () {
+            AutoRouter.of(context).push(AdminAddMoneyRoute());
+          },
+          child: Container(
+            child: Icon(
+              IconsaxPlusLinear.card_receive,
+              size: 44,
+              color: ColorValues.white,
             ),
-            Text('Ambil', style: context.textTheme.bodySmallBold),
-          ],
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+                color: ColorValues.success50,
+                borderRadius: BorderRadius.circular(100)),
+          ),
         ),
-        Column(
-          children: [
-            Container(
-              child: Icon(
-                IconsaxPlusLinear.printer,
-                size: 44,
-                color: ColorValues.white,
-              ),
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                  color: ColorValues.primary50,
-                  borderRadius: BorderRadius.circular(100)),
+        Text('Tambah', style: context.textTheme.bodySmallBold),
+      ],
+    );
+  }
+
+  Column _buildAmbilIcon() {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: () {
+            AutoRouter.of(context).push(AdminWithdrawalRoute());
+          },
+          child: Container(
+            child: Icon(
+              IconsaxPlusLinear.card_send,
+              size: 44,
+              color: ColorValues.white,
             ),
-            Text('Cetak', style: context.textTheme.bodySmallBold),
-          ],
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+                color: ColorValues.danger50,
+                borderRadius: BorderRadius.circular(100)),
+          ),
         ),
+        Text('Ambil', style: context.textTheme.bodySmallBold),
       ],
     );
   }
@@ -136,6 +220,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
               child: Padding(
                 padding: const EdgeInsets.all(Styles.defaultPadding),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Total Saldo',
@@ -143,8 +228,10 @@ class _AdminHomePageState extends State<AdminHomePage> {
                     Text('Rp $totalSaldo',
                         style: context.textTheme.titleLargeBright),
                     Padding(
-                      padding: const EdgeInsets.only(top: Styles.defaultPadding),
-                      child: Text("Transaksi Terakhir:", style: context.textTheme.bodySmallSemiBoldBright),
+                      padding:
+                      const EdgeInsets.only(top: Styles.defaultPadding),
+                      child: Text("Transaksi Terakhir:",
+                          style: context.textTheme.bodySmallSemiBoldBright),
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -152,7 +239,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
                         _saldoMasuk(),
                         _saldoKeluar(),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -166,7 +253,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
   Future<double> _getTotalSaldo() async {
     double totalSaldo = 0;
     final QuerySnapshot<Map<String, dynamic>> snapshot =
-        await FirebaseFirestore.instance.collection('Transaksi').get();
+    await FirebaseFirestore.instance.collection('Transaksi').get();
 
     snapshot.docs.forEach((doc) {
       if (doc['status'] == 'pembayaran') {
@@ -206,6 +293,8 @@ class _AdminHomePageState extends State<AdminHomePage> {
 
   Widget _saldoMasuk() {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Saldo Masuk', style: context.textTheme.bodySmallSemiBoldBright),
         FutureBuilder<Map<String, dynamic>>(
@@ -250,7 +339,10 @@ class _AdminHomePageState extends State<AdminHomePage> {
 
   Widget _buildTopBarWidget() {
     return Container(
-      width: MediaQuery.of(context).size.width,
+      width: MediaQuery
+          .of(context)
+          .size
+          .width,
       height: 150,
       decoration: BoxDecoration(
         image: DecorationImage(
