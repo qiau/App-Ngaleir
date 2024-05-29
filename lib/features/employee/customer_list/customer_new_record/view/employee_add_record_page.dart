@@ -80,7 +80,12 @@ class _EmployeeAddCustomerRecordPageState
   void setIsNotEmpty() async {
     if (widget.transaksi != null) {
       isNotEmpty = true;
-      _imagePath = widget.transaksi!.pathImage ?? 'transaksi/default.jpg';
+      if (widget.transaksi?.pathImage! == '') {
+        _imagePath = 'transaksi/default.jpg';
+      } else {
+        _imagePath = widget.transaksi!.pathImage!;
+      }
+
       Reference getImage = storageReference.child(_imagePath);
       print(_imagePath);
       setState(() {
@@ -204,9 +209,6 @@ class _EmployeeAddCustomerRecordPageState
                       child: ElevatedButton(
                         onPressed: () {
                           _tambahTransaksi(context);
-                          AutoRouter.of(context).pushAndPopUntil(
-                              EmployeeHomeRoute(),
-                              predicate: (route) => false);
                         },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
@@ -240,23 +242,31 @@ class _EmployeeAddCustomerRecordPageState
 
     int saldo = pemakaian1bulan * 5000;
     try {
-      final transaksi = Transaksi(
-        deskripsi: 'Pembayaran Air',
-        saldo: saldo,
-        meteran: int.parse(_meteranSaatIniController.text),
-        status: 'pembayaran',
-        tanggal: Timestamp.now().toDate().toString(),
-        userId: widget.customerId ?? '',
-        pathImage: _imagePath,
-      );
+      if (saldo > 0) {
+        final transaksi = Transaksi(
+          deskripsi: 'Pembayaran Air',
+          saldo: saldo,
+          meteran: int.parse(_meteranSaatIniController.text),
+          status: 'pembayaran',
+          tanggal: Timestamp.now().toDate().toString(),
+          userId: widget.customerId ?? '',
+          pathImage: _imagePath,
+        );
 
-      await FirebaseFirestore.instance
-          .collection('Transaksi')
-          .add(transaksi.toJson());
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Tambah Transaksi Berhasil')),
-      );
+        await FirebaseFirestore.instance
+            .collection('Transaksi')
+            .add(transaksi.toJson());
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Tambah Transaksi Berhasil')),
+        );
+        AutoRouter.of(context)
+            .pushAndPopUntil(EmployeeHomeRoute(), predicate: (route) => false);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Meteran saat ini kurang dari Meteran bulan lalu')),
+        );
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Terjadi kesalahan: $e')),
