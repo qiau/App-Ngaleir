@@ -32,7 +32,8 @@ class _RegisterPageState extends State<RegisterPage> {
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
       try {
-        UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        UserCredential userCredential =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _controllerEmail.text,
           password: _controllerPassword.text,
         );
@@ -43,7 +44,8 @@ class _RegisterPageState extends State<RegisterPage> {
         }
       } on FirebaseAuthException catch (error) {
         if (error.code == 'email-already-in-use') {
-          _showErrorDialog('Email sudah terdaftar. Silakan gunakan email lain atau masuk.');
+          _showErrorDialog(
+              'Email sudah terdaftar. Silakan gunakan email lain atau masuk.');
         } else {
           _showErrorDialog('Pendaftaran gagal. Silakan coba lagi.');
         }
@@ -164,7 +166,9 @@ class _RegisterPageState extends State<RegisterPage> {
                       hintText: "Kata sandi",
                       fillColor: ColorValues.white,
                       prefixIcon: IconsaxPlusLinear.key,
-                      suffixIcon: _isObscure ? IconsaxPlusLinear.eye : IconsaxPlusLinear.eye_slash,
+                      suffixIcon: _isObscure
+                          ? IconsaxPlusLinear.eye
+                          : IconsaxPlusLinear.eye_slash,
                       obscureText: _isObscure,
                       suffixIconOnPressed: _toggleObscureText,
                       onChanged: (s) {},

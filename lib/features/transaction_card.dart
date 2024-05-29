@@ -17,10 +17,12 @@ class TransactionCard extends StatelessWidget {
       {super.key,
       required this.transaksi,
       this.customerId,
-      this.meteranTerakhir});
+      this.meteranTerakhir,
+      required this.isThereTransaksi});
   final Transaksi transaksi;
   final String? customerId;
   final int? meteranTerakhir;
+  final bool isThereTransaksi;
 
   @override
   Widget build(BuildContext context) {
@@ -29,11 +31,13 @@ class TransactionCard extends StatelessWidget {
         if (customerId == null) {
           print('apalah');
           AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
+            isThereTransaksi: isThereTransaksi,
             transaksi: transaksi,
             meteranTerakhir: meteranTerakhir,
           ));
         } else {
           AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
+            isThereTransaksi: isThereTransaksi,
             customerId: customerId,
             meteranTerakhir: meteranTerakhir,
           ));

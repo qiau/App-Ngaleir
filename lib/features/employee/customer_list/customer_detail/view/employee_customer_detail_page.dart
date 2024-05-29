@@ -81,6 +81,7 @@ class _EmployeeCustomerDetailPageState
             AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
               isThereTransaksi: isThereTransaksi,
               meteranTerakhir: meteranTerakhir,
+              customerId: widget.customer.uid,
             ));
           },
           child: Row(
@@ -103,7 +104,10 @@ class _EmployeeCustomerDetailPageState
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [_buildTopBarWidget(), _buildRecordsWidget()],
+          children: [
+            _buildTopBarWidget(),
+            _buildRecordsWidget(isThereTransaksi)
+          ],
         ),
       ),
     );
@@ -151,7 +155,7 @@ class _EmployeeCustomerDetailPageState
     );
   }
 
-  Widget _buildRecordsWidget() {
+  Widget _buildRecordsWidget(bool isThereTransaksi) {
     return Container(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
@@ -178,6 +182,7 @@ class _EmployeeCustomerDetailPageState
                   }
                   Transaksi transaksi = listTransaksi[index];
                   return TransactionCard(
+                    isThereTransaksi: isThereTransaksi,
                     transaksi: transaksi,
                     meteranTerakhir: meteranTerakhir,
                   );

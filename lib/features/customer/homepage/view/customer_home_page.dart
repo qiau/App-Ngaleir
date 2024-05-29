@@ -195,6 +195,7 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
                   }
 
                   return TransactionCard(
+                    isThereTransaksi: true,
                     transaksi: transaksi,
                     meteranTerakhir: meteranTerakhir,
                   );
