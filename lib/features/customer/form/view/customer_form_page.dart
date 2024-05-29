@@ -12,7 +12,9 @@ import 'package:perairan_ngale/shared/color_values.dart';
 import 'package:perairan_ngale/shared/styles.dart';
 import 'package:perairan_ngale/utils/extensions.dart';
 import 'package:perairan_ngale/widgets/custom_button.dart';
+import 'package:perairan_ngale/widgets/custom_gesture_unfocus.dart';
 import 'package:perairan_ngale/widgets/custom_text_field.dart';
+import 'package:sizer/sizer.dart';
 
 @RoutePage()
 class CustomerFormPage extends StatefulWidget {
@@ -28,7 +30,8 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
   final TextEditingController _rtController = TextEditingController();
   final TextEditingController _rwController = TextEditingController();
   final TextEditingController _noTelponController = TextEditingController();
-  final TextEditingController _alamatTowerController = TextEditingController();
+  final TextEditingController _towerController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -38,36 +41,35 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
           backgroundColor: Colors.grey.shade200,
           title: Padding(
             padding: EdgeInsets.only(left: Styles.smallerPadding),
-            child: Text(
-              'Silakan isi data diri Anda',
-              style: context.textTheme.titleLarge,
+            child: Center(
+              child: Text(
+                'Silakan isi data diri Anda',
+                style: context.textTheme.titleLarge,
+              ),
             ),
-          ),
-          leading: IconButton(
-            icon: Icon(
-              IconsaxPlusLinear.arrow_left_1,
-              size: Styles.defaultIcon,
-            ),
-            onPressed: () {
-              AutoRouter.of(context).maybePop();
-            },
           ),
         ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: Styles.defaultPadding),
-            child: Column(
-              children: [
-                _buildNameField(),
-                _buildNomorTelpon(),
-                _buildAlamatField(),
-                _buildRTField(),
-                _buildRWField(),
-                _buildAlamatTowerField(),
-                const SizedBox(height: Styles.defaultSpacing),
-                _buildDoneButton(),
-              ],
+        body: CustomGestureUnfocus(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: Styles.defaultPadding),
+              child: Column(
+                children: [
+                  _buildNameField(),
+                  _buildNomorTelpon(),
+                  _buildAlamatField(),
+                  _buildTowerField(),
+                  _buildRTField(),
+                  _buildRWField(),
+                  const SizedBox(height: Styles.defaultSpacing),
+                  _buildDoneButton(),
+                  Container(
+                    width: 100.w,
+                    height: 5.h,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -78,20 +80,10 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
   Widget _buildNameField() {
     return CustomTextField(
       maxCharacter: 50,
-      controller: _alamatTowerController,
+      controller: _nameController,
       hintText: "Masukkan nama Anda",
       fillColor: ColorValues.white,
       label: "Nama",
-    );
-  }
-
-  Widget _buildAlamatTowerField() {
-    return CustomTextField(
-      maxCharacter: 50,
-      controller: _nameController,
-      hintText: "Masukkan Alamat Tower anda",
-      fillColor: ColorValues.white,
-      label: "Alamat Tower",
     );
   }
 
@@ -99,7 +91,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
     return CustomTextField(
       maxCharacter: 13,
       controller: _noTelponController,
-      hintText: "Masukkan Nomor Telpon Anda",
+      hintText: "Masukkan nomor telpon Anda",
       fillColor: ColorValues.white,
       label: "Nomor Telpon",
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -111,7 +103,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
     return CustomTextField(
       maxCharacter: 50,
       controller: _addressController,
-      hintText: "Masukkan alamat Anda",
+      hintText: "Masukkan alamat rumah Anda",
       fillColor: ColorValues.white,
       label: "Alamat",
     );
@@ -141,6 +133,16 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
     );
   }
 
+  Widget _buildTowerField() {
+    return CustomTextField(
+      maxCharacter: 50,
+      controller: _towerController,
+      hintText: "Masukkan alamat tower Anda",
+      fillColor: ColorValues.white,
+      label: "Tower",
+    );
+  }
+
   Widget _buildDoneButton() {
     return CustomButton(
       backgroundColor: Colors.blue,
@@ -167,12 +169,12 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
             .doc(userId)
             .set({
           'nama': _nameController.text,
-          'alamatTower': _alamatTowerController.text,
+          'alamatTower': _towerController.text,
           'alamat': _addressController.text,
           'rt': _rtController.text,
           'rw': _rwController.text,
           'noTelpon': _noTelponController.text,
-          'customer_no': _rtController.text + _rwController.text + counts
+          'customer_no': _rtController.text + _rwController.text + counts,
         });
         print('Data pelanggan berhasil disimpan di Firestore.');
       } else {

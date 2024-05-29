@@ -6,6 +6,7 @@ import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:perairan_ngale/models/admin.dart';
 import 'package:perairan_ngale/models/auth.dart';
 import 'package:perairan_ngale/routes/router.dart';
+import 'package:perairan_ngale/utils/extensions.dart';
 
 @RoutePage()
 class AdminMenuPage extends StatefulWidget {
@@ -45,8 +46,8 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
 
   @override
   void initState() {
-    _getAdmin();
     super.initState();
+    _getAdmin();
   }
   @override
   Widget build(BuildContext context) {
@@ -61,8 +62,7 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
           selectedIndex: tabsRouter.activeIndex,
           onDestinationSelected: (index) async {
             if (index == 3) {
-              await FirebaseAuth.instance.signOut();
-              AutoRouter.of(context).pushAndPopUntil(LoginRoute(), predicate: (route) => false);
+              await _showLogoutConfirmationDialog(context);
             } else {
               tabsRouter.setActiveIndex(index);
             }
@@ -83,6 +83,40 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
             NavigationDestination(
               icon: Icon(IconsaxPlusBold.logout),
               label: 'Keluar',
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showLogoutConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Konfirmasi Keluar', style: context.textTheme.bodyMediumBold),
+          content: Text('Apakah Anda yakin ingin keluar dari aplikasi?', style: context.textTheme.bodyMedium),
+          actions: [
+            TextButton(
+              child: Text('Batal', style: context.textTheme.bodyMediumBold),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: Colors.red,
+              ),
+              child: TextButton(
+                child: Text('Keluar', style: context.textTheme.bodyMediumBoldBright),
+                onPressed: () async {
+                  await FirebaseAuth.instance.signOut();
+                  AutoRouter.of(context).pushAndPopUntil(LoginRoute(), predicate: (route) => false);
+                  Navigator.of(context).pop();
+                },
+              ),
             ),
           ],
         );

@@ -11,6 +11,7 @@ import 'package:perairan_ngale/shared/app_text_styles.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
 import 'package:perairan_ngale/shared/styles.dart';
 import 'package:perairan_ngale/widgets/custom_button.dart';
+import 'package:perairan_ngale/widgets/custom_gesture_unfocus.dart';
 import 'package:perairan_ngale/widgets/custom_text_field.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:perairan_ngale/models/auth.dart';
@@ -86,17 +87,19 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: svg.Svg('assets/bg_loginregis.svg'),
-              fit: BoxFit.fill,
+      body: CustomGestureUnfocus(
+        child: SingleChildScrollView(
+          child: Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: svg.Svg('assets/bg_loginregis.svg'),
+                fit: BoxFit.fill,
+              ),
             ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.only(top: 140.0),
-            child: _buildRegisterForm(),
+            child: Padding(
+              padding: const EdgeInsets.only(top: 140.0),
+              child: _buildRegisterForm(),
+            ),
           ),
         ),
       ),
