@@ -99,5 +99,10 @@ class AppRouter extends _$AppRouter {
           path: '/withdrawal',
           transitionsBuilder: TransitionsBuilders.fadeIn,
         ),
+        CustomRoute(
+          page: AdminAddMoneyRoute.page,
+          path: '/addmoney',
+          transitionsBuilder: TransitionsBuilders.fadeIn,
+        ),
       ];
 }

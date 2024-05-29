@@ -10,8 +10,8 @@ import 'package:perairan_ngale/shared/styles.dart';
 import 'package:perairan_ngale/utils/extensions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class PlusTransactionCard extends StatelessWidget {
-  const PlusTransactionCard({super.key, required this.transaksi});
+class TransactionCardNormal extends StatelessWidget {
+  const TransactionCardNormal({super.key, required this.transaksi});
   final Transaksi transaksi;
 
   @override
@@ -73,9 +73,9 @@ class PlusTransactionCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(right: Styles.defaultPadding),
               child: Icon(
-                IconsaxPlusLinear.arrow_down_1,
+                IconsaxPlusLinear.card,
                 size: Styles.bigIcon,
-                color: Colors.green,
+                color: Colors.black,
               ),
             ),
             Expanded(
@@ -90,8 +90,8 @@ class PlusTransactionCard extends StatelessWidget {
                         style: context.textTheme.bodyMediumBold, maxLines: 1,
                       ),
                       Text(
-                        '+ $saldo',
-                        style: context.textTheme.bodyMediumBold.copyWith(color: Colors.green),
+                        '$saldo',
+                        style: context.textTheme.bodyMedium,
                       ),
                       const SizedBox(
                         height: Styles.smallSpacing,

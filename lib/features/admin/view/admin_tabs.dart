@@ -1,10 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:perairan_ngale/features/transaction_card.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:perairan_ngale/models/admin.dart';
 import 'package:perairan_ngale/models/customer.dart';
-import 'package:perairan_ngale/models/transaction_grid_model.dart';
 import 'package:perairan_ngale/models/transaksi.dart';
 import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
@@ -12,6 +11,10 @@ import 'package:perairan_ngale/utils/extensions.dart';
 import 'package:perairan_ngale/widgets/custom_gesture_unfocus.dart';
 import 'package:sizer/sizer.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+import 'package:syncfusion_flutter_datagrid_export/export.dart';
+import 'package:syncfusion_flutter_xlsio/xlsio.dart' as xlsio;
+import 'dart:io';
+
 
 @RoutePage()
 class AdminTabsPage extends StatefulWidget {
@@ -22,7 +25,8 @@ class AdminTabsPage extends StatefulWidget {
 }
 
 class _AdminTabsPageState extends State<AdminTabsPage> {
-  TransaksiDataSource? transaksiDataSource;
+  final GlobalKey<SfDataGridState> key = GlobalKey<SfDataGridState>();
+  late TransaksiDataSource transaksiDataSource;
   List<Transaksi> transaksiList = [];
   bool isLoading = true;
   String? errorMessage;
@@ -31,6 +35,14 @@ class _AdminTabsPageState extends State<AdminTabsPage> {
   void initState() {
     super.initState();
     fetchTransaksi();
+  }
+
+  Future<void> _exportDataGridToExcel() async {
+    final xlsio.Workbook workbook = xlsio.Workbook();
+    final xlsio.Worksheet worksheet = workbook.worksheets[0];
+    key.currentState!.exportToExcelWorksheet(worksheet);
+    final List<int> bytes = workbook.saveAsStream();
+    File('DataGrid.xlsx').writeAsBytes(bytes, flush: true);
   }
 
   Future<void> fetchTransaksi() async {
@@ -44,19 +56,16 @@ class _AdminTabsPageState extends State<AdminTabsPage> {
 
       Map<String, String> userIdToNameMap = {};
 
-      // Mapping Customer data
       for (var doc in customerSnapshot.docs) {
         var customer = Customer.fromFirestore(doc);
         userIdToNameMap[customer.uid] = customer.nama;
       }
 
-      // Mapping Admin data
       for (var doc in adminSnapshot.docs) {
         var admin = Admin.fromFirestore(doc);
         userIdToNameMap[admin.uid] = admin.nama;
       }
 
-      // Mapping Transaksi data with names
       transaksiList = transaksiSnapshot.docs.map((doc) {
         var transaksi = Transaksi.fromFirestore(doc);
         var userName = userIdToNameMap[transaksi.userId] ?? 'Unknown User';
@@ -85,92 +94,110 @@ class _AdminTabsPageState extends State<AdminTabsPage> {
       builder: (context, child, controller) {
         final tabsRouter = AutoTabsRouter.of(context);
         return Scaffold(
-          appBar: AppBar(
-            automaticallyImplyLeading: false,
-            title: Center(
-              child: Text(
-                "Transaksi",
-                style: context.textTheme.headlineLarge,
+            appBar: AppBar(
+              automaticallyImplyLeading: false,
+              title: Center(
+                child: Text(
+                  "Transaksi",
+                  style: context.textTheme.headlineLarge,
+                ),
               ),
             ),
-          ),
-          body: CustomGestureUnfocus(
-            child: Column(
-              children: [
-                Container(
-                  width: 100.w,
-                  height: 35.h,
-                  child: isLoading
-                      ? Center(child: CircularProgressIndicator())
-                      : errorMessage != null
-                          ? Center(child: Text(errorMessage!))
-                          : SfDataGrid(
-                              source: transaksiDataSource!,
-                              columns: <GridColumn>[
-                                GridColumn(
-                                  columnName: 'name',
-                                  label: Container(
-                                    padding: EdgeInsets.all(8.0),
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      'Name',
-                                      style: context.textTheme.bodySmallBold,
+            body: CustomGestureUnfocus(
+              child: Column(
+                children: [
+                  Container(
+                    width: 100.w,
+                    height: 35.h,
+                    child: isLoading
+                        ? Center(child: CircularProgressIndicator())
+                        : errorMessage != null
+                            ? Center(child: Text(errorMessage!))
+                            : SfDataGrid(
+                                key: key,
+                                source: transaksiDataSource,
+                                columns: <GridColumn>[
+                                  GridColumn(
+                                    columnName: 'nama',
+                                    label: Container(
+                                      padding: EdgeInsets.all(8.0),
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        'Nama',
+                                        style: context.textTheme.bodySmallBold,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                GridColumn(
-                                  columnName: 'tanggal',
-                                  label: Container(
-                                    padding: EdgeInsets.all(8.0),
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      'Tanggal',
-                                      style: context.textTheme.bodySmallBold,
+                                  GridColumn(
+                                    columnName: 'tanggal',
+                                    label: Container(
+                                      padding: EdgeInsets.all(8.0),
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        'Tanggal',
+                                        style: context.textTheme.bodySmallBold,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                GridColumn(
-                                  columnName: 'saldo',
-                                  label: Container(
-                                    padding: EdgeInsets.all(8.0),
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      'Nominal',
-                                      style: context.textTheme.bodySmallBold,
+                                  GridColumn(
+                                    columnName: 'saldo',
+                                    label: Container(
+                                      padding: EdgeInsets.all(8.0),
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        'Nominal',
+                                        style: context.textTheme.bodySmallBold,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                GridColumn(
-                                  columnName: 'deskripsi',
-                                  label: Container(
-                                    padding: EdgeInsets.all(8.0),
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      'Deskripsi',
-                                      style: context.textTheme.bodySmallBold,
+                                  GridColumn(
+                                    columnName: 'deskripsi',
+                                    label: Container(
+                                      padding: EdgeInsets.all(8.0),
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        'Deskripsi',
+                                        style: context.textTheme.bodySmallBold,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                GridColumn(
-                                  columnName: 'status',
-                                  label: Container(
-                                    padding: EdgeInsets.all(8.0),
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      'Status',
-                                      style: context.textTheme.bodySmallBold,
+                                  GridColumn(
+                                    columnName: 'status',
+                                    label: Container(
+                                      padding: EdgeInsets.all(8.0),
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        'Status',
+                                        style: context.textTheme.bodySmallBold,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                ),
-                _buildTabBar(controller, tabsRouter, context),
-                Expanded(child: child),
-              ],
+                                ],
+                              ),
+                  ),
+                  _buildTabBar(controller, tabsRouter, context),
+                  Expanded(child: child),
+                ],
+              ),
             ),
-          ),
-        );
+            floatingActionButton: SizedBox(
+              height: 64,
+              width: 64,
+              child: FloatingActionButton(
+                backgroundColor: Colors.blue,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                onPressed: () {
+                  _exportDataGridToExcel();
+                },
+                child: Icon(
+                  IconsaxPlusLinear.printer,
+                  size: 44,
+                  color: ColorValues.white,
+                ),
+              ),
+            ));
       },
     );
   }
@@ -218,12 +245,26 @@ class TransaksiDataSource extends DataGridSource {
   TransaksiDataSource({required List<Transaksi> transaksiList}) {
     dataGridRows = transaksiList.map<DataGridRow>((Transaksi transaksi) {
       return DataGridRow(cells: [
-        DataGridCell<String>(columnName: 'userId', value: transaksi.userId),
-        DataGridCell<String>(columnName: 'tanggal', value: transaksi.tanggal),
-        DataGridCell<int>(columnName: 'saldo', value: transaksi.saldo),
         DataGridCell<String>(
-            columnName: 'deskripsi', value: transaksi.deskripsi ?? ''),
-        DataGridCell<String>(columnName: 'status', value: transaksi.status),
+          columnName: 'userId',
+          value: transaksi.userId,
+        ),
+        DataGridCell<String>(
+          columnName: 'tanggal',
+          value: transaksi.tanggal,
+        ),
+        DataGridCell<int>(
+          columnName: 'saldo',
+          value: transaksi.saldo,
+        ),
+        DataGridCell<String>(
+          columnName: 'deskripsi',
+          value: transaksi.deskripsi ?? '-',
+        ),
+        DataGridCell<String>(
+          columnName: 'status',
+          value: transaksi.status,
+        ),
       ]);
     }).toList();
   }
@@ -235,7 +276,7 @@ class TransaksiDataSource extends DataGridSource {
   List<DataGridRow> get rows => dataGridRows;
 
   @override
-  DataGridRowAdapter buildRow(DataGridRow row) {
+  DataGridRowAdapter? buildRow(DataGridRow row) {
     return DataGridRowAdapter(
         cells: row.getCells().map<Widget>((dataGridCell) {
       return Container(
