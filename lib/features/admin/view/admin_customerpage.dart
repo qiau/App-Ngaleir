@@ -60,7 +60,7 @@ class _AdminCustomerPageState extends State<AdminCustomerPage> {
                   ? CustomerListAll(
                 admin: _admin!,
               )
-                  : Text('Apalah')),
+                  : Center(child: Text('Coba Lagi'))),
         ],
       ),
     );
