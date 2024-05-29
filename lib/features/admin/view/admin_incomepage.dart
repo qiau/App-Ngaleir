@@ -17,7 +17,6 @@ class AdminIncomePage extends StatefulWidget {
 }
 
 class _AdminIncomePageState extends State<AdminIncomePage> {
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -26,7 +25,11 @@ class _AdminIncomePageState extends State<AdminIncomePage> {
         children: [
           Expanded(
             child: FutureBuilder<QuerySnapshot>(
-              future: FirebaseFirestore.instance.collection('Transaksi').where('status', isEqualTo: 'pembayaran').get(),
+              future: FirebaseFirestore.instance
+                  .collection('Transaksi')
+                  .where('status', isEqualTo: 'pembayaran')
+                  .orderBy('tanggal', descending: true)
+                  .get(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return CircularProgressIndicator();

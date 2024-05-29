@@ -208,6 +208,33 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
     );
   }
 
+  Widget _buildHistoryWidget() {
+    return GestureDetector(
+      onTap: () {
+        AutoRouter.of(context).push(CustomerRecordDetailRoute());
+      },
+      child: Container(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: Styles.smallerPadding),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Text(
+                  "Mei 2024",
+                  style: context.textTheme.bodyMediumBold,
+                ),
+              ),
+              _buildHistoryItemWidget(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildHistoryItemWidget() {
     final saldo =
         NumberFormat.currency(locale: 'id_ID', symbol: 'Rp').format(123456);

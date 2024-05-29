@@ -20,22 +20,7 @@ class Transaksi with _$Transaksi {
       _$TransaksiFromJson(json);
 
   factory Transaksi.fromFirestore(DocumentSnapshot doc) {
-    if (doc.exists) {
-      final data = doc.data() as Map<String, dynamic>?;
-      if (data != null) {
-        return Transaksi(
-          meteran: data['meteran'],
-          tanggal: data['tanggal'],
-          status: data['status'],
-          saldo: data['saldo'],
-          userId: data['userId'],
-          deskripsi: data['deskripsi'],
-        );
-      } else {
-        throw Exception('Document data is null');
-      }
-    } else {
-      throw Exception('Document does not exist');
-    }
+    final data = doc.data() as Map<String, dynamic>;
+    return Transaksi.fromJson(data);
   }
 }
