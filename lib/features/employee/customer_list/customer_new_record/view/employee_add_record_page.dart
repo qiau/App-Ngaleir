@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:perairan_ngale/models/transaksi.dart';
+import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
@@ -45,7 +46,7 @@ class _EmployeeAddCustomerRecordPageState
     setIsNotEmpty();
   }
 
-  late File _imageFile;
+  late File? _imageFile = null;
 
   ///NOTE: Only supported on Android & iOS
   ///Needs image_picker plugin {https://pub.dev/packages/image_picker}
@@ -54,19 +55,20 @@ class _EmployeeAddCustomerRecordPageState
   Future pickImage() async {
     final pickedFile =
         await picker.pickImage(source: ImageSource.camera, imageQuality: 50);
-
-    setState(() {
-      _imageFile = File(pickedFile!.path);
-    });
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+      });
+    } else {}
   }
 
   String url = '';
   Future uploadImageToFirebase(BuildContext context) async {
-    String fileName = path.basename(_imageFile.path);
+    String fileName = path.basename(_imageFile!.path);
     Reference firebaseStorageRef =
         FirebaseStorage.instance.ref().child('transaksi/$fileName');
     _imagePath = 'transaksi/' + fileName;
-    UploadTask uploadTask = firebaseStorageRef.putFile(_imageFile);
+    UploadTask uploadTask = firebaseStorageRef.putFile(_imageFile!);
     TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() {});
     url = await taskSnapshot.ref.getDownloadURL();
     setState(() {}); // Add this line to update the UI after uploading the image
@@ -138,17 +140,20 @@ class _EmployeeAddCustomerRecordPageState
                 onTap: () async {
                   if (!isNotEmpty) {
                     await pickImage();
-                    if (_imageFile.path.isNotEmpty) {
-                      setState(() {
-                        loading = true;
-                      });
-                      await uploadImageToFirebase(context);
-                      setState(() {
-                        loading = false;
-                      });
+                    if (_imageFile != null) {
+                      if (_imageFile!.path.isNotEmpty) {
+                        setState(() {
+                          loading = true;
+                        });
+                        await uploadImageToFirebase(context);
+                        setState(() {
+                          loading = false;
+                        });
+                      }
                     } else {
-                      // Handle the case where _imageFile is null
-                      print('No image selected');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Gagal mengambil gambar')),
+                      );
                     }
                   }
                 },
@@ -199,6 +204,9 @@ class _EmployeeAddCustomerRecordPageState
                       child: ElevatedButton(
                         onPressed: () {
                           _tambahTransaksi(context);
+                          AutoRouter.of(context).pushAndPopUntil(
+                              EmployeeHomeRoute(),
+                              predicate: (route) => false);
                         },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
@@ -219,8 +227,17 @@ class _EmployeeAddCustomerRecordPageState
   }
 
   Future<void> _tambahTransaksi(BuildContext context) async {
-    int pemakaian1bulan =
-        int.parse(_meteranSaatIniController.text) - widget.meteranTerakhir!;
+    int pemakaian1bulan;
+    if (!widget.isThereTransaksi) {
+      int meteranTerakhir = int.parse(_nomorTagihanController.text);
+
+      pemakaian1bulan =
+          int.parse(_meteranSaatIniController.text) - meteranTerakhir;
+    } else {
+      pemakaian1bulan =
+          int.parse(_meteranSaatIniController.text) - widget.meteranTerakhir!;
+    }
+
     int saldo = pemakaian1bulan * 5000;
     try {
       final transaksi = Transaksi(
@@ -238,7 +255,7 @@ class _EmployeeAddCustomerRecordPageState
           .add(transaksi.toJson());
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Tarik saldo berhasil')),
+        SnackBar(content: Text('Tambah Transaksi Berhasil')),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -251,8 +268,6 @@ class _EmployeeAddCustomerRecordPageState
     if (widget.meteranTerakhir == 0) {
       if (widget.isThereTransaksi) {
         _nomorTagihanController.text = 'Tidak ada Data Meteran Bulan Lalu';
-      } else {
-        _nomorTagihanController.text = '0';
       }
     } else {
       _nomorTagihanController.text = widget.meteranTerakhir.toString();
