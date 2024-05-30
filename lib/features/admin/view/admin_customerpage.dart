@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:perairan_ngale/features/admin/view/customer_list_all.dart';
 import 'package:perairan_ngale/models/admin.dart';
 import 'package:perairan_ngale/models/auth.dart';
+import 'package:perairan_ngale/widgets/custom_gesture_unfocus.dart';
 
 @RoutePage()
 class AdminCustomerPage extends StatefulWidget {
@@ -53,15 +54,17 @@ class _AdminCustomerPageState extends State<AdminCustomerPage> {
         automaticallyImplyLeading: false,
         title: Center(child: Text('Data Pelanggan')),
       ),
-      body: Column(
-        children: [
-          Expanded(
-              child: _admin != null
-                  ? CustomerListAll(
-                admin: _admin!,
-              )
-                  : Center(child: Text('Coba Lagi'))),
-        ],
+      body: CustomGestureUnfocus(
+        child: Column(
+          children: [
+            Expanded(
+                child: _admin != null
+                    ? CustomerListAll(
+                  admin: _admin!,
+                )
+                    : Center(child: Text('Coba Lagi'))),
+          ],
+        ),
       ),
     );
   }
