@@ -7,6 +7,8 @@ import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/app_text_styles.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
 import 'package:perairan_ngale/shared/styles.dart';
+import 'package:perairan_ngale/utils/extensions.dart';
+
 
 @RoutePage()
 class CustomerProfilePage extends StatelessWidget {
@@ -71,9 +73,7 @@ class CustomerProfilePage extends StatelessWidget {
                     side: BorderSide(width: 1.5, color: ColorValues.danger60),
                   ),
                   onPressed: () {
-                    FirebaseAuth.instance.signOut();
-                    AutoRouter.of(context).pushAndPopUntil(LoginRoute(),
-                        predicate: (route) => false);
+                    _showLogoutConfirmationDialog(context);
                   },
                   child: Text('Keluar'),
                 ),
@@ -82,6 +82,40 @@ class CustomerProfilePage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Future<void> _showLogoutConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Konfirmasi Keluar', style: context.textTheme.bodyMediumBold),
+          content: Text('Apakah Anda yakin ingin keluar dari Akun ini?', style: context.textTheme.bodyMedium),
+          actions: [
+            TextButton(
+              child: Text('Batal', style: context.textTheme.bodyMediumBold),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: Colors.red,
+              ),
+              child: TextButton(
+                child: Text('Keluar', style: context.textTheme.bodyMediumBoldBright),
+                onPressed: () async {
+                  await FirebaseAuth.instance.signOut();
+                  AutoRouter.of(context).pushAndPopUntil(LoginRoute(), predicate: (route) => false);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 

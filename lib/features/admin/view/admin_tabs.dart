@@ -8,6 +8,7 @@ import 'package:perairan_ngale/models/customer.dart';
 import 'package:perairan_ngale/models/transaksi.dart';
 import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
+import 'package:perairan_ngale/shared/styles.dart';
 import 'package:perairan_ngale/utils/extensions.dart';
 import 'package:perairan_ngale/utils/logger.dart';
 import 'package:perairan_ngale/widgets/custom_gesture_unfocus.dart';
@@ -15,7 +16,6 @@ import 'package:sizer/sizer.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:syncfusion_flutter_datagrid_export/export.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart' as xlsio;
-import 'dart:io';
 
 @RoutePage()
 class AdminTabsPage extends StatefulWidget {
@@ -27,15 +27,18 @@ class AdminTabsPage extends StatefulWidget {
 
 class _AdminTabsPageState extends State<AdminTabsPage> {
   final GlobalKey<SfDataGridState> key = GlobalKey<SfDataGridState>();
-  late TransaksiDataSource transaksiDataSource;
+
   List<Transaksi> transaksiList = [];
   bool isLoading = true;
   String? errorMessage;
+  double saldoMasuk = 0;
+  double saldoKeluar = 0;
 
   @override
   void initState() {
     super.initState();
     fetchTransaksi();
+    _getLastTransactions();
   }
 
   Future<void> _exportDataGridToExcel() async {
@@ -75,7 +78,6 @@ class _AdminTabsPageState extends State<AdminTabsPage> {
       }).toList();
 
       setState(() {
-        transaksiDataSource = TransaksiDataSource(transaksiList: transaksiList);
         isLoading = false;
       });
     } catch (e) {
@@ -84,6 +86,60 @@ class _AdminTabsPageState extends State<AdminTabsPage> {
         isLoading = false;
       });
     }
+  }
+
+  Future<void> _getLastTransactions() async {
+    try {
+      final QuerySnapshot<Map<String, dynamic>> snapshot =
+          await FirebaseFirestore.instance
+              .collection('Transaksi')
+              .where('bulan', isEqualTo: DateTime.now().month)
+              .where('tahun', isEqualTo: DateTime.now().year)
+              .get();
+
+      snapshot.docs.forEach((doc) {
+        if (doc['status'] == 'pembayaran') {
+          saldoMasuk += doc['saldo'];
+        } else if (doc['status'] == 'pengeluaran') {
+          saldoKeluar += doc['saldo'];
+        }
+      });
+
+      setState(() {
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        errorMessage = "Error fetching transactions: $e";
+        isLoading = false;
+      });
+    }
+  }
+
+  Widget _saldoMasuk(double saldoMasuk) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Saldo Masuk', style: context.textTheme.bodySmallBoldBright),
+        Text('+ $saldoMasuk',
+            style: context.textTheme.bodyVeryLargeBold
+                .copyWith(color: ColorValues.white)),
+      ],
+    );
+  }
+
+  Widget _saldoKeluar(double saldoKeluar) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Saldo Keluar', style: context.textTheme.bodySmallBoldBright),
+        Text('- $saldoKeluar',
+            style: context.textTheme.bodyVeryLargeBold
+                .copyWith(color: ColorValues.white)),
+      ],
+    );
   }
 
   @override
@@ -96,147 +152,197 @@ class _AdminTabsPageState extends State<AdminTabsPage> {
       builder: (context, child, controller) {
         final tabsRouter = AutoTabsRouter.of(context);
         return Scaffold(
-            appBar: AppBar(
-              automaticallyImplyLeading: false,
-              title: Center(
-                child: Text(
-                  "Transaksi",
-                  style: context.textTheme.headlineLarge,
-                ),
+          appBar: AppBar(
+            backgroundColor: ColorValues.primary30,
+            automaticallyImplyLeading: false,
+            title: Center(
+              child: Text(
+                "Transaksi",
+                style: context.textTheme.bodyLargeBold
+                    .copyWith(color: ColorValues.white),
               ),
             ),
-            body: CustomGestureUnfocus(
-              child: Column(
-                children: [
-                  Container(
-                    width: 100.w,
-                    height: 35.h,
-                    child: isLoading
-                        ? Center(child: CircularProgressIndicator())
-                        : errorMessage != null
-                            ? Center(child: Text(errorMessage!))
-                            : SfDataGrid(
-                                key: key,
-                                source: transaksiDataSource,
-                                columns: <GridColumn>[
-                                  GridColumn(
-                                    columnName: 'nama',
-                                    label: Container(
-                                      padding: EdgeInsets.all(8.0),
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        'Nama',
-                                        style: context.textTheme.bodySmallBold,
-                                      ),
-                                    ),
+          ),
+          body: CustomGestureUnfocus(
+            child: Column(
+              children: [
+                Container(
+                  width: 100.w,
+                  height: 30.h,
+                  decoration: BoxDecoration(
+                      color: ColorValues.primary30,
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(20),
+                        bottomRight: Radius.circular(20),
+                      )),
+                  child: isLoading
+                      ? Center(child: CircularProgressIndicator())
+                      : errorMessage != null
+                          ? Center(child: Text(errorMessage!))
+                          : Container(
+                              width: double.infinity,
+                              padding:
+                                  const EdgeInsets.all(Styles.defaultPadding),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Ringkasan Bulan Ini',
+                                    style:
+                                        context.textTheme.bodyMediumBoldBright,
                                   ),
-                                  GridColumn(
-                                    columnName: 'tanggal',
-                                    label: Container(
-                                      padding: EdgeInsets.all(8.0),
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        'Tanggal',
-                                        style: context.textTheme.bodySmallBold,
-                                      ),
-                                    ),
-                                  ),
-                                  GridColumn(
-                                    columnName: 'saldo',
-                                    label: Container(
-                                      padding: EdgeInsets.all(8.0),
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        'Nominal',
-                                        style: context.textTheme.bodySmallBold,
-                                      ),
-                                    ),
-                                  ),
-                                  GridColumn(
-                                    columnName: 'deskripsi',
-                                    label: Container(
-                                      padding: EdgeInsets.all(8.0),
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        'Deskripsi',
-                                        style: context.textTheme.bodySmallBold,
-                                      ),
-                                    ),
-                                  ),
-                                  GridColumn(
-                                    columnName: 'status',
-                                    label: Container(
-                                      padding: EdgeInsets.all(8.0),
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        'Status',
-                                        style: context.textTheme.bodySmallBold,
-                                      ),
-                                    ),
-                                  ),
+                                  SizedBox(height: 20),
+                                  _saldoMasuk(saldoMasuk),
+                                  SizedBox(height: 20),
+                                  _saldoKeluar(saldoKeluar),
                                 ],
                               ),
-                  ),
-                  _buildTabBar(controller, tabsRouter, context),
-                  Expanded(child: child),
-                ],
-              ),
-            ),
-            floatingActionButton: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                SizedBox(
-                  height: 64,
-                  width: 64,
-                  child: FloatingActionButton(
-                    tooltip: "Refresh",
-                    backgroundColor: Colors.blue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    onPressed: () {
-                      AutoRouter.of(context)
-                          .pushAndPopUntil(HomeWrapperRoute(), predicate: (route) => false);
-                      context.showSnackBar(message: "Refreshing...");
-                    },
-                    child: Icon(
-                      IconsaxPlusLinear.refresh,
-                      size: 44,
-                      color: ColorValues.white,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 16),
-                SizedBox(
-                  height: 64,
-                  width: 64,
-                  child: FloatingActionButton(
-                    tooltip: "Export to Excel",
-                    backgroundColor: Colors.blue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    onPressed: () {
-                      try {
-                        _exportDataGridToExcel();
-                        context.showSnackBar(
-                            message:
-                                "Data berhasil disimpan di Download/ngale/");
-                      } catch (e) {
-                        context.showSnackBar(
-                            message: e.toString(), isSuccess: false);
-                      }
-                    },
-                    child: Icon(
-                      IconsaxPlusLinear.printer,
-                      size: 44,
-                      color: ColorValues.white,
-                    ),
+                            ),
 
-                  ),
+                  // SfDataGrid(
+                  //             key: key,
+                  //             source: transaksiDataSource,
+                  //             columns: <GridColumn>[
+                  //               GridColumn(
+                  //                 columnName: 'nama',
+                  //                 label: Container(
+                  //                   padding: EdgeInsets.all(8.0),
+                  //                   alignment: Alignment.center,
+                  //                   child: Text(
+                  //                     'Nama',
+                  //                     style: context.textTheme.bodySmallBold,
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //               GridColumn(
+                  //                 columnName: 'status',
+                  //                 label: Container(
+                  //                   padding: EdgeInsets.all(8.0),
+                  //                   alignment: Alignment.center,
+                  //                   child: Text(
+                  //                     'Status',
+                  //                     style: context.textTheme.bodySmallBold,
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //               GridColumn(
+                  //                 columnName: 'nominal',
+                  //                 label: Container(
+                  //                   padding: EdgeInsets.all(8.0),
+                  //                   alignment: Alignment.center,
+                  //                   child: Text(
+                  //                     'Nominal',
+                  //                     style: context.textTheme.bodySmallBold,
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //               GridColumn(
+                  //                 columnName: 'deskripsi',
+                  //                 label: Container(
+                  //                   padding: EdgeInsets.all(8.0),
+                  //                   alignment: Alignment.center,
+                  //                   child: Text(
+                  //                     'Deskripsi',
+                  //                     style: context.textTheme.bodySmallBold,
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //               GridColumn(
+                  //                 columnName: 'tanggal',
+                  //                 label: Container(
+                  //                   padding: EdgeInsets.all(8.0),
+                  //                   alignment: Alignment.center,
+                  //                   child: Text(
+                  //                     'Tanggal',
+                  //                     style: context.textTheme.bodySmallBold,
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //               GridColumn(
+                  //                 columnName: 'tahun',
+                  //                 label: Container(
+                  //                   padding: EdgeInsets.all(8.0),
+                  //                   alignment: Alignment.center,
+                  //                   child: Text(
+                  //                     'Tahun',
+                  //                     style: context.textTheme.bodySmallBold,
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //               GridColumn(
+                  //                 columnName: 'bulan',
+                  //                 label: Container(
+                  //                   padding: EdgeInsets.all(8.0),
+                  //                   alignment: Alignment.center,
+                  //                   child: Text(
+                  //                     'Bulan',
+                  //                     style: context.textTheme.bodySmallBold,
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //             ],
+                  //           ),
                 ),
+                _buildTabBar(controller, tabsRouter, context),
+                Expanded(child: child),
               ],
-            ));
+            ),
+          ),
+          // floatingActionButton: Column(
+          //   mainAxisAlignment: MainAxisAlignment.end,
+          //   children: [
+          //     SizedBox(
+          //       height: 64,
+          //       width: 64,
+          //       child: FloatingActionButton(
+          //         tooltip: "Refresh",
+          //         backgroundColor: Colors.blue,
+          //         shape: RoundedRectangleBorder(
+          //           borderRadius: BorderRadius.circular(20),
+          //         ),
+          //         onPressed: () {
+          //           AutoRouter.of(context).pushAndPopUntil(HomeWrapperRoute(),
+          //               predicate: (route) => false);
+          //           context.showSnackBar(message: "Refreshing...");
+          //         },
+          //         child: Icon(
+          //           IconsaxPlusLinear.refresh,
+          //           size: 44,
+          //           color: ColorValues.white,
+          //         ),
+          //       ),
+          //     ),
+          //     SizedBox(height: 16),
+          //     SizedBox(
+          //       height: 64,
+          //       width: 64,
+          //       child: FloatingActionButton(
+          //         tooltip: "Export to Excel",
+          //         backgroundColor: Colors.blue,
+          //         shape: RoundedRectangleBorder(
+          //           borderRadius: BorderRadius.circular(20),
+          //         ),
+          //         onPressed: () {
+          //           try {
+          //             _exportDataGridToExcel();
+          //             context.showSnackBar(
+          //                 message: "Data berhasil disimpan di Download/ngale/");
+          //           } catch (e) {
+          //             context.showSnackBar(
+          //                 message: e.toString(), isSuccess: false);
+          //           }
+          //         },
+          //         child: Icon(
+          //           IconsaxPlusLinear.printer,
+          //           size: 44,
+          //           color: ColorValues.white,
+          //         ),
+          //       ),
+          //     ),
+          //   ],
+          // ),
+        );
       },
     );
   }
@@ -277,57 +383,5 @@ class _AdminTabsPageState extends State<AdminTabsPage> {
       ],
       indicatorColor: ColorValues.primary50,
     );
-  }
-}
-
-class TransaksiDataSource extends DataGridSource {
-  TransaksiDataSource({required List<Transaksi> transaksiList}) {
-    dataGridRows = transaksiList.map<DataGridRow>((Transaksi transaksi) {
-      return DataGridRow(cells: [
-        DataGridCell<String>(
-          columnName: 'nama',
-          value: transaksi.userId,
-        ),
-        DataGridCell<String>(
-          columnName: 'tanggal',
-          value: transaksi.tanggal,
-        ),
-        DataGridCell<int>(
-          columnName: 'saldo',
-          value: transaksi.saldo,
-        ),
-        DataGridCell<String>(
-          columnName: 'deskripsi',
-          value: transaksi.deskripsi,
-        ),
-        DataGridCell<String>(
-          columnName: 'status',
-          value: transaksi.status,
-        ),
-      ]);
-    }).toList();
-  }
-
-  @override
-  List<DataGridRow> dataGridRows = [];
-
-  @override
-  List<DataGridRow> get rows => dataGridRows;
-
-  @override
-  DataGridRowAdapter? buildRow(DataGridRow row) {
-    return DataGridRowAdapter(
-        cells: row.getCells().map<Widget>((dataGridCell) {
-      return Container(
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        alignment: Alignment.centerLeft,
-        child: Text(
-          dataGridCell.value.toString(),
-          style: TextStyle(
-            fontSize: 11.0,
-          ),
-        ),
-      );
-    }).toList());
   }
 }

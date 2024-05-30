@@ -193,7 +193,6 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
                   if (index != listTransaksi.length - 1) {
                     meteranTerakhir = listTransaksi[index + 1].meteran;
                   }
-
                   return TransactionCard(
                     isThereTransaksi: true,
                     transaksi: transaksi,

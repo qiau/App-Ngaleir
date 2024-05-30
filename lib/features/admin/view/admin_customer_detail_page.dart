@@ -7,14 +7,13 @@ import 'package:perairan_ngale/features/transaction_card.dart';
 import 'package:perairan_ngale/models/customer.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart' as svg;
 import 'package:perairan_ngale/models/transaksi.dart';
-import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
 import 'package:perairan_ngale/shared/styles.dart';
 import 'package:perairan_ngale/utils/extensions.dart';
 
 @RoutePage()
-class EmployeeCustomerDetailPage extends StatefulWidget {
-  const EmployeeCustomerDetailPage({
+class AdminCustomerDetailPage extends StatefulWidget {
+  const AdminCustomerDetailPage({
     super.key,
     required this.customer,
   });
@@ -22,12 +21,12 @@ class EmployeeCustomerDetailPage extends StatefulWidget {
   final Customer customer;
 
   @override
-  State<EmployeeCustomerDetailPage> createState() =>
-      _EmployeeCustomerDetailPageState();
+  State<AdminCustomerDetailPage> createState() =>
+      _AdminCustomerDetailPageState();
 }
 
-class _EmployeeCustomerDetailPageState
-    extends State<EmployeeCustomerDetailPage> {
+class _AdminCustomerDetailPageState
+    extends State<AdminCustomerDetailPage> {
 
   List<Transaksi> listTransaksi = [];
 
@@ -68,39 +67,11 @@ class _EmployeeCustomerDetailPageState
 
   @override
   Widget build(BuildContext context) {
-    var meteranTerakhir = 0;
     var isThereTransaksi = false;
     if (listTransaksi.isNotEmpty) {
-      meteranTerakhir = listTransaksi[0].meteran!;
       isThereTransaksi = true;
     }
     return Scaffold(
-      floatingActionButton: Container(
-        padding: EdgeInsets.only(left: Styles.biggerPadding),
-        child: ElevatedButton(
-          onPressed: () {
-            AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
-              isThereTransaksi: isThereTransaksi,
-              meteranTerakhir: meteranTerakhir,
-              customerId: widget.customer.uid,
-            ));
-          },
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                IconsaxPlusLinear.add,
-                color: Colors.white,
-              ),
-              SizedBox(width: 8),
-              Text(
-                'Catat Baru',
-                style: TextStyle(color: Colors.white, fontSize: 18),
-              ),
-            ],
-          ),
-        ),
-      ),
       backgroundColor: ColorValues.white,
       body: SingleChildScrollView(
         child: Column(
