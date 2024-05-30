@@ -31,6 +31,8 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
   final TextEditingController _rwController = TextEditingController();
   final TextEditingController _noTelponController = TextEditingController();
   final TextEditingController _towerController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
 
   @override
   Widget build(BuildContext context) {
@@ -54,21 +56,24 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
             child: Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: Styles.defaultPadding),
-              child: Column(
-                children: [
-                  _buildNameField(),
-                  _buildNomorTelpon(),
-                  _buildAlamatField(),
-                  _buildTowerField(),
-                  _buildRTField(),
-                  _buildRWField(),
-                  const SizedBox(height: Styles.defaultSpacing),
-                  _buildDoneButton(),
-                  Container(
-                    width: 100.w,
-                    height: 5.h,
-                  ),
-                ],
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    _buildNameField(),
+                    _buildNomorTelpon(),
+                    _buildAlamatField(),
+                    _buildTowerField(),
+                    _buildRTField(),
+                    _buildRWField(),
+                    const SizedBox(height: Styles.defaultSpacing),
+                    _buildDoneButton(),
+                    Container(
+                      width: 100.w,
+                      height: 5.h,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -84,6 +89,12 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
       hintText: "Masukkan nama Anda",
       fillColor: ColorValues.white,
       label: "Nama",
+      validator: (value) {
+        if (value!.isEmpty) {
+          return 'Nama tidak boleh kosong';
+        }
+        return null;
+      },
     );
   }
 
@@ -96,6 +107,12 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
       label: "Nomor Telpon",
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       keyboardType: TextInputType.number,
+      validator: (value) {
+        if (value!.isEmpty) {
+          return 'Nomor telpon tidak boleh kosong';
+        }
+        return null;
+      },
     );
   }
 
@@ -106,6 +123,12 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
       hintText: "Masukkan alamat rumah Anda",
       fillColor: ColorValues.white,
       label: "Alamat",
+      validator: (value) {
+        if (value!.isEmpty) {
+          return 'Alamat tidak boleh kosong';
+        }
+        return null;
+      },
     );
   }
 
@@ -118,6 +141,12 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
       label: "RT",
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       keyboardType: TextInputType.number,
+      validator: (value) {
+        if (value!.isEmpty) {
+          return 'RT tidak boleh kosong';
+        }
+        return null;
+      },
     );
   }
 
@@ -130,6 +159,12 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
       label: "RW",
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       keyboardType: TextInputType.number,
+      validator: (value) {
+        if (value!.isEmpty) {
+          return 'RW tidak boleh kosong';
+        }
+        return null;
+      },
     );
   }
 
@@ -140,6 +175,12 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
       hintText: "Masukkan alamat tower Anda",
       fillColor: ColorValues.white,
       label: "Tower",
+      validator: (value) {
+        if (value!.isEmpty) {
+          return 'Tower tidak boleh kosong';
+        }
+        return null;
+      },
     );
   }
 
@@ -150,38 +191,40 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
       width: double.infinity,
       onPressed: () {
         _saveUserDataToFirestore();
-        AutoRouter.of(context).replace(HomeWrapperRoute());
       },
     );
   }
 
   Future<void> _saveUserDataToFirestore() async {
-    try {
-      User? user = FirebaseAuth.instance.currentUser;
-      final collectionRef = FirebaseFirestore.instance.collection('Customer');
-      final count = await collectionRef.count().get();
-      final countValue = count.count;
-      String counts = '$countValue';
-      if (user != null) {
-        String userId = user.uid;
-        await FirebaseFirestore.instance
-            .collection('Customer')
-            .doc(userId)
-            .set({
-          'nama': _nameController.text,
-          'alamatTower': _towerController.text,
-          'alamat': _addressController.text,
-          'rt': _rtController.text,
-          'rw': _rwController.text,
-          'noTelpon': _noTelponController.text,
-          'customer_no': _rtController.text + _rwController.text + counts,
-        });
-        print('Data pelanggan berhasil disimpan di Firestore.');
-      } else {
-        print('Tidak ada pengguna yang sedang login.');
+    if (_formKey.currentState!.validate()) {
+      try {
+        User? user = FirebaseAuth.instance.currentUser;
+        final collectionRef = FirebaseFirestore.instance.collection('Customer');
+        final count = await collectionRef.count().get();
+        final countValue = count.count;
+        String counts = '$countValue';
+        if (user != null) {
+          String userId = user.uid;
+          await FirebaseFirestore.instance
+              .collection('Customer')
+              .doc(userId)
+              .set({
+            'nama': _nameController.text,
+            'alamatTower': _towerController.text,
+            'alamat': _addressController.text,
+            'rt': _rtController.text,
+            'rw': _rwController.text,
+            'noTelpon': _noTelponController.text,
+            'customer_no': _rtController.text + _rwController.text + counts,
+          });
+          AutoRouter.of(context).replace(HomeWrapperRoute());
+          print('Data pelanggan berhasil disimpan di Firestore.');
+        } else {
+          print('Tidak ada pengguna yang sedang login.');
+        }
+      } catch (error) {
+        print("Error: $error");
       }
-    } catch (error) {
-      print("Error: $error");
     }
   }
 }

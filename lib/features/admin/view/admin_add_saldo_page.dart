@@ -24,28 +24,33 @@ class AdminAddMoneyPage extends StatefulWidget {
 class _AdminAddMoneyPageState extends State<AdminAddMoneyPage> {
   final _saldoController = TextEditingController();
   final _deskripsiController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
 
   Future<void> _tambahSaldo(BuildContext context) async {
-    try {
-      final transaksi = Transaksi(
-        deskripsi: _deskripsiController.text,
-        saldo: int.parse(_saldoController.text),
-        status: 'pembayaran',
-        tanggal: Timestamp.now().toDate().toString(),
-        userId: FirebaseAuth.instance.currentUser!.uid,
-      );
+    if (_formKey.currentState!.validate()) {
+      try {
+        final transaksi = Transaksi(
+          deskripsi: _deskripsiController.text,
+          saldo: int.parse(_saldoController.text),
+          status: 'pembayaran',
+          tanggal: Timestamp.now().toDate().toString(),
+          userId: FirebaseAuth.instance.currentUser!.uid,
+        );
 
-      await FirebaseFirestore.instance
-          .collection('Transaksi')
-          .add(transaksi.toJson());
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Tambah saldo berhasil')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Terjadi kesalahan: $e')),
-      );
+        await FirebaseFirestore.instance
+            .collection('Transaksi')
+            .add(transaksi.toJson());
+        AutoRouter.of(context).pushAndPopUntil(HomeWrapperRoute(),
+            predicate: (route) => false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Tambah saldo berhasil')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Terjadi kesalahan: $e')),
+        );
+      }
     }
   }
 
@@ -72,32 +77,33 @@ class _AdminAddMoneyPageState extends State<AdminAddMoneyPage> {
               topRight: Radius.circular(20),
             ),
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildTitleSection(context),
-              SizedBox(height: Styles.defaultPadding),
-              _buildSaldoTextField(context),
-              SizedBox(height: Styles.defaultPadding),
-              _buildDeskripsiTextField(context),
-              SizedBox(height: Styles.bigPadding),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: Styles.defaultPadding),
-                child: CustomButton(
-                  onPressed: () {
-                    _tambahSaldo(context);
-                    AutoRouter.of(context).pushAndPopUntil(HomeWrapperRoute(),
-                        predicate: (route) => false);
-                  },
-                  text: 'Tambah Saldo',
-                  backgroundColor: Colors.green,
-                  textColor: Colors.white,
-                  width: double.infinity,
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildTitleSection(context),
+                SizedBox(height: Styles.defaultPadding),
+                _buildSaldoTextField(context),
+                SizedBox(height: Styles.defaultPadding),
+                _buildDeskripsiTextField(context),
+                SizedBox(height: Styles.bigPadding),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: Styles.defaultPadding),
+                  child: CustomButton(
+                    onPressed: () {
+                      _tambahSaldo(context);
+                    },
+                    text: 'Tambah Saldo',
+                    backgroundColor: Colors.green,
+                    textColor: Colors.white,
+                    width: double.infinity,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -127,6 +133,12 @@ class _AdminAddMoneyPageState extends State<AdminAddMoneyPage> {
         hintText: "Rp 0",
         label: "Jumlah Saldo",
         keyboardType: TextInputType.number,
+        validator: (value) {
+          if (value!.isEmpty) {
+            return 'Jumlah saldo tidak boleh kosong';
+          }
+          return null;
+        },
       ),
     );
   }
@@ -139,6 +151,12 @@ class _AdminAddMoneyPageState extends State<AdminAddMoneyPage> {
         label: "Keterangan",
         controller: _deskripsiController,
         maxLines: null,
+        validator: (value) {
+          if (value!.isEmpty) {
+            return 'Keterangan tidak boleh kosong';
+          }
+          return null;
+        },
       ),
     );
   }
