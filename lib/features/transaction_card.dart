@@ -13,14 +13,35 @@ import 'package:perairan_ngale/shared/styles.dart';
 import 'package:perairan_ngale/utils/extensions.dart';
 
 class TransactionCard extends StatelessWidget {
-  const TransactionCard({super.key, required this.transaksi});
+  const TransactionCard(
+      {super.key,
+      required this.transaksi,
+      this.customerId,
+      this.meteranTerakhir,
+      required this.isThereTransaksi});
   final Transaksi transaksi;
+  final String? customerId;
+  final int? meteranTerakhir;
+  final bool isThereTransaksi;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        AutoRouter.of(context).push(CustomerRecordDetailRoute());
+        if (customerId == null) {
+          print('apalah');
+          AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
+            isThereTransaksi: isThereTransaksi,
+            transaksi: transaksi,
+            meteranTerakhir: meteranTerakhir,
+          ));
+        } else {
+          AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
+            isThereTransaksi: isThereTransaksi,
+            customerId: customerId,
+            meteranTerakhir: meteranTerakhir,
+          ));
+        }
       },
       child: Container(
         child: Padding(

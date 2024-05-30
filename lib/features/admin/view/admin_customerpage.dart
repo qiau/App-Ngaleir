@@ -21,7 +21,7 @@ class _AdminCustomerPageState extends State<AdminCustomerPage> {
 
   Future<Admin> getAdmin(String userId) async {
     final doc =
-    await FirebaseFirestore.instance.collection('Admin').doc(userId).get();
+        await FirebaseFirestore.instance.collection('Admin').doc(userId).get();
 
     final admin = Admin.fromFirestore(doc);
     return admin;
@@ -47,6 +47,7 @@ class _AdminCustomerPageState extends State<AdminCustomerPage> {
     super.initState();
     _getAdmin();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,8 +61,8 @@ class _AdminCustomerPageState extends State<AdminCustomerPage> {
             Expanded(
                 child: _admin != null
                     ? CustomerListAll(
-                  admin: _admin!,
-                )
+                        admin: _admin!,
+                      )
                     : Center(child: Text('Coba Lagi'))),
           ],
         ),

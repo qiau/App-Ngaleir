@@ -6,6 +6,7 @@ import 'package:perairan_ngale/features/authentication/authentication.dart';
 import 'package:perairan_ngale/features/employee/employee.dart';
 import 'package:perairan_ngale/models/customer.dart';
 import 'package:perairan_ngale/home_wrapper.dart';
+import 'package:perairan_ngale/models/transaksi.dart';
 
 part 'router.gr.dart';
 
@@ -59,6 +60,49 @@ class AppRouter extends _$AppRouter {
           path: '/',
           transitionsBuilder: TransitionsBuilders.fadeIn,
           initial: true,
+        ),
+        CustomRoute(
+            page: EmployeeCustomerDetailRoute.page,
+            path: '/employee_customer_detail',
+            transitionsBuilder: TransitionsBuilders.fadeIn),
+        CustomRoute(
+          page: AdminMenuRoute.page,
+          path: '/admin',
+          transitionsBuilder: TransitionsBuilders.fadeIn,
+          children: [
+            CustomRoute(
+              page: AdminHomeRoute.page,
+              path: 'admin-homepage',
+              transitionsBuilder: TransitionsBuilders.fadeIn,
+            ),
+            CustomRoute(
+              page: AdminCustomerRoute.page,
+              path: 'admin-customer',
+              transitionsBuilder: TransitionsBuilders.fadeIn,
+            ),
+            CustomRoute(
+              page: AdminTabsRoute.page,
+              path: 'admin-tabs',
+              transitionsBuilder: TransitionsBuilders.fadeIn,
+              children: [
+                CustomRoute(
+                  page: AdminTransactionRoute.page,
+                  path: 'admin-transaction',
+                  transitionsBuilder: TransitionsBuilders.fadeIn,
+                ),
+                CustomRoute(
+                  page: AdminIncomeRoute.page,
+                  path: 'admin-income',
+                  transitionsBuilder: TransitionsBuilders.fadeIn,
+                ),
+              ],
+            ),
+          ],
+        ),
+        CustomRoute(
+          page: AdminWithdrawalRoute.page,
+          path: '/withdrawal',
+          transitionsBuilder: TransitionsBuilders.fadeIn,
         ),
         CustomRoute(
           page: AdminMenuRoute.page,

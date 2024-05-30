@@ -12,6 +12,7 @@ class Customer with _$Customer {
     required String alamat,
     required String noTelpon,
     required String rt,
+    required String alamatTower,
     required String rw,
   }) = _Customer;
 
@@ -23,6 +24,7 @@ class Customer with _$Customer {
       if (data != null) {
         return Customer(
           uid: doc.id,
+          alamatTower: data['alamatTower'],
           noTelpon: data['noTelpon'],
           customerNo: data['customer_no'],
           nama: data['nama'],

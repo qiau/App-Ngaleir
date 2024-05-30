@@ -3,13 +3,16 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'transaksi.freezed.dart';
 part 'transaksi.g.dart';
+
 @freezed
 class Transaksi with _$Transaksi {
   const factory Transaksi({
     required String tanggal,
     required String status,
     required int saldo,
+    int? meteran,
     required String userId,
+    String? pathImage,
     required String deskripsi,
   }) = _Transaksi;
 

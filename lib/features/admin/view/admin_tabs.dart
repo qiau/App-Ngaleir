@@ -17,7 +17,6 @@ import 'package:syncfusion_flutter_datagrid_export/export.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart' as xlsio;
 import 'dart:io';
 
-
 @RoutePage()
 class AdminTabsPage extends StatefulWidget {
   const AdminTabsPage({super.key});
@@ -41,8 +40,7 @@ class _AdminTabsPageState extends State<AdminTabsPage> {
 
   Future<void> _exportDataGridToExcel() async {
     logger.d('current state key ${key.currentState}');
-    final xlsio.Workbook workbook =
-    key.currentState!.exportToExcelWorkbook();
+    final xlsio.Workbook workbook = key.currentState!.exportToExcelWorkbook();
     final List<int> bytes = workbook.saveAsStream();
     workbook.dispose();
     final helper = SaveFileMobile();
@@ -197,7 +195,8 @@ class _AdminTabsPageState extends State<AdminTabsPage> {
                     _exportDataGridToExcel();
                     context.showSnackBar(message: "Data berhasil disimpan di Download/ngale/");
                   } catch (e) {
-                    context.showSnackBar(message: e.toString(), isSuccess: false);
+                    context.showSnackBar(
+                        message: e.toString(), isSuccess: false);
                   }
                 },
                 child: Icon(

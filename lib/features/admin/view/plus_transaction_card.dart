@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:intl/intl.dart';
@@ -44,7 +43,10 @@ class PlusTransactionCard extends StatelessWidget {
 
   Future<String> _getCustomerName(String userId) async {
     final DocumentSnapshot<Map<String, dynamic>> snapshot =
-    await FirebaseFirestore.instance.collection('Customer').doc(userId).get();
+        await FirebaseFirestore.instance
+            .collection('Customer')
+            .doc(userId)
+            .get();
 
     if (snapshot.exists) {
       final customer = Customer.fromFirestore(snapshot);
@@ -104,8 +106,8 @@ class PlusTransactionCard extends StatelessWidget {
                       color: transaksi.status == 'pembayaran'
                           ? Colors.green
                           : transaksi.status == 'pengeluaran'
-                          ? Colors.red
-                          : Colors.black,
+                              ? Colors.red
+                              : Colors.black,
                     ),
                   ),
                   Text(

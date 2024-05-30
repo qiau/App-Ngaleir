@@ -117,7 +117,6 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
   }
 
   Widget _buildTopBarContentWidget() {
-    print(listTransaksi.length.toString() + 'mantap');
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(Styles.defaultPadding),
@@ -190,8 +189,15 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
                 itemCount: listTransaksi.length,
                 itemBuilder: (context, index) {
                   Transaksi transaksi = listTransaksi[index];
+                  int? meteranTerakhir = 0;
+                  if (index != listTransaksi.length - 1) {
+                    meteranTerakhir = listTransaksi[index + 1].meteran;
+                  }
+
                   return TransactionCard(
+                    isThereTransaksi: true,
                     transaksi: transaksi,
+                    meteranTerakhir: meteranTerakhir,
                   );
                 },
               ),
@@ -202,6 +208,32 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
     );
   }
 
+  Widget _buildHistoryWidget() {
+    return GestureDetector(
+      onTap: () {
+        AutoRouter.of(context).push(CustomerRecordDetailRoute());
+      },
+      child: Container(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: Styles.smallerPadding),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Text(
+                  "Mei 2024",
+                  style: context.textTheme.bodyMediumBold,
+                ),
+              ),
+              _buildHistoryItemWidget(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   Widget _buildHistoryItemWidget() {
     final saldo =

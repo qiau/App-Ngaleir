@@ -53,7 +53,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
           child: SingleChildScrollView(
             child: Padding(
               padding:
-              const EdgeInsets.symmetric(horizontal: Styles.defaultPadding),
+                  const EdgeInsets.symmetric(horizontal: Styles.defaultPadding),
               child: Column(
                 children: [
                   _buildNameField(),
@@ -169,12 +169,12 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
             .doc(userId)
             .set({
           'nama': _nameController.text,
+          'alamatTower': _towerController.text,
           'alamat': _addressController.text,
           'rt': _rtController.text,
           'rw': _rwController.text,
           'noTelpon': _noTelponController.text,
           'customer_no': _rtController.text + _rwController.text + counts,
-          'alamatTower': _towerController.text,
         });
         print('Data pelanggan berhasil disimpan di Firestore.');
       } else {
