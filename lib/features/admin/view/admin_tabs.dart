@@ -182,29 +182,60 @@ class _AdminTabsPageState extends State<AdminTabsPage> {
                 ],
               ),
             ),
-            floatingActionButton: SizedBox(
-              height: 64,
-              width: 64,
-              child: FloatingActionButton(
-                backgroundColor: Colors.blue,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+            floatingActionButton: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  height: 64,
+                  width: 64,
+                  child: FloatingActionButton(
+                    tooltip: "Refresh",
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    onPressed: () {
+                      AutoRouter.of(context)
+                          .pushAndPopUntil(HomeWrapperRoute(), predicate: (route) => false);
+                      context.showSnackBar(message: "Refreshing...");
+                    },
+                    child: Icon(
+                      IconsaxPlusLinear.refresh,
+                      size: 44,
+                      color: ColorValues.white,
+                    ),
+                  ),
                 ),
-                onPressed: () {
-                  try {
-                    _exportDataGridToExcel();
-                    context.showSnackBar(message: "Data berhasil disimpan di Download/ngale/");
-                  } catch (e) {
-                    context.showSnackBar(
-                        message: e.toString(), isSuccess: false);
-                  }
-                },
-                child: Icon(
-                  IconsaxPlusLinear.printer,
-                  size: 44,
-                  color: ColorValues.white,
+                SizedBox(height: 16),
+                SizedBox(
+                  height: 64,
+                  width: 64,
+                  child: FloatingActionButton(
+                    tooltip: "Export to Excel",
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    onPressed: () {
+                      try {
+                        _exportDataGridToExcel();
+                        context.showSnackBar(
+                            message:
+                                "Data berhasil disimpan di Download/ngale/");
+                      } catch (e) {
+                        context.showSnackBar(
+                            message: e.toString(), isSuccess: false);
+                      }
+                    },
+                    child: Icon(
+                      IconsaxPlusLinear.printer,
+                      size: 44,
+                      color: ColorValues.white,
+                    ),
+
+                  ),
                 ),
-              ),
+              ],
             ));
       },
     );

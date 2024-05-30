@@ -22,28 +22,43 @@ class AdminWithdrawalPage extends StatefulWidget {
 class _AdminWithdrawalPageState extends State<AdminWithdrawalPage> {
   final _saldoController = TextEditingController();
   final _deskripsiController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   Future<void> _tarikSaldo(BuildContext context) async {
-    try {
-      final transaksi = Transaksi(
-        deskripsi: _deskripsiController.text,
-        saldo: int.parse(_saldoController.text),
-        status: 'pengeluaran',
-        tanggal: Timestamp.now().toDate().toString(),
-        userId: FirebaseAuth.instance.currentUser!.uid,
-      );
+    if (_formKey.currentState!.validate()) {
+      try {
+        final admin = await FirebaseFirestore.instance.collection('Admin').doc(FirebaseAuth.instance.currentUser!.uid).get();
+        final int totalSaldo = admin.data()!['saldo'].toInt();
+        final int jumlahTarikSaldo = int.parse(_saldoController.text);
 
-      await FirebaseFirestore.instance
-          .collection('Transaksi')
-          .add(transaksi.toJson());
+        if (jumlahTarikSaldo > totalSaldo) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Jumlah tarik saldo tidak boleh melebihi total saldo')),
+          );
+          return;
+        }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Tarik saldo berhasil')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Terjadi kesalahan: $e')),
-      );
+        final transaksi = Transaksi(
+          deskripsi: _deskripsiController.text,
+          saldo: jumlahTarikSaldo,
+          status: 'pengeluaran',
+          tanggal: Timestamp.now().toDate().toString(),
+          userId: FirebaseAuth.instance.currentUser!.uid,
+        );
+
+        await FirebaseFirestore.instance
+            .collection('Transaksi')
+            .add(transaksi.toJson());
+        AutoRouter.of(context)
+            .pushAndPopUntil(HomeWrapperRoute(), predicate: (route) => false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Tarik saldo berhasil')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Terjadi kesalahan: $e')),
+        );
+      }
     }
   }
 
@@ -70,32 +85,33 @@ class _AdminWithdrawalPageState extends State<AdminWithdrawalPage> {
               topRight: Radius.circular(20),
             ),
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildTitleSection(context),
-              SizedBox(height: Styles.defaultPadding),
-              _buildSaldoTextField(context),
-              SizedBox(height: Styles.defaultPadding),
-              _buildDeskripsiTextField(context),
-              SizedBox(height: Styles.bigPadding),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: Styles.defaultPadding),
-                child: CustomButton(
-                  onPressed: () {
-                    _tarikSaldo(context);
-                    AutoRouter.of(context).pushAndPopUntil(HomeWrapperRoute(),
-                        predicate: (route) => false);
-                  },
-                  text: 'Tarik Saldo',
-                  backgroundColor: Colors.red,
-                  textColor: Colors.white,
-                  width: double.infinity,
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildTitleSection(context),
+                SizedBox(height: Styles.defaultPadding),
+                _buildSaldoTextField(context),
+                SizedBox(height: Styles.defaultPadding),
+                _buildDeskripsiTextField(context),
+                SizedBox(height: Styles.bigPadding),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: Styles.defaultPadding),
+                  child: CustomButton(
+                    onPressed: () {
+                      _tarikSaldo(context);
+                    },
+                    text: 'Tarik Saldo',
+                    backgroundColor: Colors.red,
+                    textColor: Colors.white,
+                    width: double.infinity,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -125,6 +141,12 @@ class _AdminWithdrawalPageState extends State<AdminWithdrawalPage> {
         hintText: "Rp 0",
         label: "Jumlah Saldo",
         keyboardType: TextInputType.number,
+        validator: (value) {
+          if (value!.isEmpty) {
+            return 'Jumlah saldo tidak boleh kosong';
+          }
+          return null;
+        },
       ),
     );
   }
@@ -137,6 +159,12 @@ class _AdminWithdrawalPageState extends State<AdminWithdrawalPage> {
         label: "Keterangan",
         controller: _deskripsiController,
         maxLines: null,
+        validator: (value) {
+          if (value!.isEmpty) {
+            return 'Keterangan tidak boleh kosong';
+          }
+          return null;
+        },
       ),
     );
   }

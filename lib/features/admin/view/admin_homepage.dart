@@ -64,11 +64,8 @@ class _AdminHomePageState extends State<AdminHomePage> {
       body: Column(
         children: [
           _buildTopBarWidget(),
-          SizedBox(height: 8),
           _buildSaldoCard(),
-          SizedBox(height: 8),
           _buildIconMenu(),
-          SizedBox(height: 8),
           Expanded(
             child: listTransaksi.isEmpty
                 ? Center(
@@ -103,10 +100,9 @@ class _AdminHomePageState extends State<AdminHomePage> {
     return Padding(
       padding: const EdgeInsets.only(
           left: Styles.defaultPadding,
-          right: Styles.defaultPadding,
-          top: Styles.defaultPadding),
+          right: Styles.defaultPadding,),
       child: Container(
-        height: 244,
+        height: MediaQuery.of(context).size.height * 0.3,
         child: ListView.builder(
           itemCount: listTransaksi.length,
           itemBuilder: (context, index) {
