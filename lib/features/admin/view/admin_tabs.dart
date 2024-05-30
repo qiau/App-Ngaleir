@@ -195,6 +195,7 @@ class _AdminTabsPageState extends State<AdminTabsPage> {
                 onPressed: () {
                   try {
                     _exportDataGridToExcel();
+                    context.showSnackBar(message: "Data berhasil disimpan di Download/ngale/");
                   } catch (e) {
                     context.showSnackBar(message: e.toString(), isSuccess: false);
                   }
@@ -267,7 +268,7 @@ class TransaksiDataSource extends DataGridSource {
         ),
         DataGridCell<String>(
           columnName: 'deskripsi',
-          value: transaksi.deskripsi ?? '-',
+          value: transaksi.deskripsi,
         ),
         DataGridCell<String>(
           columnName: 'status',

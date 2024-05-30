@@ -108,7 +108,6 @@ class _CustomerListAllState extends State<CustomerListAll> {
               .orderBy('nama'),
           itemBuilder: (context, snapshot) {
             Map<String, dynamic> user = snapshot.data();
-
             return CustomerCard(
               nama: user['nama'],
               alamat: user['alamat'],
