@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:intl/intl.dart';
@@ -12,6 +11,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TransactionCardNormal extends StatelessWidget {
   const TransactionCardNormal({super.key, required this.transaksi});
+
   final Transaksi transaksi;
 
   @override
@@ -44,7 +44,10 @@ class TransactionCardNormal extends StatelessWidget {
 
   Future<String> _getCustomerName(String userId) async {
     final DocumentSnapshot<Map<String, dynamic>> snapshot =
-    await FirebaseFirestore.instance.collection('Customer').doc(userId).get();
+        await FirebaseFirestore.instance
+            .collection('Customer')
+            .doc(userId)
+            .get();
 
     if (snapshot.exists) {
       final customer = Customer.fromFirestore(snapshot);
@@ -79,22 +82,17 @@ class TransactionCardNormal extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         '${customerName.split(' ').take(2).join(' ')}',
-                        style: context.textTheme.bodyMediumBold, maxLines: 1,
-                      ),
-                      Text(
-                        '$saldo',
-                        style: context.textTheme.bodyMedium,
-                      ),
-                      const SizedBox(
-                        height: Styles.smallSpacing,
+                        style: context.textTheme.bodyMediumBold,
+                        maxLines: 1,
                       ),
                       Text(
                         DateHelper.formatDateToDayMonthYearTime(
@@ -102,6 +100,24 @@ class TransactionCardNormal extends StatelessWidget {
                         style: context.textTheme.bodySmallGrey,
                       ),
                     ],
+                  ),
+                  Text(
+                    '$saldo',
+                    style: context.textTheme.bodyMediumBold.copyWith(
+                      color: transaksi.status == 'pembayaran'
+                          ? Colors.green
+                          : transaksi.status == 'pengeluaran'
+                              ? Colors.red
+                              : Colors.black,
+                    ),
+                  ),
+                  Text(
+                    transaksi.deskripsi,
+                    style: context.textTheme.bodySmallGrey,
+                    maxLines: 1,
+                  ),
+                  const SizedBox(
+                    height: Styles.smallSpacing,
                   ),
                 ],
               ),
