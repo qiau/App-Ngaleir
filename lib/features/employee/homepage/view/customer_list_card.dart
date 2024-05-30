@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
+import 'package:perairan_ngale/models/admin.dart';
 import 'package:perairan_ngale/models/customer.dart';
 import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
@@ -14,7 +15,6 @@ import 'package:perairan_ngale/utils/extensions.dart';
 class CustomerCard extends StatelessWidget {
   const CustomerCard({super.key, required this.customer});
   final Customer customer;
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

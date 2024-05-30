@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:perairan_ngale/features/admin/view/transaction_card.dart';
@@ -71,7 +70,11 @@ class _AdminHomePageState extends State<AdminHomePage> {
           _buildIconMenu(),
           SizedBox(height: 8),
           Expanded(
-            child: Column(
+            child: listTransaksi.isEmpty
+                ? Center(
+              child: Text('No transactions found'),
+            )
+                : Column(
               children: [
                 _buildRecentTransaction(),
                 _buildCardTransaction(),

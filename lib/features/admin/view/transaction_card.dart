@@ -90,7 +90,9 @@ class TransactionCardNormal extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '${customerName.split(' ').take(2).join(' ')}',
+                        customerName.split(' ').length > 1
+                            ? '${customerName.split(' ')[0]} ${customerName.split(' ')[1][0]}'
+                            : customerName,
                         style: context.textTheme.bodyMediumBold,
                         maxLines: 1,
                       ),
