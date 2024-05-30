@@ -131,13 +131,13 @@ class _EmployeeHomePageState extends State<EmployeeHomePage> {
             ),
             IconButton(
               icon: const Icon(
-                IconsaxPlusLinear.setting,
+                IconsaxPlusLinear.logout,
                 size: Styles.bigIcon,
-                color: Colors.white,
+                color: Colors.red,
               ),
               onPressed: () {
                 FirebaseAuth.instance.signOut();
-                AutoRouter.of(context).push(LoginRoute());
+                AutoRouter.of(context).pushAndPopUntil(LoginRoute(), predicate: (route) => false);
               },
             ),
           ],
