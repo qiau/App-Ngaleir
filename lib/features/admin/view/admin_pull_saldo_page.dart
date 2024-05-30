@@ -44,6 +44,8 @@ class _AdminWithdrawalPageState extends State<AdminWithdrawalPage> {
           status: 'pengeluaran',
           tanggal: Timestamp.now().toDate().toString(),
           userId: FirebaseAuth.instance.currentUser!.uid,
+          bulan: Timestamp.now().toDate().month,
+          tahun: Timestamp.now().toDate().year,
         );
 
         await FirebaseFirestore.instance

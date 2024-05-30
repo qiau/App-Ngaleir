@@ -148,5 +148,15 @@ class AppRouter extends _$AppRouter {
           path: '/addmoney',
           transitionsBuilder: TransitionsBuilders.fadeIn,
         ),
+        CustomRoute(
+          page: AdminCustomerDetailRoute.page,
+          path: '/admincustomerdetail',
+          transitionsBuilder: TransitionsBuilders.fadeIn,
+        ),
+        CustomRoute(
+          page: AdminCetakRoute.page,
+          path: '/admincetak',
+          transitionsBuilder: TransitionsBuilders.fadeIn,
+        ),
       ];
 }

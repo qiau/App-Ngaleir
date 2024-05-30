@@ -14,6 +14,8 @@ class Transaksi with _$Transaksi {
     required String userId,
     String? pathImage,
     required String deskripsi,
+    required int bulan,
+    required int tahun,
   }) = _Transaksi;
 
   factory Transaksi.fromJson(Map<String, dynamic> json) =>

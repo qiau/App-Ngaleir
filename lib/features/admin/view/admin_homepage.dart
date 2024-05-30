@@ -158,6 +158,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
       children: [
         _buildTarikIcon(),
         _buildAmbilIcon(),
+        _buildCetakIcon(),
       ],
     );
   }
@@ -212,6 +213,31 @@ class _AdminHomePageState extends State<AdminHomePage> {
     );
   }
 
+  Column _buildCetakIcon() {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: () {
+            AutoRouter.of(context).push(AdminCetakRoute());
+          },
+          child: Container(
+            child: Icon(
+              IconsaxPlusLinear.printer,
+              size: 44,
+              color: ColorValues.white,
+            ),
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+                color: ColorValues.primary40,
+                borderRadius: BorderRadius.circular(100)),
+          ),
+        ),
+        Text('Cetak', style: context.textTheme.bodySmallBold),
+      ],
+    );
+  }
+
   Widget _buildSaldoCard() {
     return FutureBuilder<double>(
       future: _getTotalSaldo(),
@@ -244,7 +270,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
                     Padding(
                       padding:
                           const EdgeInsets.only(top: Styles.defaultPadding),
-                      child: Text("Transaksi Terakhir:",
+                      child: Text("Transaksi Bulan Ini:",
                           style: context.textTheme.bodySmallSemiBoldBright),
                     ),
                     Row(
@@ -270,10 +296,12 @@ class _AdminHomePageState extends State<AdminHomePage> {
         await FirebaseFirestore.instance.collection('Transaksi').get();
 
     snapshot.docs.forEach((doc) {
-      if (doc['status'] == 'pembayaran') {
-        totalSaldo += doc['saldo'];
-      } else if (doc['status'] == 'pengeluaran') {
-        totalSaldo -= doc['saldo'];
+      if (doc['bulan'] == DateTime.now().month && doc['tahun'] == DateTime.now().year) {
+        if (doc['status'] == 'pembayaran') {
+          totalSaldo += doc['saldo'];
+        } else if (doc['status'] == 'pengeluaran') {
+          totalSaldo -= doc['saldo'];
+        }
       }
     });
 
@@ -289,18 +317,17 @@ class _AdminHomePageState extends State<AdminHomePage> {
     final QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
         .instance
         .collection('Transaksi')
-        .orderBy('tanggal', descending: true)
-        .limit(1)
+        .where('bulan', isEqualTo: DateTime.now().month)
+        .where('tahun', isEqualTo: DateTime.now().year)
         .get();
 
-    if (snapshot.docs.isNotEmpty) {
-      final doc = snapshot.docs.first;
+    snapshot.docs.forEach((doc) {
       if (doc['status'] == 'pembayaran') {
-        lastTransactions['saldoMasuk'] = doc['saldo'];
+        lastTransactions['saldoMasuk'] += doc['saldo'];
       } else if (doc['status'] == 'pengeluaran') {
-        lastTransactions['saldoKeluar'] = doc['saldo'];
+        lastTransactions['saldoKeluar'] += doc['saldo'];
       }
-    }
+    });
 
     return lastTransactions;
   }
@@ -320,7 +347,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
               return Text('Error: ${snapshot.error}');
             } else {
               final lastSaldoMasuk = snapshot.data!['saldoMasuk'];
-              return Text('Rp $lastSaldoMasuk',
+              return Text('+ $lastSaldoMasuk',
                   style: context.textTheme.bodyMediumBoldBright);
             }
           },
@@ -342,8 +369,8 @@ class _AdminHomePageState extends State<AdminHomePage> {
               return Text('Error: ${snapshot.error}');
             } else {
               final lastSaldoKeluar = snapshot.data!['saldoKeluar'];
-              return Text('Rp $lastSaldoKeluar',
-                  style: context.textTheme.bodyMediumBoldBright);
+              return Text('- $lastSaldoKeluar',
+                  style: context.textTheme.bodyMediumBoldBright,);
             }
           },
         ),

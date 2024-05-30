@@ -72,7 +72,7 @@ class _EmployeeHomePageState extends State<EmployeeHomePage> {
                   ? CustomerList(
                       employee: _employee!,
                     )
-                  : Text('Apalah')),
+                  : Text('Coba Lagi')),
         ],
       ),
     );
@@ -110,6 +110,7 @@ class _EmployeeHomePageState extends State<EmployeeHomePage> {
                 color: Colors.white,
               ),
             ),
+            if (_employee != null)
             Expanded(
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,25 +125,58 @@ class _EmployeeHomePageState extends State<EmployeeHomePage> {
                       height: Styles.smallSpacing,
                     ),
                     Text(
-                      'coba',
+                      _employee!.alamatTower,
                       style: context.textTheme.bodySmallBright,
                     ),
                   ]),
             ),
             IconButton(
               icon: const Icon(
-                IconsaxPlusLinear.setting,
+                IconsaxPlusLinear.logout,
                 size: Styles.bigIcon,
                 color: Colors.white,
               ),
               onPressed: () {
-                FirebaseAuth.instance.signOut();
-                AutoRouter.of(context).push(LoginRoute());
+                _showLogoutConfirmationDialog(context);
               },
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _showLogoutConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Konfirmasi Keluar', style: context.textTheme.bodyMediumBold),
+          content: Text('Apakah Anda yakin ingin keluar dari Petugas?', style: context.textTheme.bodyMedium),
+          actions: [
+            TextButton(
+              child: Text('Batal', style: context.textTheme.bodyMediumBold),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: Colors.red,
+              ),
+              child: TextButton(
+                child: Text('Keluar', style: context.textTheme.bodyMediumBoldBright),
+                onPressed: () async {
+                  await FirebaseAuth.instance.signOut();
+                  AutoRouter.of(context).pushAndPopUntil(LoginRoute(), predicate: (route) => false);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

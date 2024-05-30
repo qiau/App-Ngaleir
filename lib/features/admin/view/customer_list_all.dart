@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
-import 'package:perairan_ngale/features/employee/homepage/view/customer_list_card.dart';
+import 'package:perairan_ngale/features/admin/view/admin_customer_card.dart';
 import 'package:perairan_ngale/models/admin.dart';
 import 'package:perairan_ngale/models/customer.dart';
 import 'package:firebase_ui_firestore/firebase_ui_firestore.dart';
@@ -41,11 +41,6 @@ class _CustomerListAllState extends State<CustomerListAll> {
     _searchQuery.value = _searchController.text;
   }
 
-  void _onSearchSubmitted(String value) {
-    print("Search submitted: $value"); // Debug statement
-    _searchQuery.value = value;
-    print("Refresh triggered"); // Debug statement
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,8 +94,7 @@ class _CustomerListAllState extends State<CustomerListAll> {
       query: FirebaseFirestore.instance.collection('Customer').orderBy('nama'),
       itemBuilder: (context, snapshot) {
         final customer = Customer.fromFirestore(snapshot);
-
-        return CustomerCard(
+        return AdminCustomerCard(
           customer: customer,
         );
       },
@@ -126,7 +120,7 @@ class _CustomerListAllState extends State<CustomerListAll> {
             itemBuilder: (context, index) {
               var data = snapshot.data!.docs[index];
               final customer = Customer.fromFirestore(data);
-              return CustomerCard(
+              return AdminCustomerCard(
                 customer: customer,
               );
             },

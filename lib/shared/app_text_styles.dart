@@ -219,6 +219,18 @@ class AppTextStyles extends TextTheme {
         fontWeight: _regular,
       );
 
+
+  TextStyle get bodyLargeBold => GoogleFonts.plusJakartaSans(
+    color: ColorValues.text50,
+    fontSize: _largeFontSize,
+    fontWeight: _bold,
+  );
+
+  TextStyle get bodyVeryLargeBold => GoogleFonts.plusJakartaSans(
+    color: ColorValues.text50,
+    fontSize: _extraLargeFontSize,
+    fontWeight: _bold,
+  );
   @override
   TextStyle get bodyMedium => GoogleFonts.plusJakartaSans(
         color: ColorValues.text50,

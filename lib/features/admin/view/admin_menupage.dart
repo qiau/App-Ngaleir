@@ -96,7 +96,7 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Konfirmasi Keluar', style: context.textTheme.bodyMediumBold),
-          content: Text('Apakah Anda yakin ingin keluar dari aplikasi?', style: context.textTheme.bodyMedium),
+          content: Text('Apakah Anda yakin ingin keluar dari Admin?', style: context.textTheme.bodyMedium),
           actions: [
             TextButton(
               child: Text('Batal', style: context.textTheme.bodyMediumBold),
