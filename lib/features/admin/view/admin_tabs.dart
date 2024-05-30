@@ -2,12 +2,14 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
+import 'package:perairan_ngale/features/admin/save_file_mobile.dart';
 import 'package:perairan_ngale/models/admin.dart';
 import 'package:perairan_ngale/models/customer.dart';
 import 'package:perairan_ngale/models/transaksi.dart';
 import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
 import 'package:perairan_ngale/utils/extensions.dart';
+import 'package:perairan_ngale/utils/logger.dart';
 import 'package:perairan_ngale/widgets/custom_gesture_unfocus.dart';
 import 'package:sizer/sizer.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -38,11 +40,13 @@ class _AdminTabsPageState extends State<AdminTabsPage> {
   }
 
   Future<void> _exportDataGridToExcel() async {
-    final xlsio.Workbook workbook = xlsio.Workbook();
-    final xlsio.Worksheet worksheet = workbook.worksheets[0];
-    key.currentState!.exportToExcelWorksheet(worksheet);
+    logger.d('current state key ${key.currentState}');
+    final xlsio.Workbook workbook =
+    key.currentState!.exportToExcelWorkbook();
     final List<int> bytes = workbook.saveAsStream();
-    File('DataGrid.xlsx').writeAsBytes(bytes, flush: true);
+    workbook.dispose();
+    final helper = SaveFileMobile();
+    await helper.download(bytes, 'DataGrid.xlsx');
   }
 
   Future<void> fetchTransaksi() async {
@@ -189,7 +193,11 @@ class _AdminTabsPageState extends State<AdminTabsPage> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 onPressed: () {
-                  _exportDataGridToExcel();
+                  try {
+                    _exportDataGridToExcel();
+                  } catch (e) {
+                    context.showSnackBar(message: e.toString(), isSuccess: false);
+                  }
                 },
                 child: Icon(
                   IconsaxPlusLinear.printer,
@@ -246,7 +254,7 @@ class TransaksiDataSource extends DataGridSource {
     dataGridRows = transaksiList.map<DataGridRow>((Transaksi transaksi) {
       return DataGridRow(cells: [
         DataGridCell<String>(
-          columnName: 'userId',
+          columnName: 'nama',
           value: transaksi.userId,
         ),
         DataGridCell<String>(
