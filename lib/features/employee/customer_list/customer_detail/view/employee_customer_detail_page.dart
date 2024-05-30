@@ -28,6 +28,7 @@ class EmployeeCustomerDetailPage extends StatefulWidget {
 
 class _EmployeeCustomerDetailPageState
     extends State<EmployeeCustomerDetailPage> {
+
   List<Transaksi> listTransaksi = [];
 
   Future<void> getTransaksiByUserIdAndYear(String userId) async {

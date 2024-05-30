@@ -288,12 +288,12 @@ class TransaksiDataSource extends DataGridSource {
     return DataGridRowAdapter(
         cells: row.getCells().map<Widget>((dataGridCell) {
       return Container(
-        padding: EdgeInsets.all(8.0),
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         alignment: Alignment.centerLeft,
         child: Text(
           dataGridCell.value.toString(),
           style: TextStyle(
-            fontSize: 14.0,
+            fontSize: 11.0,
           ),
         ),
       );
