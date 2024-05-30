@@ -29,10 +29,9 @@ class _AdminHomePageState extends State<AdminHomePage> {
   Admin? _admin;
   List<Transaksi> listTransaksi = [];
 
-
   Future<Admin> getAdmin(String userId) async {
     final doc =
-    await FirebaseFirestore.instance.collection('Admin').doc(userId).get();
+        await FirebaseFirestore.instance.collection('Admin').doc(userId).get();
 
     final admin = Admin.fromFirestore(doc);
     return admin;
@@ -71,27 +70,38 @@ class _AdminHomePageState extends State<AdminHomePage> {
           SizedBox(height: 8),
           _buildIconMenu(),
           SizedBox(height: 8),
-          _buildRecentTransaction(),
-          _buildCardTransaction(),
+          Expanded(
+            child: Column(
+              children: [
+                _buildRecentTransaction(),
+                _buildCardTransaction(),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
-  Future<void>
-  _fetchTransaction() async {
+
+  Future<void> _fetchTransaction() async {
     final querySnapshot = await FirebaseFirestore.instance
         .collection('Transaksi')
         .orderBy('tanggal', descending: true)
-    .limit(4)
+        .limit(4)
         .get();
     setState(() {
-      listTransaksi = querySnapshot.docs.map((doc) => Transaksi.fromFirestore(doc)).toList();
+      listTransaksi = querySnapshot.docs
+          .map((doc) => Transaksi.fromFirestore(doc))
+          .toList();
     });
   }
 
   Widget _buildCardTransaction() {
     return Padding(
-      padding: const EdgeInsets.only(left: Styles.defaultPadding, right: Styles.defaultPadding, top: Styles.defaultPadding),
+      padding: const EdgeInsets.only(
+          left: Styles.defaultPadding,
+          right: Styles.defaultPadding,
+          top: Styles.defaultPadding),
       child: Container(
         height: 244,
         child: ListView.builder(
@@ -106,7 +116,10 @@ class _AdminHomePageState extends State<AdminHomePage> {
 
   Widget _buildRecentTransaction() {
     return Padding(
-      padding: const EdgeInsets.only(top: Styles.defaultPadding, left: Styles.defaultPadding, right: Styles.defaultPadding),
+      padding: const EdgeInsets.only(
+          top: Styles.defaultPadding,
+          left: Styles.defaultPadding,
+          right: Styles.defaultPadding),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -115,16 +128,18 @@ class _AdminHomePageState extends State<AdminHomePage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "Ringkasan Transaksi",
+                "Transaksi Terakhir",
                 style: context.textTheme.bodyMediumBold,
               ),
               GestureDetector(
-                onTap: (){
+                onTap: () {
                   AutoRouter.of(context).navigate(AdminTabsRoute());
                 },
-                child: Text("Selengkapnya",
-                  style: context.textTheme.bodySmallBold.copyWith(
-                      color: Colors.blue),),
+                child: Text(
+                  "Selengkapnya",
+                  style: context.textTheme.bodySmallBold
+                      .copyWith(color: Colors.blue),
+                ),
               )
             ],
           ),
@@ -229,7 +244,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
                         style: context.textTheme.titleLargeBright),
                     Padding(
                       padding:
-                      const EdgeInsets.only(top: Styles.defaultPadding),
+                          const EdgeInsets.only(top: Styles.defaultPadding),
                       child: Text("Transaksi Terakhir:",
                           style: context.textTheme.bodySmallSemiBoldBright),
                     ),
@@ -253,7 +268,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
   Future<double> _getTotalSaldo() async {
     double totalSaldo = 0;
     final QuerySnapshot<Map<String, dynamic>> snapshot =
-    await FirebaseFirestore.instance.collection('Transaksi').get();
+        await FirebaseFirestore.instance.collection('Transaksi').get();
 
     snapshot.docs.forEach((doc) {
       if (doc['status'] == 'pembayaran') {
@@ -339,10 +354,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
 
   Widget _buildTopBarWidget() {
     return Container(
-      width: MediaQuery
-          .of(context)
-          .size
-          .width,
+      width: MediaQuery.of(context).size.width,
       height: 150,
       decoration: BoxDecoration(
         image: DecorationImage(

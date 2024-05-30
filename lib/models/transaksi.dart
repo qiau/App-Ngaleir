@@ -10,7 +10,7 @@ class Transaksi with _$Transaksi {
     required String status,
     required int saldo,
     required String userId,
-    String? deskripsi,
+    required String deskripsi,
   }) = _Transaksi;
 
   factory Transaksi.fromJson(Map<String, dynamic> json) =>
