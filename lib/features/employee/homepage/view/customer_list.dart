@@ -1,5 +1,6 @@
 // ignore_for_file: unused_import
 
+import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,10 +10,13 @@ import 'package:perairan_ngale/features/employee/homepage/view/customer_list_car
 import 'package:perairan_ngale/models/customer.dart';
 import 'package:perairan_ngale/models/employee.dart';
 import 'package:firebase_ui_firestore/firebase_ui_firestore.dart';
+import 'package:perairan_ngale/routes/router.dart';
+import 'package:perairan_ngale/widgets/custom_button.dart';
 import 'package:perairan_ngale/widgets/custom_text_field.dart';
 
 class CustomerList extends StatefulWidget {
   const CustomerList({super.key, required this.employee});
+
   final Employee employee;
 
   @override
@@ -80,7 +84,32 @@ class _CustomerListState extends State<CustomerList> {
                 },
               ),
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 28),
+            Container(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CustomButton(
+                    text: "Sudah Bayar",
+                    backgroundColor: Colors.transparent,
+                    textColor: Colors.grey,
+                    isOutlined: true,
+                    onPressed: () {
+                      AutoRouter.of(context).push(EmployeeCustomerBayarRoute(employee: widget.employee));
+                    },
+                  ),
+                  CustomButton(
+                    text: "Belum Bayar",
+                    backgroundColor: Colors.transparent,
+                    textColor: Colors.grey,
+                    isOutlined: true,
+                    onPressed: () {
+                      AutoRouter.of(context).push(EmployeeCustomerNonBayarRoute(employee: widget.employee));
+                    },
+                  ),
+                ],
+              ),
+            ),
             Expanded(
               child: ValueListenableBuilder<String>(
                 valueListenable: _searchQuery,
