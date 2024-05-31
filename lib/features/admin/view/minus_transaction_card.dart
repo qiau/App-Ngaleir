@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:intl/intl.dart';
+import 'package:perairan_ngale/models/customer.dart';
 import 'package:perairan_ngale/models/transaksi.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
 import 'package:perairan_ngale/shared/date_helper.dart';
 import 'package:perairan_ngale/shared/styles.dart';
 import 'package:perairan_ngale/utils/extensions.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MinusTransactionCard extends StatelessWidget {
   const MinusTransactionCard({super.key, required this.transaksi});
@@ -20,14 +22,51 @@ class MinusTransactionCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            _buildHistoryItemWidget(context),
+            FutureBuilder<Map<String, String>>(
+              future: _getCustomerDetails(transaksi.userId),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  final customerDetails = snapshot.data!;
+                  return _buildHistoryItemWidget(
+                    context,
+                    customerDetails['name']!,
+                    customerDetails['alamatTower'] ?? 'Dicatat oleh Admin',
+                  );
+                }
+              },
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHistoryItemWidget(BuildContext context) {
+  Future<Map<String, String>> _getCustomerDetails(String userId) async {
+    final DocumentSnapshot<Map<String, dynamic>> snapshot =
+    await FirebaseFirestore.instance
+        .collection('Customer')
+        .doc(userId)
+        .get();
+
+    if (snapshot.exists) {
+      final customer = Customer.fromFirestore(snapshot);
+      return {
+        'name': customer.nama,
+        'alamatTower': customer.alamatTower ?? '',
+      };
+    } else {
+      return {
+        'name': 'Admin',
+        'alamatTower': '',
+      };
+    }
+  }
+
+  Widget _buildHistoryItemWidget(BuildContext context, String customerName, String alamatTower) {
     final saldo = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp')
         .format(transaksi.saldo);
     return Container(
@@ -60,7 +99,9 @@ class MinusTransactionCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Admin',
+                        customerName.split(' ').length > 1
+                            ? '${customerName.split(' ')[0]} ${customerName.split(' ')[1][0]}'
+                            : customerName,
                         style: context.textTheme.bodyMediumBold,
                         maxLines: 1,
                       ),
@@ -83,8 +124,14 @@ class MinusTransactionCard extends StatelessWidget {
                   ),
                   Text(
                     transaksi.deskripsi,
-                    style: context.textTheme.bodySmallGrey,
+                    style: context.textTheme.bodySmallBold,
                     maxLines: 1,
+                  ),
+                  Text(
+                    alamatTower.isNotEmpty
+                        ? "Dicatat oleh Petugas $alamatTower"
+                        : "Dicatat oleh Admin",
+                    style: context.textTheme.bodySmallGrey,
                   ),
                   const SizedBox(
                     height: Styles.smallSpacing,
