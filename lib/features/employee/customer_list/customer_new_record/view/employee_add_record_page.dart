@@ -330,23 +330,20 @@ class _EmployeeAddCustomerRecordPageState
   }
 
   Future<void> _editTransaksi(BuildContext context) async {
-    int pemakaian1bulan;
+    int pemakaian1bulan = 0;
     if (_formKey.currentState!.validate()) {
-      if (!widget.isThereTransaksi) {
-        int meteranTerakhir = int.parse(_nomorTagihanController.text);
-
-        pemakaian1bulan =
-            int.parse(_meteranSaatIniController.text) - meteranTerakhir;
-      } else {
-        pemakaian1bulan =
-            int.parse(_meteranSaatIniController.text) - widget.meteranTerakhir!;
+      if (widget.transaksi != null) {
+        pemakaian1bulan = int.parse(_meteranSaatIniController.text) -
+            (widget.transaksi?.meteranBulanLalu ?? 0);
       }
 
       int saldo = pemakaian1bulan * 5000;
       try {
         await FirebaseFirestore.instance
             .collection('Transaksi')
-            .where('meteranBulanLalu', isEqualTo: widget.meteranTerakhir)
+            .where('meteranBulanLalu',
+                isEqualTo: widget.transaksi?.meteranBulanLalu)
+            .where('userId', isEqualTo: widget.transaksi?.userId)
             .get()
             .then((QuerySnapshot querySnapshot) {
           querySnapshot.docs.forEach((doc) {
