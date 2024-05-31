@@ -28,7 +28,6 @@ class EmployeeCustomerDetailPage extends StatefulWidget {
 
 class _EmployeeCustomerDetailPageState
     extends State<EmployeeCustomerDetailPage> {
-
   List<Transaksi> listTransaksi = [];
 
   Future<void> getTransaksiByUserIdAndYear(String userId) async {
@@ -118,12 +117,7 @@ class _EmployeeCustomerDetailPageState
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(Styles.defaultPadding),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildCustomerName(),
-          ],
-        ),
+        child: _buildCustomerName(),
       ),
     );
   }

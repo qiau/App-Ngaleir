@@ -25,9 +25,7 @@ class AdminCustomerDetailPage extends StatefulWidget {
       _AdminCustomerDetailPageState();
 }
 
-class _AdminCustomerDetailPageState
-    extends State<AdminCustomerDetailPage> {
-
+class _AdminCustomerDetailPageState extends State<AdminCustomerDetailPage> {
   List<Transaksi> listTransaksi = [];
 
   Future<void> getTransaksiByUserIdAndYear(String userId) async {
@@ -89,12 +87,7 @@ class _AdminCustomerDetailPageState
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(Styles.defaultPadding),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildCustomerName(),
-          ],
-        ),
+        child: _buildCustomerName(),
       ),
     );
   }

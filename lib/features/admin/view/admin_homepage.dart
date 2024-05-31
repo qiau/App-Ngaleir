@@ -59,26 +59,52 @@ class _AdminHomePageState extends State<AdminHomePage> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
         children: [
           _buildTopBarWidget(),
-          _buildSaldoCard(),
-          _buildIconMenu(),
           Expanded(
-            child: listTransaksi.isEmpty
-                ? Center(
-              child: Text('No transactions found'),
-            )
-                : Column(
-              children: [
-                _buildRecentTransaction(),
-                _buildCardTransaction(),
-              ],
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  _buildSaldoCard(),
+                  _buildIconMenu(),
+                  listTransaksi.isEmpty
+                      ? Center(
+                          child: Text('No transactions found'),
+                        )
+                      : Column(
+                          children: [
+                            _buildRecentTransaction(),
+                            _buildCardTransaction(),
+                          ],
+                        ),
+                ],
+              ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildCardTransaction() {
+    final lastThreeTransactions = listTransaksi.take(3).toList();
+
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: Styles.defaultPadding,
+        right: Styles.defaultPadding,
+      ),
+      child: ListView.builder(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(), // Disable inner scrolling
+        itemCount: lastThreeTransactions.length,
+        itemBuilder: (context, index) {
+          return TransactionCardNormal(transaksi: lastThreeTransactions[index]);
+        },
       ),
     );
   }
@@ -94,23 +120,6 @@ class _AdminHomePageState extends State<AdminHomePage> {
           .map((doc) => Transaksi.fromFirestore(doc))
           .toList();
     });
-  }
-
-  Widget _buildCardTransaction() {
-    return Padding(
-      padding: const EdgeInsets.only(
-          left: Styles.defaultPadding,
-          right: Styles.defaultPadding,),
-      child: Container(
-        height: MediaQuery.of(context).size.height * 0.3,
-        child: ListView.builder(
-          itemCount: listTransaksi.length,
-          itemBuilder: (context, index) {
-            return TransactionCardNormal(transaksi: listTransaksi[index]);
-          },
-        ),
-      ),
-    );
   }
 
   Widget _buildRecentTransaction() {
@@ -255,7 +264,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
             padding: const EdgeInsets.all(Styles.defaultPadding),
             child: Container(
               decoration: BoxDecoration(
-                  color: ColorValues.primary60,
+                  color: ColorValues.primary50,
                   borderRadius: BorderRadius.circular(Styles.defaultBorder)),
               child: Padding(
                 padding: const EdgeInsets.all(Styles.defaultPadding),
@@ -296,7 +305,8 @@ class _AdminHomePageState extends State<AdminHomePage> {
         await FirebaseFirestore.instance.collection('Transaksi').get();
 
     snapshot.docs.forEach((doc) {
-      if (doc['bulan'] == DateTime.now().month && doc['tahun'] == DateTime.now().year) {
+      if (doc['bulan'] == DateTime.now().month &&
+          doc['tahun'] == DateTime.now().year) {
         if (doc['status'] == 'pembayaran') {
           totalSaldo += doc['saldo'];
         } else if (doc['status'] == 'pengeluaran') {
@@ -369,8 +379,10 @@ class _AdminHomePageState extends State<AdminHomePage> {
               return Text('Error: ${snapshot.error}');
             } else {
               final lastSaldoKeluar = snapshot.data!['saldoKeluar'];
-              return Text('- $lastSaldoKeluar',
-                  style: context.textTheme.bodyMediumBoldBright,);
+              return Text(
+                '- $lastSaldoKeluar',
+                style: context.textTheme.bodyMediumBoldBright,
+              );
             }
           },
         ),

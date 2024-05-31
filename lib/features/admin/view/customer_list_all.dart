@@ -65,6 +65,7 @@ class _CustomerListAllState extends State<CustomerListAll> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: CustomTextField(
+                borderWidth: 0,
                 hintText: 'Cari pelanggan',
                 prefixIcon: IconsaxPlusLinear.search_normal,
                 controller: _searchController,
