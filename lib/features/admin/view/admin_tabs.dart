@@ -153,7 +153,7 @@ class _AdminTabsPageState extends State<AdminTabsPage> {
         final tabsRouter = AutoTabsRouter.of(context);
         return Scaffold(
           appBar: AppBar(
-            backgroundColor: ColorValues.primary30,
+            backgroundColor: ColorValues.primary50,
             automaticallyImplyLeading: false,
             title: Center(
               child: Text(
@@ -168,9 +168,9 @@ class _AdminTabsPageState extends State<AdminTabsPage> {
               children: [
                 Container(
                   width: 100.w,
-                  height: 30.h,
+                  height: 240,
                   decoration: BoxDecoration(
-                      color: ColorValues.primary30,
+                      color: ColorValues.primary50,
                       borderRadius: BorderRadius.only(
                         bottomLeft: Radius.circular(20),
                         bottomRight: Radius.circular(20),
