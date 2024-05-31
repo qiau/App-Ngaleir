@@ -194,6 +194,7 @@ class _CustomerHomePageState extends State<CustomerHomePage> {
                     meteranTerakhir = listTransaksi[index + 1].meteran;
                   }
                   return TransactionCard(
+                    employee: null,
                     isThereTransaksi: true,
                     transaksi: transaksi,
                     meteranTerakhir: meteranTerakhir,

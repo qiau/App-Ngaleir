@@ -11,6 +11,7 @@ class Transaksi with _$Transaksi {
     required String status,
     required int saldo,
     int? meteran,
+    int? meteranBulanLalu,
     required String userId,
     required String employeeId,
     String? pathImage,

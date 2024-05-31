@@ -19,29 +19,43 @@ class TransactionCard extends StatelessWidget {
       required this.transaksi,
       this.customerId,
       this.meteranTerakhir,
-      required this.isThereTransaksi, required this.employee});
+      required this.isThereTransaksi,
+      this.employee,
+      this.isEditable});
   final Transaksi transaksi;
   final String? customerId;
   final int? meteranTerakhir;
   final bool isThereTransaksi;
   final Employee? employee;
+  final bool? isEditable;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         if (customerId == null) {
-          print('apalah');
-          AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
-            isThereTransaksi: isThereTransaksi,
-            transaksi: transaksi,
-            meteranTerakhir: meteranTerakhir,
-          ));
+          if (employee != null) {
+            AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
+              isThereTransaksi: isThereTransaksi,
+              isEditable: isEditable!,
+              transaksi: transaksi,
+              meteranTerakhir: meteranTerakhir,
+            ));
+          } else {
+            AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
+              isThereTransaksi: isThereTransaksi,
+              isEditable: false,
+              transaksi: transaksi,
+              meteranTerakhir: meteranTerakhir,
+            ));
+          }
         } else {
           AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
             isThereTransaksi: isThereTransaksi,
+            isEditable: true,
             customerId: customerId,
             meteranTerakhir: meteranTerakhir,
+            employee: employee,
           ));
         }
       },

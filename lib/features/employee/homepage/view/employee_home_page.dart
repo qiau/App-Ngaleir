@@ -1,10 +1,7 @@
-// ignore_for_file: unnecessary_import
-
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:perairan_ngale/features/employee/homepage/view/customer_list.dart';
 import 'package:perairan_ngale/models/auth.dart';
@@ -25,14 +22,23 @@ class EmployeeHomePage extends StatefulWidget {
 class _EmployeeHomePageState extends State<EmployeeHomePage> {
   final User? user = Auth().currentUser;
   Employee? _employee;
-  Future<Employee> getEmployee(String userId) async {
-    final doc = await FirebaseFirestore.instance
-        .collection('Employee')
-        .doc(userId)
-        .get();
 
-    final employee = Employee.fromFirestore(doc);
-    return employee;
+  Future<Employee?> getEmployee(String userId) async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('Employee')
+          .doc(userId)
+          .get();
+      if (doc.exists) {
+        return Employee.fromFirestore(doc);
+      } else {
+        print("No employee found for userId: $userId");
+        return null;
+      }
+    } catch (e) {
+      print("Error fetching employee: $e");
+      return null;
+    }
   }
 
   Future<void> _getEmployee() async {
@@ -47,7 +53,9 @@ class _EmployeeHomePageState extends State<EmployeeHomePage> {
     setState(() {
       _employee = employee;
     });
-    print(employee.nama);
+    if (employee != null) {
+      print(employee.nama);
+    }
   }
 
   Future<void> signOut() async {
@@ -68,11 +76,10 @@ class _EmployeeHomePageState extends State<EmployeeHomePage> {
           _buildTopBarWidget(),
           SizedBox(height: 16),
           Expanded(
-              child: _employee != null
-                  ? CustomerList(
-                      employee: _employee!,
-                    )
-                  : Text('Coba Lagi')),
+            child: _employee != null
+                ? CustomerList(employee: _employee!)
+                : Center(child: Text('Coba Lagi')),
+          ),
         ],
       ),
     );
@@ -111,25 +118,23 @@ class _EmployeeHomePageState extends State<EmployeeHomePage> {
               ),
             ),
             if (_employee != null)
-            Expanded(
-              child: Column(
+              Expanded(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    if (_employee != null)
-                      Text(
-                        _employee!.nama,
-                        style: context.textTheme.bodyMediumBoldBright,
-                      ),
-                    const SizedBox(
-                      height: Styles.smallSpacing,
+                    Text(
+                      _employee!.nama,
+                      style: context.textTheme.bodyMediumBoldBright,
                     ),
+                    const SizedBox(height: Styles.smallSpacing),
                     Text(
                       _employee!.alamatTower,
                       style: context.textTheme.bodySmallBright,
                     ),
-                  ]),
-            ),
+                  ],
+                ),
+              ),
             IconButton(
               icon: const Icon(
                 IconsaxPlusLinear.logout,
@@ -151,8 +156,10 @@ class _EmployeeHomePageState extends State<EmployeeHomePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Konfirmasi Keluar', style: context.textTheme.bodyMediumBold),
-          content: Text('Apakah Anda yakin ingin keluar dari Petugas?', style: context.textTheme.bodyMedium),
+          title: Text('Konfirmasi Keluar',
+              style: context.textTheme.bodyMediumBold),
+          content: Text('Apakah Anda yakin ingin keluar dari Petugas?',
+              style: context.textTheme.bodyMedium),
           actions: [
             TextButton(
               child: Text('Batal', style: context.textTheme.bodyMediumBold),
@@ -166,10 +173,12 @@ class _EmployeeHomePageState extends State<EmployeeHomePage> {
                 color: Colors.red,
               ),
               child: TextButton(
-                child: Text('Keluar', style: context.textTheme.bodyMediumBoldBright),
+                child: Text('Keluar',
+                    style: context.textTheme.bodyMediumBoldBright),
                 onPressed: () async {
                   await FirebaseAuth.instance.signOut();
-                  AutoRouter.of(context).pushAndPopUntil(LoginRoute(), predicate: (route) => false);
+                  AutoRouter.of(context).pushAndPopUntil(LoginRoute(),
+                      predicate: (route) => false);
                   Navigator.of(context).pop();
                 },
               ),

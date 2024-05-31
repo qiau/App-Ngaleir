@@ -17,7 +17,8 @@ import 'package:perairan_ngale/utils/extensions.dart';
 class EmployeeCustomerDetailPage extends StatefulWidget {
   const EmployeeCustomerDetailPage({
     super.key,
-    required this.customer, required this.employee,
+    required this.customer,
+    required this.employee,
   });
 
   final Customer customer;
@@ -81,10 +82,11 @@ class _EmployeeCustomerDetailPageState
         child: ElevatedButton(
           onPressed: () {
             AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
-              isThereTransaksi: isThereTransaksi,
-              meteranTerakhir: meteranTerakhir,
-              customerId: widget.customer.uid,
-            ));
+                isThereTransaksi: isThereTransaksi,
+                isEditable: true,
+                meteranTerakhir: meteranTerakhir,
+                customerId: widget.customer.uid,
+                employee: widget.employee));
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -187,6 +189,24 @@ class _EmployeeCustomerDetailPageState
                     meteranTerakhir = listTransaksi[index + 1].meteran;
                   }
                   Transaksi transaksi = listTransaksi[index];
+                  if (index == 0) {
+                    if (widget.employee != null) {
+                      return TransactionCard(
+                        isEditable: true,
+                        isThereTransaksi: isThereTransaksi,
+                        transaksi: transaksi,
+                        employee: widget.employee,
+                        meteranTerakhir: meteranTerakhir,
+                      );
+                    } else {
+                      return TransactionCard(
+                        isEditable: true,
+                        isThereTransaksi: isThereTransaksi,
+                        transaksi: transaksi,
+                        meteranTerakhir: meteranTerakhir,
+                      );
+                    }
+                  }
                   return TransactionCard(
                     isThereTransaksi: isThereTransaksi,
                     transaksi: transaksi,

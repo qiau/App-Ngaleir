@@ -20,18 +20,22 @@ import 'package:perairan_ngale/widgets/custom_text_field.dart';
 
 @RoutePage()
 class EmployeeAddCustomerRecordPage extends StatefulWidget {
-  const EmployeeAddCustomerRecordPage(
-      {super.key,
-      this.meteranTerakhir,
-      this.transaksi,
-      this.customerId,
-      required this.isThereTransaksi, required this.employee,});
+  const EmployeeAddCustomerRecordPage({
+    super.key,
+    this.meteranTerakhir,
+    this.transaksi,
+    this.customerId,
+    required this.isThereTransaksi,
+    this.employee,
+    required this.isEditable,
+  });
 
   final int? meteranTerakhir;
   final Transaksi? transaksi;
   final String? customerId;
   final bool isThereTransaksi;
-  final Employee employee;
+  final Employee? employee;
+  final bool isEditable;
 
   @override
   State<EmployeeAddCustomerRecordPage> createState() =>
@@ -49,6 +53,7 @@ class _EmployeeAddCustomerRecordPageState
   late String _imagePath = '';
   bool loading = false;
   bool isNotEmpty = false;
+  bool isEditable = false;
 
   @override
   void initState() {
@@ -74,12 +79,22 @@ class _EmployeeAddCustomerRecordPageState
   }
 
   Future<void> getPencatat() async {
-    final doc = await FirebaseFirestore.instance
-        .collection('Employee')
-        .doc(FirebaseAuth.instance.currentUser!.uid) // cuman work sebagai petugas
-        .get();
-    final _employee = Employee.fromFirestore(doc);
-    _pencatatController.text = _employee.nama;
+    if (isNotEmpty) {
+      final doc = await FirebaseFirestore.instance
+          .collection('Employee')
+          .doc(widget.transaksi?.employeeId) // cuman work sebagai petugas
+          .get();
+      final _employee = Employee.fromFirestore(doc);
+      _pencatatController.text = _employee.nama;
+    } else {
+      final doc = await FirebaseFirestore.instance
+          .collection('Employee')
+          .doc(FirebaseAuth
+              .instance.currentUser!.uid) // cuman work sebagai petugas
+          .get();
+      final _employee = Employee.fromFirestore(doc);
+      _pencatatController.text = _employee.nama;
+    }
   }
 
   String url = '';
@@ -280,6 +295,7 @@ class _EmployeeAddCustomerRecordPageState
             saldo: saldo,
             meteran: int.parse(_meteranSaatIniController.text),
             status: 'pembayaran',
+            meteranBulanLalu: int.parse(_nomorTagihanController.text),
             tanggal: Timestamp.now().toDate().toString(),
             userId: widget.customerId ?? '',
             employeeId: FirebaseAuth.instance.currentUser!.uid,
@@ -314,7 +330,8 @@ class _EmployeeAddCustomerRecordPageState
   Widget _buildNomorTagihanField() {
     if (widget.meteranTerakhir == 0) {
       if (widget.isThereTransaksi) {
-        _nomorTagihanController.text = 'Tidak ada data meteran bulan lalu';
+        _nomorTagihanController.text =
+            widget.transaksi!.meteranBulanLalu.toString();
       }
     } else {
       _nomorTagihanController.text = widget.meteranTerakhir.toString();
@@ -349,7 +366,7 @@ class _EmployeeAddCustomerRecordPageState
       controller: _meteranSaatIniController,
       fillColor: ColorValues.white,
       label: "Meteran saat ini (m³)",
-      enabled: isNotEmpty ? false : true,
+      enabled: widget.isEditable,
       validator: (value) {
         if (value!.isEmpty) {
           return 'Meteran tidak boleh kosong!';
@@ -362,12 +379,11 @@ class _EmployeeAddCustomerRecordPageState
   }
 
   Widget _buildPencatatField() {
-    if (isNotEmpty) {
-      return CustomTextField(
-        controller: _pencatatController,
-        fillColor: ColorValues.white,
-        label: "Pencatat",
-      );
-    } return SizedBox();
+    return CustomTextField(
+      controller: _pencatatController,
+      enabled: !widget.isThereTransaksi,
+      fillColor: ColorValues.white,
+      label: "Pencatat",
+    );
   }
 }
