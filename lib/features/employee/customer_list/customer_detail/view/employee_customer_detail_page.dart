@@ -6,6 +6,7 @@ import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:perairan_ngale/features/transaction_card.dart';
 import 'package:perairan_ngale/models/customer.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart' as svg;
+import 'package:perairan_ngale/models/employee.dart';
 import 'package:perairan_ngale/models/transaksi.dart';
 import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
@@ -16,10 +17,11 @@ import 'package:perairan_ngale/utils/extensions.dart';
 class EmployeeCustomerDetailPage extends StatefulWidget {
   const EmployeeCustomerDetailPage({
     super.key,
-    required this.customer,
+    required this.customer, required this.employee,
   });
 
   final Customer customer;
+  final Employee? employee;
 
   @override
   State<EmployeeCustomerDetailPage> createState() =>
@@ -79,6 +81,7 @@ class _EmployeeCustomerDetailPageState
         child: ElevatedButton(
           onPressed: () {
             AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
+              employee: emplo,
               isThereTransaksi: isThereTransaksi,
               meteranTerakhir: meteranTerakhir,
               customerId: widget.customer.uid,

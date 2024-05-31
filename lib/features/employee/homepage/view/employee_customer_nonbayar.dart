@@ -157,6 +157,8 @@ class _EmployeeCustomerNonBayarPageState extends State<EmployeeCustomerNonBayarP
                 final customer = customerSnapshot.data![index];
                 return CustomerCard(
                   customer: customer,
+                  employee: widget.employee,
+
                 );
               },
             );
@@ -205,6 +207,8 @@ class _EmployeeCustomerNonBayarPageState extends State<EmployeeCustomerNonBayarP
                 final customer = filteredCustomers[index];
                 return CustomerCard(
                   customer: customer,
+                  employee: widget.employee,
+
                 );
               },
             );

@@ -12,6 +12,7 @@ class Transaksi with _$Transaksi {
     required int saldo,
     int? meteran,
     required String userId,
+    required String employeeId,
     String? pathImage,
     required String deskripsi,
     required int bulan,

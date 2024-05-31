@@ -36,6 +36,7 @@ class _AdminAddMoneyPageState extends State<AdminAddMoneyPage> {
           status: 'pembayaran',
           tanggal: Timestamp.now().toDate().toString(),
           userId: FirebaseAuth.instance.currentUser!.uid,
+          employeeId: FirebaseAuth.instance.currentUser!.uid,
           bulan: Timestamp.now().toDate().month,
           tahun: Timestamp.now().toDate().year,
         );

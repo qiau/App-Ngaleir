@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:perairan_ngale/models/employee.dart';
 import 'package:perairan_ngale/models/transaksi.dart';
 import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
@@ -21,11 +25,13 @@ class EmployeeAddCustomerRecordPage extends StatefulWidget {
       this.meteranTerakhir,
       this.transaksi,
       this.customerId,
-      required this.isThereTransaksi});
+      required this.isThereTransaksi, required this.employee,});
+
   final int? meteranTerakhir;
   final Transaksi? transaksi;
   final String? customerId;
   final bool isThereTransaksi;
+  final Employee employee;
 
   @override
   State<EmployeeAddCustomerRecordPage> createState() =>
@@ -34,17 +40,21 @@ class EmployeeAddCustomerRecordPage extends StatefulWidget {
 
 class _EmployeeAddCustomerRecordPageState
     extends State<EmployeeAddCustomerRecordPage> {
+  late final Employee _employee;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nomorTagihanController = TextEditingController();
   final TextEditingController _meteranSaatIniController =
       TextEditingController();
+  final TextEditingController _pencatatController = TextEditingController();
   late String _imagePath = '';
   bool loading = false;
   bool isNotEmpty = false;
+
   @override
   void initState() {
     super.initState();
     setIsNotEmpty();
+    getPencatat();
   }
 
   late File? _imageFile = null;
@@ -63,7 +73,17 @@ class _EmployeeAddCustomerRecordPageState
     } else {}
   }
 
+  Future<void> getPencatat() async {
+    final doc = await FirebaseFirestore.instance
+        .collection('Employee')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get();
+    final _employee = Employee.fromFirestore(doc);
+    _pencatatController.text = _employee.nama;
+  }
+
   String url = '';
+
   Future uploadImageToFirebase(BuildContext context) async {
     String fileName = path.basename(_imageFile!.path);
     Reference firebaseStorageRef =
@@ -120,15 +140,19 @@ class _EmployeeAddCustomerRecordPageState
       ),
       body: CustomGestureUnfocus(
           child: SingleChildScrollView(
-            child: Form(
-              key: _formKey,
-              child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
+        child: Form(
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
                   height: 8,
+                ),
+                _buildPencatatField(),
+                SizedBox(
+                  height: Styles.biggerSpacing,
                 ),
                 _buildNomorTagihanField(),
                 SizedBox(
@@ -219,7 +243,8 @@ class _EmployeeAddCustomerRecordPageState
                                   horizontal: 16, vertical: 8),
                               child: Text(
                                 'Catat Tagihan',
-                                style: TextStyle(color: Colors.white, fontSize: 20),
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 20),
                               ),
                             ),
                           ),
@@ -227,10 +252,10 @@ class _EmployeeAddCustomerRecordPageState
                       )
                     : SizedBox(),
               ],
-                      ),
-                    ),
             ),
-          )),
+          ),
+        ),
+      )),
     );
   }
 
@@ -257,15 +282,10 @@ class _EmployeeAddCustomerRecordPageState
             status: 'pembayaran',
             tanggal: Timestamp.now().toDate().toString(),
             userId: widget.customerId ?? '',
+            employeeId: FirebaseAuth.instance.currentUser!.uid,
             pathImage: _imagePath,
-            bulan: Timestamp
-                .now()
-                .toDate()
-                .month,
-            tahun: Timestamp
-                .now()
-                .toDate()
-                .year,
+            bulan: Timestamp.now().toDate().month,
+            tahun: Timestamp.now().toDate().year,
           );
 
           await FirebaseFirestore.instance
@@ -274,14 +294,13 @@ class _EmployeeAddCustomerRecordPageState
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Tambah Transaksi Berhasil')),
           );
-          AutoRouter.of(context)
-              .pushAndPopUntil(
-              EmployeeHomeRoute(), predicate: (route) => false);
+          AutoRouter.of(context).pushAndPopUntil(EmployeeHomeRoute(),
+              predicate: (route) => false);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-                content: Text(
-                    'Meteran saat ini kurang dari Meteran bulan lalu')),
+                content:
+                    Text('Meteran saat ini kurang dari Meteran bulan lalu')),
           );
         }
       } catch (e) {
@@ -340,5 +359,15 @@ class _EmployeeAddCustomerRecordPageState
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       keyboardType: TextInputType.number,
     );
+  }
+
+  Widget _buildPencatatField() {
+    if (isNotEmpty) {
+      return CustomTextField(
+        controller: _pencatatController,
+        fillColor: ColorValues.white,
+        label: "Pencatat",
+      );
+    } return SizedBox();
   }
 }

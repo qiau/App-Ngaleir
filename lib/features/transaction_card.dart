@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
+import 'package:perairan_ngale/models/employee.dart';
 import 'package:perairan_ngale/models/transaksi.dart';
 import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
@@ -23,6 +24,7 @@ class TransactionCard extends StatelessWidget {
   final String? customerId;
   final int? meteranTerakhir;
   final bool isThereTransaksi;
+  final Employee? employee;
 
   @override
   Widget build(BuildContext context) {
