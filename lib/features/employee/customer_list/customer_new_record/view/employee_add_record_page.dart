@@ -76,7 +76,7 @@ class _EmployeeAddCustomerRecordPageState
   Future<void> getPencatat() async {
     final doc = await FirebaseFirestore.instance
         .collection('Employee')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .doc(FirebaseAuth.instance.currentUser!.uid) // cuman work sebagai petugas
         .get();
     final _employee = Employee.fromFirestore(doc);
     _pencatatController.text = _employee.nama;

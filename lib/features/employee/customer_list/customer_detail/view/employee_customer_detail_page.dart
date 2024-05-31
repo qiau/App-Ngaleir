@@ -81,7 +81,6 @@ class _EmployeeCustomerDetailPageState
         child: ElevatedButton(
           onPressed: () {
             AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
-              employee: emplo,
               isThereTransaksi: isThereTransaksi,
               meteranTerakhir: meteranTerakhir,
               customerId: widget.customer.uid,

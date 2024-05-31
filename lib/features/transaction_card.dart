@@ -19,7 +19,7 @@ class TransactionCard extends StatelessWidget {
       required this.transaksi,
       this.customerId,
       this.meteranTerakhir,
-      required this.isThereTransaksi});
+      required this.isThereTransaksi, required this.employee});
   final Transaksi transaksi;
   final String? customerId;
   final int? meteranTerakhir;
