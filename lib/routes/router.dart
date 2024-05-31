@@ -4,8 +4,10 @@ import 'package:perairan_ngale/features/customer/customer.dart';
 import 'package:perairan_ngale/features/admin/admin.dart';
 import 'package:perairan_ngale/features/authentication/authentication.dart';
 import 'package:perairan_ngale/features/employee/employee.dart';
+import 'package:perairan_ngale/models/admin.dart';
 import 'package:perairan_ngale/models/customer.dart';
 import 'package:perairan_ngale/home_wrapper.dart';
+import 'package:perairan_ngale/models/employee.dart';
 import 'package:perairan_ngale/models/transaksi.dart';
 
 part 'router.gr.dart';
@@ -156,6 +158,26 @@ class AppRouter extends _$AppRouter {
         CustomRoute(
           page: AdminCetakRoute.page,
           path: '/admincetak',
+          transitionsBuilder: TransitionsBuilders.fadeIn,
+        ),
+        CustomRoute(
+          page: AdminCustomerBayarRoute.page,
+          path: '/admincustomerbayar',
+          transitionsBuilder: TransitionsBuilders.fadeIn,
+        ),
+        CustomRoute(
+          page: AdminCustomerNonBayarRoute.page,
+          path: '/admincustomernonbayar',
+          transitionsBuilder: TransitionsBuilders.fadeIn,
+        ),
+        CustomRoute(
+          page: EmployeeCustomerBayarRoute.page,
+          path: '/employeecustomerbayar',
+          transitionsBuilder: TransitionsBuilders.fadeIn,
+        ),
+        CustomRoute(
+          page: EmployeeCustomerNonBayarRoute.page,
+          path: '/employeecustomernonbayar',
           transitionsBuilder: TransitionsBuilders.fadeIn,
         ),
       ];

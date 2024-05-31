@@ -8,3 +8,5 @@ export 'view/admin_pull_saldo_page.dart';
 export 'view/admin_add_saldo_page.dart';
 export 'view/admin_customer_detail_page.dart';
 export 'view/admin_cetak_page.dart';
+export 'view/admin_customer_bayar_page.dart';
+export 'view/admin_customer_nonbayar_page.dart';
