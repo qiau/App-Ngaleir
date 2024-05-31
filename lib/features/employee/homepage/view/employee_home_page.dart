@@ -1,7 +1,10 @@
+// ignore_for_file: unnecessary_import
+
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:perairan_ngale/features/employee/homepage/view/customer_list.dart';
 import 'package:perairan_ngale/models/auth.dart';
@@ -22,23 +25,14 @@ class EmployeeHomePage extends StatefulWidget {
 class _EmployeeHomePageState extends State<EmployeeHomePage> {
   final User? user = Auth().currentUser;
   Employee? _employee;
+  Future<Employee> getEmployee(String userId) async {
+    final doc = await FirebaseFirestore.instance
+        .collection('Employee')
+        .doc(userId)
+        .get();
 
-  Future<Employee?> getEmployee(String userId) async {
-    try {
-      final doc = await FirebaseFirestore.instance
-          .collection('Employee')
-          .doc(userId)
-          .get();
-      if (doc.exists) {
-        return Employee.fromFirestore(doc);
-      } else {
-        print("No employee found for userId: $userId");
-        return null;
-      }
-    } catch (e) {
-      print("Error fetching employee: $e");
-      return null;
-    }
+    final employee = Employee.fromFirestore(doc);
+    return employee;
   }
 
   Future<void> _getEmployee() async {
@@ -53,9 +47,7 @@ class _EmployeeHomePageState extends State<EmployeeHomePage> {
     setState(() {
       _employee = employee;
     });
-    if (employee != null) {
-      print(employee.nama);
-    }
+    print(employee.nama);
   }
 
   Future<void> signOut() async {
@@ -76,10 +68,11 @@ class _EmployeeHomePageState extends State<EmployeeHomePage> {
           _buildTopBarWidget(),
           SizedBox(height: 16),
           Expanded(
-            child: _employee != null
-                ? CustomerList(employee: _employee!)
-                : Center(child: Text('Coba Lagi')),
-          ),
+              child: _employee != null
+                  ? CustomerList(
+                      employee: _employee!,
+                    )
+                  : Text('Coba Lagi')),
         ],
       ),
     );
@@ -120,20 +113,22 @@ class _EmployeeHomePageState extends State<EmployeeHomePage> {
             if (_employee != null)
               Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      _employee!.nama,
-                      style: context.textTheme.bodyMediumBoldBright,
-                    ),
-                    const SizedBox(height: Styles.smallSpacing),
-                    Text(
-                      _employee!.alamatTower,
-                      style: context.textTheme.bodySmallBright,
-                    ),
-                  ],
-                ),
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (_employee != null)
+                        Text(
+                          _employee!.nama,
+                          style: context.textTheme.bodyMediumBoldBright,
+                        ),
+                      const SizedBox(
+                        height: Styles.smallSpacing,
+                      ),
+                      Text(
+                        _employee!.alamatTower,
+                        style: context.textTheme.bodySmallBright,
+                      ),
+                    ]),
               ),
             IconButton(
               icon: const Icon(

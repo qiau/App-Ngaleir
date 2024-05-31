@@ -245,13 +245,15 @@ class _EmployeeAddCustomerRecordPageState
                                 },
                               )),
                 SizedBox(height: 16),
-                !isNotEmpty
+                widget.isEditable
                     ? Center(
                         child: SizedBox(
                           width: 343,
                           child: ElevatedButton(
                             onPressed: () {
-                              _tambahTransaksi(context);
+                              isNotEmpty
+                                  ? _editTransaksi(context)
+                                  : _tambahTransaksi(context);
                             },
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
@@ -327,6 +329,46 @@ class _EmployeeAddCustomerRecordPageState
     }
   }
 
+  Future<void> _editTransaksi(BuildContext context) async {
+    int pemakaian1bulan;
+    if (_formKey.currentState!.validate()) {
+      if (!widget.isThereTransaksi) {
+        int meteranTerakhir = int.parse(_nomorTagihanController.text);
+
+        pemakaian1bulan =
+            int.parse(_meteranSaatIniController.text) - meteranTerakhir;
+      } else {
+        pemakaian1bulan =
+            int.parse(_meteranSaatIniController.text) - widget.meteranTerakhir!;
+      }
+
+      int saldo = pemakaian1bulan * 5000;
+      try {
+        await FirebaseFirestore.instance
+            .collection('Transaksi')
+            .where('meteranBulanLalu', isEqualTo: widget.meteranTerakhir)
+            .get()
+            .then((QuerySnapshot querySnapshot) {
+          querySnapshot.docs.forEach((doc) {
+            doc.reference.update({
+              'meteran': int.parse(_meteranSaatIniController.text),
+              'saldo': saldo,
+            });
+          });
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Tambah Transaksi Berhasil')),
+        );
+        AutoRouter.of(context)
+            .pushAndPopUntil(EmployeeHomeRoute(), predicate: (route) => false);
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Terjadi kesalahan: $e')),
+        );
+      }
+    }
+  }
+
   Widget _buildNomorTagihanField() {
     if (widget.meteranTerakhir == 0) {
       if (widget.isThereTransaksi) {
@@ -348,11 +390,7 @@ class _EmployeeAddCustomerRecordPageState
         }
         return null;
       },
-      inputFormatters: [
-        widget.meteranTerakhir == 0 && widget.isThereTransaksi == true
-            ? FilteringTextInputFormatter.singleLineFormatter
-            : FilteringTextInputFormatter.digitsOnly
-      ],
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       keyboardType: TextInputType.number,
     );
   }

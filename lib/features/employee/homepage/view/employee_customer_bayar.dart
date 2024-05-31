@@ -16,7 +16,8 @@ class EmployeeCustomerBayarPage extends StatefulWidget {
   final Employee employee;
 
   @override
-  State<EmployeeCustomerBayarPage> createState() => _EmployeeCustomerBayarPageState();
+  State<EmployeeCustomerBayarPage> createState() =>
+      _EmployeeCustomerBayarPageState();
 }
 
 class _EmployeeCustomerBayarPageState extends State<EmployeeCustomerBayarPage> {
@@ -50,7 +51,8 @@ class _EmployeeCustomerBayarPageState extends State<EmployeeCustomerBayarPage> {
         .where('bulan', isEqualTo: currentMonth);
   }
 
-  Future<List<Customer>> _getCustomersFromTransactions(QuerySnapshot<Map<String, dynamic>> snapshot) async {
+  Future<List<Customer>> _getCustomersFromTransactions(
+      QuerySnapshot<Map<String, dynamic>> snapshot) async {
     List<Customer> customers = [];
     for (var doc in snapshot.docs) {
       String userId = doc['userId'];
@@ -196,7 +198,9 @@ class _EmployeeCustomerBayarPageState extends State<EmployeeCustomerBayarPage> {
             }
 
             List<Customer> filteredCustomers = customerSnapshot.data!
-                .where((customer) => customer.nama.toLowerCase().contains(searchname.toLowerCase()))
+                .where((customer) => customer.nama
+                    .toLowerCase()
+                    .contains(searchname.toLowerCase()))
                 .toList();
 
             return ListView.builder(
@@ -206,7 +210,6 @@ class _EmployeeCustomerBayarPageState extends State<EmployeeCustomerBayarPage> {
                 return CustomerCard(
                   customer: customer,
                   employee: widget.employee,
-
                 );
               },
             );

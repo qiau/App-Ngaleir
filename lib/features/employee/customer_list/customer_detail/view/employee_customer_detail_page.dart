@@ -32,20 +32,21 @@ class EmployeeCustomerDetailPage extends StatefulWidget {
 class _EmployeeCustomerDetailPageState
     extends State<EmployeeCustomerDetailPage> {
   List<Transaksi> listTransaksi = [];
+  List<int> tahun = [];
 
-  Future<void> getTransaksiByUserIdAndYear(String userId) async {
+  void getTanggal10TahunTerakhir() {
+    for (int i = 1; i <= 10; i++) {
+      int year = DateTime.now().year - i;
+      tahun.add(year);
+    }
+  }
+
+  Future<void> getTransaksiByUserIdAndYear(
+      String userId, List<int> tahun) async {
     final tahun = DateTime.now().year;
     final collection = FirebaseFirestore.instance.collection('Transaksi');
     final user = FirebaseAuth.instance.currentUser;
-
-    if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please log in to view this page')),
-      );
-      return;
-    }
-
-    final startOfYear = DateTime(tahun - 1, 12, 1).toIso8601String();
+    final startOfYear = DateTime(tahun, 1, 1).toIso8601String();
     final endOfYear = DateTime(tahun + 1, 1, 1).toIso8601String();
 
     final querySnapshot = await collection
@@ -60,12 +61,19 @@ class _EmployeeCustomerDetailPageState
           .map((doc) => Transaksi.fromJson(doc.data()))
           .toList();
     });
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please log in to view this page')),
+      );
+      return;
+    }
   }
 
   @override
   void initState() {
     super.initState();
-    getTransaksiByUserIdAndYear(widget.customer.uid);
+    getTanggal10TahunTerakhir();
+    getTransaksiByUserIdAndYear(widget.customer.uid, tahun);
   }
 
   @override
