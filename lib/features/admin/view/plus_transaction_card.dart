@@ -22,16 +22,20 @@ class PlusTransactionCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            FutureBuilder<String>(
-              future: _getCustomerName(transaksi.userId),
+            FutureBuilder<Map<String, String>>(
+              future: _getCustomerDetails(transaksi.userId),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return CircularProgressIndicator();
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else {
-                  final customerName = snapshot.data!;
-                  return _buildHistoryItemWidget(context, customerName);
+                  final customerDetails = snapshot.data!;
+                  return _buildHistoryItemWidget(
+                    context,
+                    customerDetails['name']!,
+                    customerDetails['alamatTower'] ?? 'Dicatat oleh Admin',
+                  );
                 }
               },
             ),
@@ -41,22 +45,28 @@ class PlusTransactionCard extends StatelessWidget {
     );
   }
 
-  Future<String> _getCustomerName(String userId) async {
+  Future<Map<String, String>> _getCustomerDetails(String userId) async {
     final DocumentSnapshot<Map<String, dynamic>> snapshot =
-        await FirebaseFirestore.instance
-            .collection('Customer')
-            .doc(userId)
-            .get();
+    await FirebaseFirestore.instance
+        .collection('Customer')
+        .doc(userId)
+        .get();
 
     if (snapshot.exists) {
       final customer = Customer.fromFirestore(snapshot);
-      return customer.nama;
+      return {
+        'name': customer.nama,
+        'alamatTower': customer.alamatTower ?? '',
+      };
     } else {
-      return 'Admin';
+      return {
+        'name': 'Admin',
+        'alamatTower': '',
+      };
     }
   }
 
-  Widget _buildHistoryItemWidget(BuildContext context, String customerName) {
+  Widget _buildHistoryItemWidget(BuildContext context, String customerName, String alamatTower) {
     final saldo = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp')
         .format(transaksi.saldo);
     return Container(
@@ -108,14 +118,20 @@ class PlusTransactionCard extends StatelessWidget {
                       color: transaksi.status == 'pembayaran'
                           ? Colors.green
                           : transaksi.status == 'pengeluaran'
-                              ? Colors.red
-                              : Colors.black,
+                          ? Colors.red
+                          : Colors.black,
                     ),
                   ),
                   Text(
                     transaksi.deskripsi,
-                    style: context.textTheme.bodySmallGrey,
+                    style: context.textTheme.bodySmallBold,
                     maxLines: 1,
+                  ),
+                  Text(
+                    alamatTower.isNotEmpty
+                        ? "Dicatat oleh Petugas $alamatTower"
+                        : "Dicatat oleh Admin",
+                    style: context.textTheme.bodySmallGrey,
                   ),
                   const SizedBox(
                     height: Styles.smallSpacing,
