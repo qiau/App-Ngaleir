@@ -11,8 +11,6 @@ import 'package:perairan_ngale/widgets/custom_button.dart';
 import 'package:perairan_ngale/widgets/custom_text_field.dart';
 import 'package:sizer/sizer.dart';
 
-
-
 @RoutePage()
 class AdminAddMoneyPage extends StatefulWidget {
   const AdminAddMoneyPage({super.key});
@@ -26,13 +24,12 @@ class _AdminAddMoneyPageState extends State<AdminAddMoneyPage> {
   final _deskripsiController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-
   Future<void> _tambahSaldo(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       try {
         final transaksi = Transaksi(
           deskripsi: _deskripsiController.text,
-          saldo: int.parse(_saldoController.text),
+          saldo: double.parse(_saldoController.text),
           status: 'pembayaran',
           tanggal: Timestamp.now().toDate().toString(),
           userId: FirebaseAuth.instance.currentUser!.uid,
@@ -44,8 +41,8 @@ class _AdminAddMoneyPageState extends State<AdminAddMoneyPage> {
         await FirebaseFirestore.instance
             .collection('Transaksi')
             .add(transaksi.toJson());
-        AutoRouter.of(context).pushAndPopUntil(HomeWrapperRoute(),
-            predicate: (route) => false);
+        AutoRouter.of(context)
+            .pushAndPopUntil(HomeWrapperRoute(), predicate: (route) => false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Tambah saldo berhasil')),
         );

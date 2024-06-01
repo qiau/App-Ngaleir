@@ -9,9 +9,9 @@ class Transaksi with _$Transaksi {
   const factory Transaksi({
     required String tanggal,
     required String status,
-    required int saldo,
-    int? meteran,
-    int? meteranBulanLalu,
+    required double saldo,
+    double? meteran,
+    double? meteranBulanLalu,
     required String userId,
     required String employeeId,
     String? pathImage,

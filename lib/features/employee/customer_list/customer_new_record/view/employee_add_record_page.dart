@@ -28,14 +28,16 @@ class EmployeeAddCustomerRecordPage extends StatefulWidget {
     required this.isThereTransaksi,
     this.employee,
     required this.isEditable,
+    required this.isAdd,
   });
 
-  final int? meteranTerakhir;
+  final double? meteranTerakhir;
   final Transaksi? transaksi;
   final String? customerId;
   final bool isThereTransaksi;
   final Employee? employee;
   final bool isEditable;
+  final bool isAdd;
 
   @override
   State<EmployeeAddCustomerRecordPage> createState() =>
@@ -277,27 +279,27 @@ class _EmployeeAddCustomerRecordPageState
   }
 
   Future<void> _tambahTransaksi(BuildContext context) async {
-    int pemakaian1bulan;
+    double pemakaian1bulan;
     if (_formKey.currentState!.validate()) {
       if (!widget.isThereTransaksi) {
-        int meteranTerakhir = int.parse(_nomorTagihanController.text);
+        double meteranTerakhir = double.parse(_nomorTagihanController.text);
 
         pemakaian1bulan =
-            int.parse(_meteranSaatIniController.text) - meteranTerakhir;
+            double.parse(_meteranSaatIniController.text) - meteranTerakhir;
       } else {
-        pemakaian1bulan =
-            int.parse(_meteranSaatIniController.text) - widget.meteranTerakhir!;
+        pemakaian1bulan = double.parse(_meteranSaatIniController.text) -
+            widget.meteranTerakhir!;
       }
 
-      int saldo = pemakaian1bulan * 5000;
+      double saldo = pemakaian1bulan * 5000;
       try {
         if (saldo > 0) {
           final transaksi = Transaksi(
             deskripsi: 'Pembayaran Air',
             saldo: saldo,
-            meteran: int.parse(_meteranSaatIniController.text),
+            meteran: double.parse(_meteranSaatIniController.text),
             status: 'pembayaran',
-            meteranBulanLalu: int.parse(_nomorTagihanController.text),
+            meteranBulanLalu: double.parse(_nomorTagihanController.text),
             tanggal: Timestamp.now().toDate().toString(),
             userId: widget.customerId ?? '',
             employeeId: FirebaseAuth.instance.currentUser!.uid,
@@ -330,34 +332,42 @@ class _EmployeeAddCustomerRecordPageState
   }
 
   Future<void> _editTransaksi(BuildContext context) async {
-    int pemakaian1bulan = 0;
+    double pemakaian1bulan = 0;
     if (_formKey.currentState!.validate()) {
       if (widget.transaksi != null) {
-        pemakaian1bulan = int.parse(_meteranSaatIniController.text) -
+        pemakaian1bulan = double.parse(_meteranSaatIniController.text) -
             (widget.transaksi?.meteranBulanLalu ?? 0);
       }
 
-      int saldo = pemakaian1bulan * 5000;
+      double saldo = pemakaian1bulan * 5000;
       try {
-        await FirebaseFirestore.instance
-            .collection('Transaksi')
-            .where('meteranBulanLalu',
-                isEqualTo: widget.transaksi?.meteranBulanLalu)
-            .where('userId', isEqualTo: widget.transaksi?.userId)
-            .get()
-            .then((QuerySnapshot querySnapshot) {
-          querySnapshot.docs.forEach((doc) {
-            doc.reference.update({
-              'meteran': int.parse(_meteranSaatIniController.text),
-              'saldo': saldo,
+        if (saldo > 0) {
+          await FirebaseFirestore.instance
+              .collection('Transaksi')
+              .where('meteranBulanLalu',
+                  isEqualTo: widget.transaksi?.meteranBulanLalu)
+              .where('userId', isEqualTo: widget.transaksi?.userId)
+              .get()
+              .then((QuerySnapshot querySnapshot) {
+            querySnapshot.docs.forEach((doc) {
+              doc.reference.update({
+                'meteran': int.parse(_meteranSaatIniController.text),
+                'saldo': saldo,
+              });
             });
           });
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Tambah Transaksi Berhasil')),
-        );
-        AutoRouter.of(context)
-            .pushAndPopUntil(EmployeeHomeRoute(), predicate: (route) => false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Tambah Transaksi Berhasil')),
+          );
+          AutoRouter.of(context).pushAndPopUntil(EmployeeHomeRoute(),
+              predicate: (route) => false);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content:
+                    Text('Meteran saat ini kurang dari Meteran bulan lalu')),
+          );
+        }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Terjadi kesalahan: $e')),

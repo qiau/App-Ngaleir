@@ -48,10 +48,10 @@ class TransactionCardNormal extends StatelessWidget {
 
   Future<Map<String, String>> _getCustomerDetails(String userId) async {
     final DocumentSnapshot<Map<String, dynamic>> snapshot =
-    await FirebaseFirestore.instance
-        .collection('Customer')
-        .doc(userId)
-        .get();
+        await FirebaseFirestore.instance
+            .collection('Customer')
+            .doc(userId)
+            .get();
 
     if (snapshot.exists) {
       final customer = Customer.fromFirestore(snapshot);
@@ -67,7 +67,8 @@ class TransactionCardNormal extends StatelessWidget {
     }
   }
 
-  Widget _buildHistoryItemWidget(BuildContext context, String customerName, String alamatTower) {
+  Widget _buildHistoryItemWidget(
+      BuildContext context, String customerName, String alamatTower) {
     final saldo = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp')
         .format(transaksi.saldo);
     return Container(
@@ -119,8 +120,8 @@ class TransactionCardNormal extends StatelessWidget {
                       color: transaksi.status == 'pembayaran'
                           ? Colors.green
                           : transaksi.status == 'pengeluaran'
-                          ? Colors.red
-                          : Colors.black,
+                              ? Colors.red
+                              : Colors.black,
                     ),
                   ),
                   Text(

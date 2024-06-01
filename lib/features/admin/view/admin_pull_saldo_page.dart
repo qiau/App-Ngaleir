@@ -27,13 +27,18 @@ class _AdminWithdrawalPageState extends State<AdminWithdrawalPage> {
   Future<void> _tarikSaldo(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       try {
-        final admin = await FirebaseFirestore.instance.collection('Admin').doc(FirebaseAuth.instance.currentUser!.uid).get();
+        final admin = await FirebaseFirestore.instance
+            .collection('Admin')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .get();
         final int totalSaldo = admin.data()!['saldo'].toInt();
-        final int jumlahTarikSaldo = int.parse(_saldoController.text);
+        final double jumlahTarikSaldo = double.parse(_saldoController.text);
 
         if (jumlahTarikSaldo > totalSaldo) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Jumlah tarik saldo tidak boleh melebihi total saldo')),
+            SnackBar(
+                content: Text(
+                    'Jumlah tarik saldo tidak boleh melebihi total saldo')),
           );
           return;
         }

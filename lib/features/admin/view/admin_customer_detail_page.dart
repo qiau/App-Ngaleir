@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -28,21 +30,48 @@ class AdminCustomerDetailPage extends StatefulWidget {
 class _AdminCustomerDetailPageState extends State<AdminCustomerDetailPage> {
   List<Transaksi> listTransaksi = [];
 
-  Future<void> getTransaksiByUserIdAndYear(String userId) async {
-    final tahun = DateTime.now().year;
-    final collection = FirebaseFirestore.instance.collection('Transaksi');
-    final user = FirebaseAuth.instance.currentUser;
+  List<int> tahun = [];
+  List<double> penggunaanPerBulan = [];
+  List<Transaksi> latestTransaksi = [];
+  var loading = false;
+  int year = DateTime.now().year;
 
-    if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please log in to view this page')),
-      );
-      return;
+  void getTanggal10TahunTerakhir() {
+    for (int i = 0; i < 10; i++) {
+      int year = DateTime.now().year - i;
+      tahun.add(year);
+    }
+  }
+
+  Future<void> setPenggunaanPerBulan() async {
+    penggunaanPerBulan = List.generate(12, (index) => 0.0);
+    final completer = Completer<void>();
+
+    if (listTransaksi.isNotEmpty) {
+      for (int i = 0; i < listTransaksi.length; i++) {
+        double penggunaan =
+            listTransaksi[i].meteran! - listTransaksi[i].meteranBulanLalu!;
+        int bulan = listTransaksi[i].bulan;
+        setState(() {
+          penggunaanPerBulan[bulan - 1] += penggunaan;
+        });
+      }
     }
 
-    final startOfYear = DateTime(tahun - 1, 12, 1).toIso8601String();
-    final endOfYear = DateTime(tahun + 1, 1, 1).toIso8601String();
+    print(penggunaanPerBulan);
+    completer.complete();
 
+    return completer.future;
+  }
+
+  Future<void> getTransaksiByUserIdAndYear(String userId, int tahun) async {
+    final collection = FirebaseFirestore.instance.collection('Transaksi');
+    final user = FirebaseAuth.instance.currentUser;
+    final startOfYear = DateTime(tahun, 1, 1).toIso8601String();
+    final endOfYear = DateTime(tahun + 1, 1, 1).toIso8601String();
+    setState(() {
+      loading = true;
+    });
     final querySnapshot = await collection
         .where('userId', isEqualTo: userId)
         .where('tanggal', isGreaterThanOrEqualTo: startOfYear)
@@ -54,13 +83,87 @@ class _AdminCustomerDetailPageState extends State<AdminCustomerDetailPage> {
       listTransaksi = querySnapshot.docs
           .map((doc) => Transaksi.fromJson(doc.data()))
           .toList();
+
+      loading = false;
     });
+
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please log in to view this page')),
+      );
+      return;
+    }
+  }
+
+  Future<void> getTransaksiByUserIdAndYearWithoutSorting(String userId) async {
+    int tahun = DateTime.now().year;
+    final collection = FirebaseFirestore.instance.collection('Transaksi');
+    final user = FirebaseAuth.instance.currentUser;
+    final startOfYear = DateTime(tahun, 1, 1).toIso8601String();
+    final endOfYear = DateTime(tahun + 1, 1, 1).toIso8601String();
+    setState(() {
+      loading = true;
+    });
+    final querySnapshot = await collection
+        .where('userId', isEqualTo: userId)
+        .where('tanggal', isGreaterThanOrEqualTo: startOfYear)
+        .where('tanggal', isLessThan: endOfYear)
+        .orderBy('tanggal', descending: true)
+        .get();
+
+    setState(() {
+      listTransaksi = querySnapshot.docs
+          .map((doc) => Transaksi.fromJson(doc.data()))
+          .toList();
+
+      loading = false;
+    });
+
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please log in to view this page')),
+      );
+      return;
+    }
+  }
+
+  Future<void> getLatestTransaksi(String userId) async {
+    final collection = FirebaseFirestore.instance.collection('Transaksi');
+    final user = FirebaseAuth.instance.currentUser;
+    final querySnapshot = await collection
+        .where('userId', isEqualTo: userId)
+        .orderBy('tanggal', descending: true)
+        .limit(1)
+        .get();
+
+    setState(() {
+      loading = false;
+    });
+
+    setState(() {
+      if (querySnapshot.docs.isNotEmpty) {
+        latestTransaksi = querySnapshot.docs
+            .map((doc) => Transaksi.fromJson(doc.data()))
+            .toList();
+      } else {
+        latestTransaksi = [];
+      }
+    });
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please log in to view this page')),
+      );
+      return;
+    }
   }
 
   @override
   void initState() {
     super.initState();
-    getTransaksiByUserIdAndYear(widget.customer.uid);
+    getTanggal10TahunTerakhir();
+    getTransaksiByUserIdAndYearWithoutSorting(widget.customer.uid);
+    setPenggunaanPerBulan();
+    getLatestTransaksi(widget.customer.uid);
   }
 
   @override
@@ -150,7 +253,7 @@ class _AdminCustomerDetailPageState extends State<AdminCustomerDetailPage> {
               child: ListView.builder(
                 itemCount: listTransaksi.length,
                 itemBuilder: (context, index) {
-                  int? meteranTerakhir = 0;
+                  double? meteranTerakhir = 0;
                   if (index != listTransaksi.length - 1) {
                     meteranTerakhir = listTransaksi[index + 1].meteran;
                   }

@@ -24,7 +24,7 @@ class TransactionCard extends StatelessWidget {
       this.isEditable});
   final Transaksi transaksi;
   final String? customerId;
-  final int? meteranTerakhir;
+  final double? meteranTerakhir;
   final bool isThereTransaksi;
   final Employee? employee;
   final bool? isEditable;
@@ -36,6 +36,7 @@ class TransactionCard extends StatelessWidget {
         if (customerId == null) {
           if (employee != null) {
             AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
+              isAdd: true,
               isThereTransaksi: isThereTransaksi,
               isEditable: isEditable!,
               transaksi: transaksi,
@@ -45,6 +46,7 @@ class TransactionCard extends StatelessWidget {
             AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
               isThereTransaksi: isThereTransaksi,
               isEditable: false,
+              isAdd: false,
               transaksi: transaksi,
               meteranTerakhir: meteranTerakhir,
             ));
@@ -52,6 +54,7 @@ class TransactionCard extends StatelessWidget {
         } else {
           AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
             isThereTransaksi: isThereTransaksi,
+            isAdd: true,
             isEditable: true,
             customerId: customerId,
             meteranTerakhir: meteranTerakhir,
