@@ -14,7 +14,7 @@ class Transaksi with _$Transaksi {
     double? meteranBulanLalu,
     required String userId,
     required String employeeId,
-    String? pathImage,
+    @Default(null) String? pathImage,
     required String deskripsi,
     required int bulan,
     required int tahun,

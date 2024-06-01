@@ -113,7 +113,6 @@ class _AdminHomePageState extends State<AdminHomePage> {
     final querySnapshot = await FirebaseFirestore.instance
         .collection('Transaksi')
         .orderBy('tanggal', descending: true)
-        .limit(4)
         .get();
     setState(() {
       listTransaksi = querySnapshot.docs

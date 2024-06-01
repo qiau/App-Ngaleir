@@ -31,6 +31,7 @@ class TransactionCardNormal extends StatelessWidget {
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else {
+                  print(transaksi.pathImage);
                   final customerDetails = snapshot.data!;
                   return _buildHistoryItemWidget(
                     context,
