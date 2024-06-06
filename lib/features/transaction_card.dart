@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
+import 'package:perairan_ngale/models/customer.dart';
 import 'package:perairan_ngale/models/employee.dart';
 import 'package:perairan_ngale/models/transaksi.dart';
 import 'package:perairan_ngale/routes/router.dart';
@@ -21,8 +22,10 @@ class TransactionCard extends StatelessWidget {
       this.meteranTerakhir,
       required this.isThereTransaksi,
       this.employee,
-      this.isEditable});
+      this.isEditable,
+      this.customer});
   final Transaksi transaksi;
+  final Customer? customer;
   final String? customerId;
   final double? meteranTerakhir;
   final bool isThereTransaksi;
@@ -35,12 +38,13 @@ class TransactionCard extends StatelessWidget {
       onTap: () {
         if (customerId == null) {
           if (employee != null) {
-            AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
+            print('cek2');
+            AutoRouter.of(context).popAndPush(EmployeeAddCustomerRecordRoute(
               isAdd: true,
               isThereTransaksi: isThereTransaksi,
+              customer: customer,
               isEditable: isEditable!,
               transaksi: transaksi,
-              meteranTerakhir: meteranTerakhir,
             ));
           } else {
             AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
@@ -48,16 +52,14 @@ class TransactionCard extends StatelessWidget {
               isEditable: false,
               isAdd: false,
               transaksi: transaksi,
-              meteranTerakhir: meteranTerakhir,
             ));
           }
         } else {
-          AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
+          AutoRouter.of(context).popAndPush(EmployeeAddCustomerRecordRoute(
             isThereTransaksi: isThereTransaksi,
             isAdd: true,
             isEditable: true,
             customerId: customerId,
-            meteranTerakhir: meteranTerakhir,
             employee: employee,
           ));
         }

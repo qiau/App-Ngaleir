@@ -47,23 +47,29 @@ class _EmployeeCustomerBayarPageState extends State<EmployeeCustomerBayarPage> {
     int currentMonth = DateTime.now().month;
     return FirebaseFirestore.instance
         .collection('Transaksi')
+        .where('tahun', isEqualTo: DateTime.now().year)
         .where('status', isEqualTo: 'pembayaran')
         .where('bulan', isEqualTo: currentMonth);
   }
 
   Future<List<Customer>> _getCustomersFromTransactions(
       QuerySnapshot<Map<String, dynamic>> snapshot) async {
+    Set<String> addedCustomerIds = {};
     List<Customer> customers = [];
+
     for (var doc in snapshot.docs) {
       String userId = doc['userId'];
-      DocumentSnapshot customerSnapshot = await FirebaseFirestore.instance
-          .collection('Customer')
-          .doc(userId)
-          .get();
-      if (customerSnapshot.exists) {
-        var customer = Customer.fromFirestore(customerSnapshot);
-        if (customer.alamatTower == widget.employee.alamatTower) {
-          customers.add(customer);
+      if (!addedCustomerIds.contains(userId)) {
+        DocumentSnapshot customerSnapshot = await FirebaseFirestore.instance
+            .collection('Customer')
+            .doc(userId)
+            .get();
+        if (customerSnapshot.exists) {
+          var customer = Customer.fromFirestore(customerSnapshot);
+          if (customer.alamatTower == widget.employee.alamatTower) {
+            customers.add(customer);
+            addedCustomerIds.add(userId);
+          }
         }
       }
     }

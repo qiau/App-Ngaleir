@@ -56,6 +56,7 @@ dependencies:
   permission_handler: ^11.3.1
   fl_chart: ^0.68.0
   cool_dropdown: ^2.1.0
+  fluttertoast: any
 
 dev_dependencies:
   auto_route_generator: ^8.0.0

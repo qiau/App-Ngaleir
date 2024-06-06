@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:perairan_ngale/models/transaksi.dart';
 import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
@@ -59,9 +60,14 @@ class _AdminWithdrawalPageState extends State<AdminWithdrawalPage> {
             .add(transaksi.toJson());
         AutoRouter.of(context)
             .pushAndPopUntil(HomeWrapperRoute(), predicate: (route) => false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Tarik saldo berhasil')),
-        );
+        Fluttertoast.showToast(
+            msg: "Tarik Saldo berhasil",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Terjadi kesalahan: $e')),

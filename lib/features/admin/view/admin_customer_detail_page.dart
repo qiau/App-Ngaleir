@@ -1,10 +1,12 @@
 import 'dart:async';
 
+import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
+import 'package:perairan_ngale/features/chart_template.dart';
 import 'package:perairan_ngale/features/transaction_card.dart';
 import 'package:perairan_ngale/models/customer.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart' as svg;
@@ -232,6 +234,18 @@ class _AdminCustomerDetailPageState extends State<AdminCustomerDetailPage> {
     );
   }
 
+  Widget _buildSortTransaksi() {
+    return CustomDropdown<int>(
+      hintText: 'Pilih tahun',
+      items: tahun,
+      initialItem: year,
+      onChanged: (value) {
+        year = value;
+        getTransaksiByUserIdAndYear(widget.customer.uid, year);
+      },
+    );
+  }
+
   Widget _buildRecordsWidget(bool isThereTransaksi) {
     return Container(
       width: MediaQuery.of(context).size.width,
@@ -245,7 +259,24 @@ class _AdminCustomerDetailPageState extends State<AdminCustomerDetailPage> {
           children: [
             Center(
               child: Text(
-                "Riwayat Pencatatan",
+                "Penggunaan Per Bulan",
+                style: context.textTheme.bodyMediumBold,
+              ),
+            ),
+            FutureBuilder(
+              future: setPenggunaanPerBulan(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return LineChartSample2(data: penggunaanPerBulan);
+                } else {
+                  return Center(child: CircularProgressIndicator());
+                }
+              },
+            ),
+            _buildSortTransaksi(),
+            Center(
+              child: Text(
+                "Riwayat Transaksi",
                 style: context.textTheme.bodyMediumBold,
               ),
             ),

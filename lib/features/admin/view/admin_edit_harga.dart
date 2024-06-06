@@ -1,7 +1,10 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:perairan_ngale/models/harga.dart';
 import 'package:perairan_ngale/models/transaksi.dart';
 import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
@@ -9,55 +12,62 @@ import 'package:perairan_ngale/shared/styles.dart';
 import 'package:perairan_ngale/utils/extensions.dart';
 import 'package:perairan_ngale/widgets/custom_button.dart';
 import 'package:perairan_ngale/widgets/custom_text_field.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sizer/sizer.dart';
 
 @RoutePage()
-class AdminAddMoneyPage extends StatefulWidget {
-  const AdminAddMoneyPage({super.key});
+class EditHargaPage extends StatefulWidget {
+  const EditHargaPage({super.key});
 
   @override
-  State<AdminAddMoneyPage> createState() => _AdminAddMoneyPageState();
+  State<EditHargaPage> createState() => _EditHargaPageState();
 }
 
-class _AdminAddMoneyPageState extends State<AdminAddMoneyPage> {
-  final _saldoController = TextEditingController();
-  final _deskripsiController = TextEditingController();
+class _EditHargaPageState extends State<EditHargaPage> {
+  final _hargaController = TextEditingController();
+  final _dendaController = TextEditingController();
+  final String idHarga = '6aXCOuQhjN9HeVIPTMTO';
+  Harga? _harga;
+
   final _formKey = GlobalKey<FormState>();
 
-  Future<void> _tambahSaldo(BuildContext context) async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        final transaksi = Transaksi(
-          deskripsi: _deskripsiController.text,
-          saldo: double.parse(_saldoController.text),
-          status: 'pembayaran',
-          tanggal: Timestamp.now().toDate().toString(),
-          userId: FirebaseAuth.instance.currentUser!.uid,
-          employeeId: FirebaseAuth.instance.currentUser!.uid,
-          bulan: Timestamp.now().toDate().month,
-          tahun: Timestamp.now().toDate().year,
-        );
+  Future<void> updateDocument() async {
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    final CollectionReference _collection = _firestore.collection('Harga');
 
-        await FirebaseFirestore.instance
-            .collection('Transaksi')
-            .add(transaksi.toJson());
-        AutoRouter.of(context)
-            .pushAndPopUntil(HomeWrapperRoute(), predicate: (route) => false);
-        Fluttertoast.showToast(
-            msg: "Tambah Saldo berhasil",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.green,
-            textColor: Colors.white,
-            fontSize: 16.0);
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Terjadi kesalahan: $e')),
-        );
-      }
+    await _collection.doc(idHarga).update({
+      'harga': int.parse(_hargaController.text),
+      'denda': int.parse(_dendaController.text),
+    });
+  }
+
+  Future<Harga> getHarga() async {
+    final doc =
+        await FirebaseFirestore.instance.collection('Harga').doc(idHarga).get();
+
+    final harga = Harga.fromFirestore(doc);
+    return harga;
+  }
+
+  Future<void> _getHarga() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please log in to view this page')),
+      );
+      return;
     }
+    final harga = await getHarga();
+    setState(() {
+      _harga = harga;
+      _hargaController.text = _harga!.harga.toString();
+      _dendaController.text = _harga!.denda.toString();
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getHarga();
   }
 
   @override
@@ -65,12 +75,12 @@ class _AdminAddMoneyPageState extends State<AdminAddMoneyPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Tambah Saldo',
+          'Edit Biaya',
           style: context.textTheme.titleMedium,
         ),
-        backgroundColor: ColorValues.success10,
+        backgroundColor: Color(0xFFFFF6D7),
       ),
-      backgroundColor: ColorValues.success10,
+      backgroundColor: Color(0xFFFFF6D7),
       body: Padding(
         padding: const EdgeInsets.only(top: Styles.defaultPadding),
         child: Container(
@@ -93,17 +103,27 @@ class _AdminAddMoneyPageState extends State<AdminAddMoneyPage> {
                 SizedBox(height: Styles.defaultPadding),
                 _buildSaldoTextField(context),
                 SizedBox(height: Styles.defaultPadding),
-                _buildDeskripsiTextField(context),
+                _buildDendaTextField(context),
                 SizedBox(height: Styles.bigPadding),
                 Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: Styles.defaultPadding),
                   child: CustomButton(
                     onPressed: () {
-                      _tambahSaldo(context);
+                      updateDocument();
+                      AutoRouter.of(context).pushAndPopUntil(HomeWrapperRoute(),
+                          predicate: (route) => false);
+                      Fluttertoast.showToast(
+                          msg: "Edit Harga berhasil",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: Colors.green,
+                          textColor: Colors.white,
+                          fontSize: 16.0);
                     },
-                    text: 'Tambah Saldo',
-                    backgroundColor: Colors.green,
+                    text: 'Ganti Harga',
+                    backgroundColor: Color(0xFFFDD037),
                     textColor: Colors.white,
                     width: double.infinity,
                   ),
@@ -123,8 +143,9 @@ class _AdminAddMoneyPageState extends State<AdminAddMoneyPage> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Catat Saldo Masuk", style: context.textTheme.bodyMediumBold),
-          Text("Pastikan data yang dimasukkan sesuai",
+          Text("Tetapkan Biaya Tagihan",
+              style: context.textTheme.bodyMediumBold),
+          Text("Pastikan biaya sudah sesuai perhitungan.",
               style: context.textTheme.bodySmallGrey),
         ],
       ),
@@ -135,9 +156,9 @@ class _AdminAddMoneyPageState extends State<AdminAddMoneyPage> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: Styles.defaultPadding),
       child: CustomTextField(
-        controller: _saldoController,
+        controller: _hargaController,
         hintText: "Rp 0",
-        label: "Jumlah Saldo",
+        label: "Harga air per-m3",
         keyboardType: TextInputType.number,
         validator: (value) {
           if (value!.isEmpty) {
@@ -149,17 +170,17 @@ class _AdminAddMoneyPageState extends State<AdminAddMoneyPage> {
     );
   }
 
-  Padding _buildDeskripsiTextField(BuildContext context) {
+  Padding _buildDendaTextField(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: Styles.defaultPadding),
       child: CustomTextField(
-        hintText: "Tambahkan keterangan singkat...",
-        label: "Keterangan",
-        controller: _deskripsiController,
-        maxLines: null,
+        controller: _dendaController,
+        hintText: "Contoh: 5",
+        label: "Besar Denda dalam %",
+        keyboardType: TextInputType.number,
         validator: (value) {
           if (value!.isEmpty) {
-            return 'Keterangan tidak boleh kosong';
+            return 'Jumlah saldo tidak boleh kosong';
           }
           return null;
         },

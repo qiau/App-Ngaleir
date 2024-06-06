@@ -167,6 +167,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
         _buildTarikIcon(),
         _buildAmbilIcon(),
         _buildCetakIcon(),
+        _buildGantiHargaIcon(),
       ],
     );
   }
@@ -192,6 +193,31 @@ class _AdminHomePageState extends State<AdminHomePage> {
           ),
         ),
         Text('Tambah', style: context.textTheme.bodySmallBold),
+      ],
+    );
+  }
+
+  Column _buildGantiHargaIcon() {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: () {
+            AutoRouter.of(context).push(EditHargaRoute());
+          },
+          child: Container(
+            child: Icon(
+              IconsaxPlusLinear.receipt_edit,
+              size: 44,
+              color: ColorValues.white,
+            ),
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+                color: Color.fromARGB(251, 228, 201, 25),
+                borderRadius: BorderRadius.circular(100)),
+          ),
+        ),
+        Text('Ganti Harga', style: context.textTheme.bodySmallBold),
       ],
     );
   }

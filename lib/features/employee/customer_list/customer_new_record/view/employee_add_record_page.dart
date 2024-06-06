@@ -5,7 +5,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:perairan_ngale/models/customer.dart';
 import 'package:perairan_ngale/models/employee.dart';
+import 'package:perairan_ngale/models/harga.dart';
 import 'package:perairan_ngale/models/transaksi.dart';
 import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
@@ -22,16 +25,18 @@ import 'package:perairan_ngale/widgets/custom_text_field.dart';
 class EmployeeAddCustomerRecordPage extends StatefulWidget {
   const EmployeeAddCustomerRecordPage({
     super.key,
-    this.meteranTerakhir,
+    this.transaksiBulanLalu,
     this.transaksi,
     this.customerId,
     required this.isThereTransaksi,
     this.employee,
     required this.isEditable,
     required this.isAdd,
+    this.customer,
   });
 
-  final double? meteranTerakhir;
+  final Transaksi? transaksiBulanLalu;
+  final Customer? customer;
   final Transaksi? transaksi;
   final String? customerId;
   final bool isThereTransaksi;
@@ -46,7 +51,6 @@ class EmployeeAddCustomerRecordPage extends StatefulWidget {
 
 class _EmployeeAddCustomerRecordPageState
     extends State<EmployeeAddCustomerRecordPage> {
-  late final Employee _employee;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nomorTagihanController = TextEditingController();
   final TextEditingController _meteranSaatIniController =
@@ -57,11 +61,40 @@ class _EmployeeAddCustomerRecordPageState
   bool isNotEmpty = false;
   bool isEditable = false;
 
+  Employee? _employee;
+  String idHarga = '6aXCOuQhjN9HeVIPTMTO';
+  Harga? _harga;
+  late int meteranTerakhir;
+
   @override
   void initState() {
     super.initState();
     setIsNotEmpty();
     getPencatat();
+
+    _getHarga();
+  }
+
+  Future<Harga> getHarga() async {
+    final doc =
+        await FirebaseFirestore.instance.collection('Harga').doc(idHarga).get();
+
+    final harga = Harga.fromFirestore(doc);
+    return harga;
+  }
+
+  Future<void> _getHarga() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please log in to view this page')),
+      );
+      return;
+    }
+    final harga = await getHarga();
+    setState(() {
+      _harga = harga;
+    });
   }
 
   late File? _imageFile = null;
@@ -86,16 +119,19 @@ class _EmployeeAddCustomerRecordPageState
           .collection('Employee')
           .doc(widget.transaksi?.employeeId) // cuman work sebagai petugas
           .get();
-      final _employee = Employee.fromFirestore(doc);
-      _pencatatController.text = _employee.nama;
+      final employee = Employee.fromFirestore(doc);
+      _pencatatController.text = employee.nama;
     } else {
       final doc = await FirebaseFirestore.instance
           .collection('Employee')
           .doc(FirebaseAuth
               .instance.currentUser!.uid) // cuman work sebagai petugas
           .get();
-      final _employee = Employee.fromFirestore(doc);
-      _pencatatController.text = _employee.nama;
+      final employee = Employee.fromFirestore(doc);
+      _pencatatController.text = employee.nama;
+      setState(() {
+        _employee = employee;
+      });
     }
   }
 
@@ -118,7 +154,7 @@ class _EmployeeAddCustomerRecordPageState
   void setIsNotEmpty() async {
     if (widget.transaksi != null) {
       isNotEmpty = true;
-      if (widget.transaksi?.pathImage! == '') {
+      if (widget.transaksi?.pathImage == '') {
         _imagePath = 'transaksi/default.jpg';
       } else {
         _imagePath = widget.transaksi!.pathImage!;
@@ -261,7 +297,7 @@ class _EmployeeAddCustomerRecordPageState
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 8),
                               child: Text(
-                                'Catat Tagihan',
+                                isNotEmpty ? 'Edit Tagihan' : 'Catat Tagihan',
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 20),
                               ),
@@ -280,6 +316,12 @@ class _EmployeeAddCustomerRecordPageState
 
   Future<void> _tambahTransaksi(BuildContext context) async {
     double pemakaian1bulan;
+    var bulanTerakhir = widget.transaksiBulanLalu?.bulan ?? 0;
+    var tahunTerakhir = widget.transaksiBulanLalu?.tahun ?? 0;
+    var selisihBulan = DateTime.now().month - bulanTerakhir;
+    var selisihTahun = DateTime.now().year - tahunTerakhir;
+    int pengali = 0;
+
     if (_formKey.currentState!.validate()) {
       if (!widget.isThereTransaksi) {
         double meteranTerakhir = double.parse(_nomorTagihanController.text);
@@ -288,15 +330,20 @@ class _EmployeeAddCustomerRecordPageState
             double.parse(_meteranSaatIniController.text) - meteranTerakhir;
       } else {
         pemakaian1bulan = double.parse(_meteranSaatIniController.text) -
-            widget.meteranTerakhir!;
+            widget.transaksiBulanLalu!.meteran!;
       }
 
-      double saldo = pemakaian1bulan * 5000;
+      if (selisihBulan < 0) {
+        pengali = selisihBulan + 12 * selisihTahun;
+      }
+
+      double saldo = pemakaian1bulan * _harga!.harga;
+      double saldofix = saldo + saldo * _harga!.denda / 100 * pengali;
       try {
-        if (saldo > 0) {
+        if (saldofix > 0) {
           final transaksi = Transaksi(
             deskripsi: 'Pembayaran Air',
-            saldo: saldo,
+            saldo: saldofix,
             meteran: double.parse(_meteranSaatIniController.text),
             status: 'pembayaran',
             meteranBulanLalu: double.parse(_nomorTagihanController.text),
@@ -311,11 +358,20 @@ class _EmployeeAddCustomerRecordPageState
           await FirebaseFirestore.instance
               .collection('Transaksi')
               .add(transaksi.toJson());
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Tambah Transaksi Berhasil')),
+          Fluttertoast.showToast(
+              msg: "Tambah Transaksi berhasil",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.green,
+              textColor: Colors.white,
+              fontSize: 16.0);
+          AutoRouter.of(context).popAndPush(
+            EmployeeCustomerDetailRoute(
+              customer: widget.customer!,
+              employee: _employee,
+            ),
           );
-          AutoRouter.of(context).pushAndPopUntil(EmployeeHomeRoute(),
-              predicate: (route) => false);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -333,15 +389,21 @@ class _EmployeeAddCustomerRecordPageState
 
   Future<void> _editTransaksi(BuildContext context) async {
     double pemakaian1bulan = 0;
+    var bulanTerakhir = widget.transaksiBulanLalu?.bulan ?? 0;
+    var tahunTerakhir = widget.transaksiBulanLalu?.tahun ?? 0;
+    var selisihBulan = DateTime.now().month - bulanTerakhir;
+    var selisihTahun = DateTime.now().year - tahunTerakhir;
+    int pengali = 0;
     if (_formKey.currentState!.validate()) {
       if (widget.transaksi != null) {
         pemakaian1bulan = double.parse(_meteranSaatIniController.text) -
             (widget.transaksi?.meteranBulanLalu ?? 0);
       }
 
-      double saldo = pemakaian1bulan * 5000;
+      double saldo = pemakaian1bulan * _harga!.harga;
+      double saldofix = saldo + saldo * _harga!.denda / 100 * pengali;
       try {
-        if (saldo > 0) {
+        if (saldofix > 0) {
           await FirebaseFirestore.instance
               .collection('Transaksi')
               .where('meteranBulanLalu',
@@ -351,16 +413,25 @@ class _EmployeeAddCustomerRecordPageState
               .then((QuerySnapshot querySnapshot) {
             querySnapshot.docs.forEach((doc) {
               doc.reference.update({
-                'meteran': int.parse(_meteranSaatIniController.text),
+                'meteran': double.parse(_meteranSaatIniController.text),
                 'saldo': saldo,
               });
             });
           });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Tambah Transaksi Berhasil')),
+          Fluttertoast.showToast(
+              msg: "Edit Transaksi berhasil",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.green,
+              textColor: Colors.white,
+              fontSize: 16.0);
+          AutoRouter.of(context).popAndPush(
+            EmployeeCustomerDetailRoute(
+              customer: widget.customer!,
+              employee: _employee,
+            ),
           );
-          AutoRouter.of(context).pushAndPopUntil(EmployeeHomeRoute(),
-              predicate: (route) => false);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -377,13 +448,16 @@ class _EmployeeAddCustomerRecordPageState
   }
 
   Widget _buildNomorTagihanField() {
-    if (widget.meteranTerakhir == 0) {
+    var meteranTerakhir = widget.transaksiBulanLalu?.meteran ?? 0;
+
+    if (meteranTerakhir == 0) {
       if (widget.isThereTransaksi) {
         _nomorTagihanController.text =
             widget.transaksi!.meteranBulanLalu.toString();
       }
     } else {
-      _nomorTagihanController.text = widget.meteranTerakhir.toString();
+      _nomorTagihanController.text =
+          widget.transaksiBulanLalu!.meteran.toString();
     }
     return CustomTextField(
       maxCharacter: 50,
@@ -397,7 +471,19 @@ class _EmployeeAddCustomerRecordPageState
         }
         return null;
       },
-      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+        TextInputFormatter.withFunction((oldValue, newValue) {
+          if (newValue.text.contains(',')) {
+            final newText = newValue.text.replaceAll(',', '.');
+            return TextEditingValue(
+              text: newText,
+              selection: newValue.selection,
+            );
+          }
+          return newValue;
+        }),
+      ],
       keyboardType: TextInputType.number,
     );
   }
@@ -418,7 +504,19 @@ class _EmployeeAddCustomerRecordPageState
         }
         return null;
       },
-      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+        TextInputFormatter.withFunction((oldValue, newValue) {
+          if (newValue.text.contains(',')) {
+            final newText = newValue.text.replaceAll(',', '.');
+            return TextEditingValue(
+              text: newText,
+              selection: newValue.selection,
+            );
+          }
+          return newValue;
+        }),
+      ],
       keyboardType: TextInputType.number,
     );
   }

@@ -189,7 +189,8 @@ class _EmployeeCustomerDetailPageState
                 isThereTransaksi: isThereTransaksi,
                 isAdd: true,
                 isEditable: true,
-                meteranTerakhir: meteranTerakhir,
+                customer: widget.customer,
+                transaksiBulanLalu: latestTransaksi[0],
                 customerId: widget.customer.uid,
                 employee: widget.employee));
           },
@@ -283,7 +284,6 @@ class _EmployeeCustomerDetailPageState
   Widget _buildRecordsWidget(bool isThereTransaksi) {
     return Container(
       width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height,
       decoration: const BoxDecoration(
         color: ColorValues.white,
       ),
@@ -314,43 +314,53 @@ class _EmployeeCustomerDetailPageState
                 style: context.textTheme.bodyMediumBold,
               ),
             ),
-            Expanded(
-              child: !loading
-                  ? ListView.builder(
-                      itemCount: listTransaksi.length,
-                      itemBuilder: (context, index) {
-                        double? meteranTerakhir = 0;
-                        if (index != listTransaksi.length - 1) {
-                          meteranTerakhir = listTransaksi[index + 1].meteran;
-                        }
-                        Transaksi transaksi = listTransaksi[index];
-                        if (listTransaksi[index] == latestTransaksi[0]) {
-                          if (widget.employee != null) {
-                            return TransactionCard(
-                              isEditable: true,
-                              isThereTransaksi: isThereTransaksi,
-                              transaksi: transaksi,
-                              employee: widget.employee,
-                              meteranTerakhir: meteranTerakhir,
-                            );
-                          } else {
-                            return TransactionCard(
-                              isEditable: true,
-                              isThereTransaksi: isThereTransaksi,
-                              transaksi: transaksi,
-                              meteranTerakhir: meteranTerakhir,
-                            );
-                          }
-                        }
-                        return TransactionCard(
-                          isThereTransaksi: isThereTransaksi,
-                          transaksi: transaksi,
-                          meteranTerakhir: meteranTerakhir,
-                        );
-                      },
-                    )
-                  : Center(child: CircularProgressIndicator()),
+            SizedBox(
+              height: 8,
             ),
+            !loading
+                ? ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: listTransaksi.length,
+                    itemBuilder: (context, index) {
+                      double? meteranTerakhir = 0;
+
+                      if (index != listTransaksi.length - 1) {
+                        meteranTerakhir = listTransaksi[index + 1].meteran;
+                      }
+                      Transaksi transaksi = listTransaksi[index];
+                      if (listTransaksi[index] == latestTransaksi[0]) {
+                        if (widget.employee != null) {
+                          print('cek1');
+                          return TransactionCard(
+                            isEditable: true,
+                            isThereTransaksi: isThereTransaksi,
+                            transaksi: transaksi,
+                            customer: widget.customer,
+                            employee: widget.employee,
+                            meteranTerakhir: meteranTerakhir,
+                          );
+                        } else {
+                          print('cek2');
+                          return TransactionCard(
+                            isEditable: true,
+                            isThereTransaksi: isThereTransaksi,
+                            transaksi: transaksi,
+                            meteranTerakhir: meteranTerakhir,
+                          );
+                        }
+                      }
+                      return TransactionCard(
+                        isThereTransaksi: isThereTransaksi,
+                        transaksi: transaksi,
+                        meteranTerakhir: meteranTerakhir,
+                      );
+                    },
+                  )
+                : Center(child: CircularProgressIndicator()),
+            SizedBox(
+              height: 16,
+            )
           ],
         ),
       ),
