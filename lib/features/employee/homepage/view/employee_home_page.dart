@@ -111,25 +111,25 @@ class _EmployeeHomePageState extends State<EmployeeHomePage> {
               ),
             ),
             if (_employee != null)
-            Expanded(
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (_employee != null)
-                      Text(
-                        _employee!.nama,
-                        style: context.textTheme.bodyMediumBoldBright,
+              Expanded(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (_employee != null)
+                        Text(
+                          _employee!.nama,
+                          style: context.textTheme.bodyMediumBoldBright,
+                        ),
+                      const SizedBox(
+                        height: Styles.smallSpacing,
                       ),
-                    const SizedBox(
-                      height: Styles.smallSpacing,
-                    ),
-                    Text(
-                      _employee!.alamatTower,
-                      style: context.textTheme.bodySmallBright,
-                    ),
-                  ]),
-            ),
+                      Text(
+                        _employee!.alamatTower,
+                        style: context.textTheme.bodySmallBright,
+                      ),
+                    ]),
+              ),
             IconButton(
               icon: const Icon(
                 IconsaxPlusLinear.logout,
@@ -151,8 +151,10 @@ class _EmployeeHomePageState extends State<EmployeeHomePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Konfirmasi Keluar', style: context.textTheme.bodyMediumBold),
-          content: Text('Apakah Anda yakin ingin keluar dari Petugas?', style: context.textTheme.bodyMedium),
+          title: Text('Konfirmasi Keluar',
+              style: context.textTheme.bodyMediumBold),
+          content: Text('Apakah Anda yakin ingin keluar dari Petugas?',
+              style: context.textTheme.bodyMedium),
           actions: [
             TextButton(
               child: Text('Batal', style: context.textTheme.bodyMediumBold),
@@ -166,10 +168,12 @@ class _EmployeeHomePageState extends State<EmployeeHomePage> {
                 color: Colors.red,
               ),
               child: TextButton(
-                child: Text('Keluar', style: context.textTheme.bodyMediumBoldBright),
+                child: Text('Keluar',
+                    style: context.textTheme.bodyMediumBoldBright),
                 onPressed: () async {
                   await FirebaseAuth.instance.signOut();
-                  AutoRouter.of(context).pushAndPopUntil(LoginRoute(), predicate: (route) => false);
+                  AutoRouter.of(context).pushAndPopUntil(LoginRoute(),
+                      predicate: (route) => false);
                   Navigator.of(context).pop();
                 },
               ),

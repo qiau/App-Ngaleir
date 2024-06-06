@@ -54,13 +54,24 @@ class _AdminCustomerBayarPageState extends State<AdminCustomerBayarPage> {
         .where('bulan', isEqualTo: currentMonth);
   }
 
-  Future<List<Customer>> _getCustomersFromTransactions(QuerySnapshot<Map<String, dynamic>> snapshot) async {
+  Future<List<Customer>> _getCustomersFromTransactions(
+      QuerySnapshot<Map<String, dynamic>> snapshot) async {
+    Set<String> addedCustomerIds = {};
     List<Customer> customers = [];
+
     for (var doc in snapshot.docs) {
       String userId = doc['userId'];
-      DocumentSnapshot customerSnapshot = await FirebaseFirestore.instance.collection('Customer').doc(userId).get();
-      if (customerSnapshot.exists) {
-        customers.add(Customer.fromFirestore(customerSnapshot));
+      if (!addedCustomerIds.contains(userId)) {
+        DocumentSnapshot customerSnapshot = await FirebaseFirestore.instance
+            .collection('Customer')
+            .doc(userId)
+            .get();
+        if (customerSnapshot.exists) {
+          var customer = Customer.fromFirestore(customerSnapshot);
+
+          customers.add(customer);
+          addedCustomerIds.add(userId);
+        }
       }
     }
     return customers;
@@ -196,7 +207,9 @@ class _AdminCustomerBayarPageState extends State<AdminCustomerBayarPage> {
               itemCount: customerSnapshot.data!.length,
               itemBuilder: (context, index) {
                 final customer = customerSnapshot.data![index];
-                if (customer.nama.toLowerCase().contains(searchname.toLowerCase())) {
+                if (customer.nama
+                    .toLowerCase()
+                    .contains(searchname.toLowerCase())) {
                   return AdminCustomerCard(
                     customer: customer,
                   );

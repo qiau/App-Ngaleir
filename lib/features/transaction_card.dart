@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
+import 'package:perairan_ngale/models/customer.dart';
+import 'package:perairan_ngale/models/employee.dart';
 import 'package:perairan_ngale/models/transaksi.dart';
 import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
@@ -18,28 +20,47 @@ class TransactionCard extends StatelessWidget {
       required this.transaksi,
       this.customerId,
       this.meteranTerakhir,
-      required this.isThereTransaksi});
+      required this.isThereTransaksi,
+      this.employee,
+      this.isEditable,
+      this.customer});
   final Transaksi transaksi;
+  final Customer? customer;
   final String? customerId;
-  final int? meteranTerakhir;
+  final double? meteranTerakhir;
   final bool isThereTransaksi;
+  final Employee? employee;
+  final bool? isEditable;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         if (customerId == null) {
-          print('apalah');
-          AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
-            isThereTransaksi: isThereTransaksi,
-            transaksi: transaksi,
-            meteranTerakhir: meteranTerakhir,
-          ));
+          if (employee != null) {
+            print('cek2');
+            AutoRouter.of(context).popAndPush(EmployeeAddCustomerRecordRoute(
+              isAdd: true,
+              isThereTransaksi: isThereTransaksi,
+              customer: customer,
+              isEditable: isEditable!,
+              transaksi: transaksi,
+            ));
+          } else {
+            AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
+              isThereTransaksi: isThereTransaksi,
+              isEditable: false,
+              isAdd: false,
+              transaksi: transaksi,
+            ));
+          }
         } else {
-          AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
+          AutoRouter.of(context).popAndPush(EmployeeAddCustomerRecordRoute(
             isThereTransaksi: isThereTransaksi,
+            isAdd: true,
+            isEditable: true,
             customerId: customerId,
-            meteranTerakhir: meteranTerakhir,
+            employee: employee,
           ));
         }
       },

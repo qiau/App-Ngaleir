@@ -7,20 +7,27 @@ import 'package:flutter/widgets.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:perairan_ngale/models/admin.dart';
 import 'package:perairan_ngale/models/customer.dart';
+import 'package:perairan_ngale/models/employee.dart';
 import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
 import 'package:perairan_ngale/shared/styles.dart';
 import 'package:perairan_ngale/utils/extensions.dart';
 
 class CustomerCard extends StatelessWidget {
-  const CustomerCard({super.key, required this.customer});
+  const CustomerCard(
+      {super.key, required this.customer, required this.employee});
+
   final Customer customer;
+  final Employee employee;
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        AutoRouter.of(context)
-            .push(EmployeeCustomerDetailRoute(customer: customer));
+        AutoRouter.of(context).push(EmployeeCustomerDetailRoute(
+          customer: customer,
+          employee: employee,
+        ));
       },
       child: Padding(
         padding: const EdgeInsets.fromLTRB(0, Styles.smallPadding, 0, 0),

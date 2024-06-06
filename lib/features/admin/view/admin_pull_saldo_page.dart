@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:perairan_ngale/models/transaksi.dart';
 import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
@@ -27,13 +28,18 @@ class _AdminWithdrawalPageState extends State<AdminWithdrawalPage> {
   Future<void> _tarikSaldo(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       try {
-        final admin = await FirebaseFirestore.instance.collection('Admin').doc(FirebaseAuth.instance.currentUser!.uid).get();
+        final admin = await FirebaseFirestore.instance
+            .collection('Admin')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .get();
         final int totalSaldo = admin.data()!['saldo'].toInt();
-        final int jumlahTarikSaldo = int.parse(_saldoController.text);
+        final double jumlahTarikSaldo = double.parse(_saldoController.text);
 
         if (jumlahTarikSaldo > totalSaldo) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Jumlah tarik saldo tidak boleh melebihi total saldo')),
+            SnackBar(
+                content: Text(
+                    'Jumlah tarik saldo tidak boleh melebihi total saldo')),
           );
           return;
         }
@@ -44,6 +50,7 @@ class _AdminWithdrawalPageState extends State<AdminWithdrawalPage> {
           status: 'pengeluaran',
           tanggal: Timestamp.now().toDate().toString(),
           userId: FirebaseAuth.instance.currentUser!.uid,
+          employeeId: FirebaseAuth.instance.currentUser!.uid,
           bulan: Timestamp.now().toDate().month,
           tahun: Timestamp.now().toDate().year,
         );
@@ -53,9 +60,14 @@ class _AdminWithdrawalPageState extends State<AdminWithdrawalPage> {
             .add(transaksi.toJson());
         AutoRouter.of(context)
             .pushAndPopUntil(HomeWrapperRoute(), predicate: (route) => false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Tarik saldo berhasil')),
-        );
+        Fluttertoast.showToast(
+            msg: "Tarik Saldo berhasil",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Terjadi kesalahan: $e')),

@@ -16,7 +16,8 @@ class EmployeeCustomerBayarPage extends StatefulWidget {
   final Employee employee;
 
   @override
-  State<EmployeeCustomerBayarPage> createState() => _EmployeeCustomerBayarPageState();
+  State<EmployeeCustomerBayarPage> createState() =>
+      _EmployeeCustomerBayarPageState();
 }
 
 class _EmployeeCustomerBayarPageState extends State<EmployeeCustomerBayarPage> {
@@ -46,22 +47,29 @@ class _EmployeeCustomerBayarPageState extends State<EmployeeCustomerBayarPage> {
     int currentMonth = DateTime.now().month;
     return FirebaseFirestore.instance
         .collection('Transaksi')
+        .where('tahun', isEqualTo: DateTime.now().year)
         .where('status', isEqualTo: 'pembayaran')
         .where('bulan', isEqualTo: currentMonth);
   }
 
-  Future<List<Customer>> _getCustomersFromTransactions(QuerySnapshot<Map<String, dynamic>> snapshot) async {
+  Future<List<Customer>> _getCustomersFromTransactions(
+      QuerySnapshot<Map<String, dynamic>> snapshot) async {
+    Set<String> addedCustomerIds = {};
     List<Customer> customers = [];
+
     for (var doc in snapshot.docs) {
       String userId = doc['userId'];
-      DocumentSnapshot customerSnapshot = await FirebaseFirestore.instance
-          .collection('Customer')
-          .doc(userId)
-          .get();
-      if (customerSnapshot.exists) {
-        var customer = Customer.fromFirestore(customerSnapshot);
-        if (customer.alamatTower == widget.employee.alamatTower) {
-          customers.add(customer);
+      if (!addedCustomerIds.contains(userId)) {
+        DocumentSnapshot customerSnapshot = await FirebaseFirestore.instance
+            .collection('Customer')
+            .doc(userId)
+            .get();
+        if (customerSnapshot.exists) {
+          var customer = Customer.fromFirestore(customerSnapshot);
+          if (customer.alamatTower == widget.employee.alamatTower) {
+            customers.add(customer);
+            addedCustomerIds.add(userId);
+          }
         }
       }
     }
@@ -156,6 +164,7 @@ class _EmployeeCustomerBayarPageState extends State<EmployeeCustomerBayarPage> {
                 final customer = customerSnapshot.data![index];
                 return CustomerCard(
                   customer: customer,
+                  employee: widget.employee,
                 );
               },
             );
@@ -195,7 +204,9 @@ class _EmployeeCustomerBayarPageState extends State<EmployeeCustomerBayarPage> {
             }
 
             List<Customer> filteredCustomers = customerSnapshot.data!
-                .where((customer) => customer.nama.toLowerCase().contains(searchname.toLowerCase()))
+                .where((customer) => customer.nama
+                    .toLowerCase()
+                    .contains(searchname.toLowerCase()))
                 .toList();
 
             return ListView.builder(
@@ -204,6 +215,7 @@ class _EmployeeCustomerBayarPageState extends State<EmployeeCustomerBayarPage> {
                 final customer = filteredCustomers[index];
                 return CustomerCard(
                   customer: customer,
+                  employee: widget.employee,
                 );
               },
             );

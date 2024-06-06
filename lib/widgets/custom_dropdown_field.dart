@@ -4,7 +4,6 @@ import 'package:perairan_ngale/shared/styles.dart';
 import 'package:perairan_ngale/utils/extensions.dart';
 import 'package:perairan_ngale/utils/validator.dart';
 
-
 class CustomDropdownField<T> extends StatelessWidget {
   const CustomDropdownField({
     required this.value,
@@ -19,7 +18,8 @@ class CustomDropdownField<T> extends StatelessWidget {
     required this.items,
     required this.onChanged,
     this.enabled,
-    this.suffixIcon, this.suffixIconOnPressed,
+    this.suffixIcon,
+    this.suffixIconOnPressed,
   });
 
   final T? value;
@@ -35,7 +35,6 @@ class CustomDropdownField<T> extends StatelessWidget {
   final List<DropdownMenuItem<T>> items;
   final void Function(T?)? onChanged;
   final VoidCallback? suffixIconOnPressed;
-
 
   @override
   Widget build(BuildContext context) {

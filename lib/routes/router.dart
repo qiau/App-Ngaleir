@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/foundation.dart';
+import 'package:perairan_ngale/features/admin/view/admin_edit_harga.dart';
 import 'package:perairan_ngale/features/customer/customer.dart';
 import 'package:perairan_ngale/features/admin/admin.dart';
 import 'package:perairan_ngale/features/authentication/authentication.dart';
@@ -148,6 +149,11 @@ class AppRouter extends _$AppRouter {
         CustomRoute(
           page: AdminAddMoneyRoute.page,
           path: '/addmoney',
+          transitionsBuilder: TransitionsBuilders.fadeIn,
+        ),
+        CustomRoute(
+          page: EditHargaRoute.page,
+          path: '/editprice',
           transitionsBuilder: TransitionsBuilders.fadeIn,
         ),
         CustomRoute(

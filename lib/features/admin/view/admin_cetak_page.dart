@@ -35,7 +35,6 @@ class _AdminCetakPageState extends State<AdminCetakPage> {
   late String _selectedBulan;
   late bool _exportAllData;
 
-
   @override
   void initState() {
     super.initState();
@@ -47,11 +46,11 @@ class _AdminCetakPageState extends State<AdminCetakPage> {
   Future<void> fetchTransaksi() async {
     try {
       QuerySnapshot transaksiSnapshot =
-      await FirebaseFirestore.instance.collection('Transaksi').get();
+          await FirebaseFirestore.instance.collection('Transaksi').get();
       QuerySnapshot customerSnapshot =
-      await FirebaseFirestore.instance.collection('Customer').get();
+          await FirebaseFirestore.instance.collection('Customer').get();
       QuerySnapshot adminSnapshot =
-      await FirebaseFirestore.instance.collection('Admin').get();
+          await FirebaseFirestore.instance.collection('Admin').get();
 
       Map<String, String> userIdToNameMap = {};
 
@@ -96,15 +95,23 @@ class _AdminCetakPageState extends State<AdminCetakPage> {
     if (_formKey.currentState!.validate()) {
       List<Transaksi> filteredTransaksi = _exportAllData
           ? transaksiList
-          : transaksiList.where((transaksi) => transaksi.bulan.toString() == _selectedBulan).toList();
+          : transaksiList
+              .where(
+                  (transaksi) => transaksi.bulan.toString() == _selectedBulan)
+              .toList();
 
       if (filteredTransaksi.isNotEmpty) {
         try {
           final csv = _generateCSV(filteredTransaksi);
 
           final helper = SaveFileMobile();
-          await helper.download(csv.codeUnits, _exportAllData ? 'SemuaTransaksi.csv' : 'NgaleBulan$_selectedBulan.csv');
-          context.showSnackBar(message: "File berhasil disimpan di storage:Download/ngale/");
+          await helper.download(
+              csv.codeUnits,
+              _exportAllData
+                  ? 'SemuaTransaksi.csv'
+                  : 'NgaleBulan$_selectedBulan.csv');
+          context.showSnackBar(
+              message: "File berhasil disimpan di storage:Download/ngale/");
         } catch (e) {
           logger.e('Error saat mencetak data: $e');
           ScaffoldMessenger.of(context).showSnackBar(
@@ -113,7 +120,10 @@ class _AdminCetakPageState extends State<AdminCetakPage> {
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(_exportAllData ? 'Tidak ada transaksi' : 'Tidak ada transaksi untuk bulan $_selectedBulan')),
+          SnackBar(
+              content: Text(_exportAllData
+                  ? 'Tidak ada transaksi'
+                  : 'Tidak ada transaksi untuk bulan $_selectedBulan')),
         );
       }
     }
@@ -144,10 +154,10 @@ class _AdminCetakPageState extends State<AdminCetakPage> {
       ]);
     }
 
-    final List<String> csvRows = rows.map((row) => row.map((item) => '"$item"').join(',')).toList();
+    final List<String> csvRows =
+        rows.map((row) => row.map((item) => '"$item"').join(',')).toList();
     return csvRows.join('\n');
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -263,7 +273,10 @@ class _AdminCetakPageState extends State<AdminCetakPage> {
 
   Padding _buildExportAllDataCheckbox(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: Styles.defaultPadding, right: Styles.defaultPadding, bottom: Styles.defaultPadding),
+      padding: const EdgeInsets.only(
+          left: Styles.defaultPadding,
+          right: Styles.defaultPadding,
+          bottom: Styles.defaultPadding),
       child: Row(
         children: [
           Checkbox(
@@ -277,7 +290,10 @@ class _AdminCetakPageState extends State<AdminCetakPage> {
               });
             },
           ),
-          Text('Export Semua Data', style: context.textTheme.bodyMediumSemiBold,),
+          Text(
+            'Export Semua Data',
+            style: context.textTheme.bodyMediumSemiBold,
+          ),
         ],
       ),
     );
@@ -287,90 +303,90 @@ class _AdminCetakPageState extends State<AdminCetakPage> {
     return isLoading
         ? Center(child: CircularProgressIndicator())
         : errorMessage != null
-        ? Center(child: Text(errorMessage!))
-        : SfDataGrid(
-      key: key,
-      source: transaksiDataSource,
-      columns: <GridColumn>[
-        GridColumn(
-          columnName: 'nama',
-          label: Container(
-            padding: EdgeInsets.all(8.0),
-            alignment: Alignment.center,
-            child: Text(
-              'Nama',
-              style: context.textTheme.bodySmallBold,
-            ),
-          ),
-        ),
-        GridColumn(
-          columnName: 'status',
-          label: Container(
-            padding: EdgeInsets.all(8.0),
-            alignment: Alignment.center,
-            child: Text(
-              'Status',
-              style: context.textTheme.bodySmallBold,
-            ),
-          ),
-        ),
-        GridColumn(
-          columnName: 'nominal',
-          label: Container(
-            padding: EdgeInsets.all(8.0),
-            alignment: Alignment.center,
-            child: Text(
-              'Nominal',
-              style: context.textTheme.bodySmallBold,
-            ),
-          ),
-        ),
-        GridColumn(
-          columnName: 'deskripsi',
-          label: Container(
-            padding: EdgeInsets.all(8.0),
-            alignment: Alignment.center,
-            child: Text(
-              'Deskripsi',
-              style: context.textTheme.bodySmallBold,
-            ),
-          ),
-        ),
-        GridColumn(
-          columnName: 'tanggal',
-          label: Container(
-            padding: EdgeInsets.all(8.0),
-            alignment: Alignment.center,
-            child: Text(
-              'Tanggal',
-              style: context.textTheme.bodySmallBold,
-            ),
-          ),
-        ),
-        GridColumn(
-          columnName: 'tahun',
-          label: Container(
-            padding: EdgeInsets.all(8.0),
-            alignment: Alignment.center,
-            child: Text(
-              'Tahun',
-              style: context.textTheme.bodySmallBold,
-            ),
-          ),
-        ),
-        GridColumn(
-          columnName: 'bulan',
-          label: Container(
-            padding: EdgeInsets.all(8.0),
-            alignment: Alignment.center,
-            child: Text(
-              'Bulan',
-              style: context.textTheme.bodySmallBold,
-            ),
-          ),
-        ),
-      ],
-    );
+            ? Center(child: Text(errorMessage!))
+            : SfDataGrid(
+                key: key,
+                source: transaksiDataSource,
+                columns: <GridColumn>[
+                  GridColumn(
+                    columnName: 'nama',
+                    label: Container(
+                      padding: EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Nama',
+                        style: context.textTheme.bodySmallBold,
+                      ),
+                    ),
+                  ),
+                  GridColumn(
+                    columnName: 'status',
+                    label: Container(
+                      padding: EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Status',
+                        style: context.textTheme.bodySmallBold,
+                      ),
+                    ),
+                  ),
+                  GridColumn(
+                    columnName: 'nominal',
+                    label: Container(
+                      padding: EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Nominal',
+                        style: context.textTheme.bodySmallBold,
+                      ),
+                    ),
+                  ),
+                  GridColumn(
+                    columnName: 'deskripsi',
+                    label: Container(
+                      padding: EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Deskripsi',
+                        style: context.textTheme.bodySmallBold,
+                      ),
+                    ),
+                  ),
+                  GridColumn(
+                    columnName: 'tanggal',
+                    label: Container(
+                      padding: EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Tanggal',
+                        style: context.textTheme.bodySmallBold,
+                      ),
+                    ),
+                  ),
+                  GridColumn(
+                    columnName: 'tahun',
+                    label: Container(
+                      padding: EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Tahun',
+                        style: context.textTheme.bodySmallBold,
+                      ),
+                    ),
+                  ),
+                  GridColumn(
+                    columnName: 'bulan',
+                    label: Container(
+                      padding: EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Bulan',
+                        style: context.textTheme.bodySmallBold,
+                      ),
+                    ),
+                  ),
+                ],
+              );
   }
 
   Padding _buildTitleSection(BuildContext context) {
@@ -435,7 +451,7 @@ class TransaksiDataSource extends DataGridSource {
           columnName: 'status',
           value: transaksi.status,
         ),
-        DataGridCell<int>(
+        DataGridCell<double>(
           columnName: 'nominal',
           value: transaksi.saldo,
         ),
@@ -468,16 +484,16 @@ class TransaksiDataSource extends DataGridSource {
   DataGridRowAdapter? buildRow(DataGridRow row) {
     return DataGridRowAdapter(
         cells: row.getCells().map<Widget>((dataGridCell) {
-          return Container(
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            alignment: Alignment.centerLeft,
-            child: Text(
-              dataGridCell.value.toString(),
-              style: TextStyle(
-                fontSize: 11.0,
-              ),
-            ),
-          );
-        }).toList());
+      return Container(
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        alignment: Alignment.centerLeft,
+        child: Text(
+          dataGridCell.value.toString(),
+          style: TextStyle(
+            fontSize: 11.0,
+          ),
+        ),
+      );
+    }).toList());
   }
 }

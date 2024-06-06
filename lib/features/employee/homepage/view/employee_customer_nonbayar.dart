@@ -16,10 +16,12 @@ class EmployeeCustomerNonBayarPage extends StatefulWidget {
   final Employee employee;
 
   @override
-  State<EmployeeCustomerNonBayarPage> createState() => _EmployeeCustomerNonBayarPageState();
+  State<EmployeeCustomerNonBayarPage> createState() =>
+      _EmployeeCustomerNonBayarPageState();
 }
 
-class _EmployeeCustomerNonBayarPageState extends State<EmployeeCustomerNonBayarPage> {
+class _EmployeeCustomerNonBayarPageState
+    extends State<EmployeeCustomerNonBayarPage> {
   final TextEditingController _searchController = TextEditingController();
   final ValueNotifier<String> _searchQuery = ValueNotifier<String>('');
   var searchname = "";
@@ -50,7 +52,8 @@ class _EmployeeCustomerNonBayarPageState extends State<EmployeeCustomerNonBayarP
         .where('bulan', isEqualTo: currentMonth);
   }
 
-  Future<List<Customer>> _getCustomersWithoutTransactions(QuerySnapshot<Map<String, dynamic>> transactionSnapshot) async {
+  Future<List<Customer>> _getCustomersWithoutTransactions(
+      QuerySnapshot<Map<String, dynamic>> transactionSnapshot) async {
     List<Customer> allCustomers = [];
     QuerySnapshot customerSnapshot = await FirebaseFirestore.instance
         .collection('Customer')
@@ -66,7 +69,10 @@ class _EmployeeCustomerNonBayarPageState extends State<EmployeeCustomerNonBayarP
       customerIdsWithTransactions.add(doc['userId']);
     }
 
-    return allCustomers.where((customer) => !customerIdsWithTransactions.contains(customer.uid)).toList();
+    return allCustomers
+        .where(
+            (customer) => !customerIdsWithTransactions.contains(customer.uid))
+        .toList();
   }
 
   @override
@@ -157,6 +163,7 @@ class _EmployeeCustomerNonBayarPageState extends State<EmployeeCustomerNonBayarP
                 final customer = customerSnapshot.data![index];
                 return CustomerCard(
                   customer: customer,
+                  employee: widget.employee,
                 );
               },
             );
@@ -196,7 +203,9 @@ class _EmployeeCustomerNonBayarPageState extends State<EmployeeCustomerNonBayarP
             }
 
             List<Customer> filteredCustomers = customerSnapshot.data!
-                .where((customer) => customer.nama.toLowerCase().contains(searchname.toLowerCase()))
+                .where((customer) => customer.nama
+                    .toLowerCase()
+                    .contains(searchname.toLowerCase()))
                 .toList();
 
             return ListView.builder(
@@ -205,6 +214,7 @@ class _EmployeeCustomerNonBayarPageState extends State<EmployeeCustomerNonBayarP
                 final customer = filteredCustomers[index];
                 return CustomerCard(
                   customer: customer,
+                  employee: widget.employee,
                 );
               },
             );

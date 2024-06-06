@@ -95,7 +95,8 @@ class _CustomerListState extends State<CustomerList> {
                     textColor: Colors.grey,
                     isOutlined: true,
                     onPressed: () {
-                      AutoRouter.of(context).push(EmployeeCustomerBayarRoute(employee: widget.employee));
+                      AutoRouter.of(context).push(EmployeeCustomerBayarRoute(
+                          employee: widget.employee));
                     },
                   ),
                   CustomButton(
@@ -104,7 +105,8 @@ class _CustomerListState extends State<CustomerList> {
                     textColor: Colors.grey,
                     isOutlined: true,
                     onPressed: () {
-                      AutoRouter.of(context).push(EmployeeCustomerNonBayarRoute(employee: widget.employee));
+                      AutoRouter.of(context).push(EmployeeCustomerNonBayarRoute(
+                          employee: widget.employee));
                     },
                   ),
                 ],
@@ -136,9 +138,9 @@ class _CustomerListState extends State<CustomerList> {
           .orderBy('nama'),
       itemBuilder: (context, snapshot) {
         final customer = Customer.fromFirestore(snapshot);
-
         return CustomerCard(
           customer: customer,
+          employee: widget.employee,
         );
       },
     );
@@ -164,7 +166,10 @@ class _CustomerListState extends State<CustomerList> {
             itemBuilder: (context, index) {
               var data = snapshot.data!.docs[index];
               final customer = Customer.fromFirestore(data);
-              return CustomerCard(customer: customer);
+              return CustomerCard(
+                customer: customer,
+                employee: widget.employee,
+              );
             },
           );
         });

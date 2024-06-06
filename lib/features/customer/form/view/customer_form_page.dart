@@ -10,6 +10,7 @@ import 'package:perairan_ngale/models/customer.dart';
 import 'package:perairan_ngale/routes/router.dart';
 import 'package:perairan_ngale/shared/color_values.dart';
 import 'package:perairan_ngale/shared/styles.dart';
+import 'package:perairan_ngale/widgets/custom_dropdown_field.dart';
 import 'package:perairan_ngale/utils/extensions.dart';
 import 'package:perairan_ngale/widgets/custom_button.dart';
 import 'package:perairan_ngale/widgets/custom_dropdown_field.dart';
@@ -180,25 +181,37 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
 
   Widget _buildTowerField() {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: CustomDropdownField(
-        value: _selectedValue,
-        enabled: true,
-        fillColor: ColorValues.white,
-        label: 'Alamat Tower',
-        items: [
-          DropdownMenuItem<String>(value: 'Bumi', child: Text('Bumi'),),
-          DropdownMenuItem<String>(value: 'Mars', child: Text('Mars'),),
-          DropdownMenuItem<String>(value: 'Saturnus', child: Text('Saturnus'),),
-          DropdownMenuItem<String>(value: 'Jupiter', child: Text('Jupiter'),),
-        ],
-        onChanged: (value) {
-          setState(() {
-            _selectedValue = value;
-          });
-        },
-      ),
-    );
+        padding: const EdgeInsets.symmetric(vertical: 16.0),
+        child: CustomDropdownField(
+          value: _selectedValue,
+          enabled: true,
+          fillColor: ColorValues.white,
+          label: 'Alamat Tower',
+          items: [
+            DropdownMenuItem<String>(
+              value: 'Bumi',
+              child: Text('Bumi'),
+            ),
+            DropdownMenuItem<String>(
+              value: 'Mars',
+              child: Text('Mars'),
+            ),
+            DropdownMenuItem<String>(
+              value: 'Saturnus',
+              child: Text('Saturnus'),
+            ),
+            DropdownMenuItem<String>(
+              value: 'Jupiter',
+              child: Text('Jupiter'),
+            ),
+          ],
+          onChanged: (value) {
+            setState(() {
+              _selectedValue = value;
+            });
+          },
+        ),
+      );
   }
 
   Widget _buildDoneButton() {
