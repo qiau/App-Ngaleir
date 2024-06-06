@@ -51,23 +51,18 @@ class _EmployeeCustomerDetailPageState
 
   Future<void> setPenggunaanPerBulan() async {
     penggunaanPerBulan = List.generate(12, (index) => 0.0);
-    final completer = Completer<void>();
 
     if (listTransaksi.isNotEmpty) {
       for (int i = 0; i < listTransaksi.length; i++) {
-        double penggunaan =
-            listTransaksi[i].meteran! - listTransaksi[i].meteranBulanLalu!;
         int bulan = listTransaksi[i].bulan;
-        setState(() {
-          penggunaanPerBulan[bulan - 1] += penggunaan;
-        });
+        if (bulan > 0 && bulan <= 12) {
+          setState(() {
+            penggunaanPerBulan[bulan - 1] +=
+                listTransaksi[i].meteran! - listTransaksi[i].meteranBulanLalu!;
+          });
+        }
       }
     }
-
-    print(penggunaanPerBulan);
-    completer.complete();
-
-    return completer.future;
   }
 
   Future<void> getTransaksiByUserIdAndYear(String userId, int tahun) async {
@@ -323,11 +318,6 @@ class _EmployeeCustomerDetailPageState
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: listTransaksi.length,
                     itemBuilder: (context, index) {
-                      double? meteranTerakhir = 0;
-
-                      if (index != listTransaksi.length - 1) {
-                        meteranTerakhir = listTransaksi[index + 1].meteran;
-                      }
                       Transaksi transaksi = listTransaksi[index];
                       if (listTransaksi[index] == latestTransaksi[0]) {
                         if (widget.employee != null) {
@@ -338,7 +328,6 @@ class _EmployeeCustomerDetailPageState
                             transaksi: transaksi,
                             customer: widget.customer,
                             employee: widget.employee,
-                            meteranTerakhir: meteranTerakhir,
                           );
                         } else {
                           print('cek2');
@@ -346,14 +335,12 @@ class _EmployeeCustomerDetailPageState
                             isEditable: true,
                             isThereTransaksi: isThereTransaksi,
                             transaksi: transaksi,
-                            meteranTerakhir: meteranTerakhir,
                           );
                         }
                       }
                       return TransactionCard(
                         isThereTransaksi: isThereTransaksi,
                         transaksi: transaksi,
-                        meteranTerakhir: meteranTerakhir,
                       );
                     },
                   )

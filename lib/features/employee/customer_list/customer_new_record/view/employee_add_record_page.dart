@@ -399,6 +399,9 @@ class _EmployeeAddCustomerRecordPageState
         pemakaian1bulan = double.parse(_meteranSaatIniController.text) -
             (widget.transaksi?.meteranBulanLalu ?? 0);
       }
+      if (selisihBulan < 0) {
+        pengali = selisihBulan + 12 * selisihTahun;
+      }
 
       double saldo = pemakaian1bulan * _harga!.harga;
       double saldofix = saldo + saldo * _harga!.denda / 100 * pengali;
