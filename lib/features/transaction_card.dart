@@ -41,8 +41,9 @@ class TransactionCard extends StatelessWidget {
             print('cek2');
             AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
               isAdd: true,
-              isThereTransaksi: isThereTransaksi,
               customer: customer,
+              employee: employee,
+              isThereTransaksi: isThereTransaksi,
               isEditable: isEditable!,
               transaksi: transaksi,
             ));

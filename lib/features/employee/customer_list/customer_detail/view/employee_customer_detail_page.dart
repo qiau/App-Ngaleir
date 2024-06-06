@@ -131,6 +131,9 @@ class _EmployeeCustomerDetailPageState
   Future<void> getLatestTransaksi(String userId) async {
     final collection = FirebaseFirestore.instance.collection('Transaksi');
     final user = FirebaseAuth.instance.currentUser;
+    setState(() {
+      loading = true;
+    });
     final querySnapshot = await collection
         .where('userId', isEqualTo: userId)
         .orderBy('tanggal', descending: true)
@@ -180,14 +183,24 @@ class _EmployeeCustomerDetailPageState
         padding: EdgeInsets.only(left: Styles.biggerPadding),
         child: ElevatedButton(
           onPressed: () {
-            AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
-                isThereTransaksi: isThereTransaksi,
-                isAdd: true,
-                isEditable: true,
-                customer: widget.customer,
-                transaksiBulanLalu: latestTransaksi[0],
-                customerId: widget.customer.uid,
-                employee: widget.employee));
+            if (latestTransaksi.isNotEmpty) {
+              AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
+                  isThereTransaksi: isThereTransaksi,
+                  isAdd: true,
+                  isEditable: true,
+                  customer: widget.customer,
+                  transaksiBulanLalu: latestTransaksi[0],
+                  customerId: widget.customer.uid,
+                  employee: widget.employee));
+            } else {
+              AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
+                  isThereTransaksi: isThereTransaksi,
+                  isAdd: true,
+                  isEditable: true,
+                  customer: widget.customer,
+                  customerId: widget.customer.uid,
+                  employee: widget.employee));
+            }
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -319,14 +332,15 @@ class _EmployeeCustomerDetailPageState
                     itemCount: listTransaksi.length,
                     itemBuilder: (context, index) {
                       Transaksi transaksi = listTransaksi[index];
-                      if (listTransaksi[index] == latestTransaksi[0]) {
+                      if (latestTransaksi.isNotEmpty &&
+                          listTransaksi[index] == latestTransaksi[0]) {
                         if (widget.employee != null) {
                           print('cek1');
                           return TransactionCard(
                             isEditable: true,
+                            customer: widget.customer,
                             isThereTransaksi: isThereTransaksi,
                             transaksi: transaksi,
-                            customer: widget.customer,
                             employee: widget.employee,
                           );
                         } else {

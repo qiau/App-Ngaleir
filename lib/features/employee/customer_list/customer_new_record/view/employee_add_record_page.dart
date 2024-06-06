@@ -366,13 +366,12 @@ class _EmployeeAddCustomerRecordPageState
               backgroundColor: Colors.green,
               textColor: Colors.white,
               fontSize: 16.0);
-          AutoRouter.of(context).pushAndPopUntil(HomeWrapperRoute(), predicate: (route) => false);
-          // AutoRouter.of(context).popAndPush(
-          //   EmployeeCustomerDetailRoute(
-          //     customer: widget.customer!,
-          //     employee: _employee,
-          //   ),
-          // );
+          AutoRouter.of(context).replace(
+            EmployeeCustomerDetailRoute(
+              customer: widget.customer!,
+              employee: _employee,
+            ),
+          );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -400,9 +399,6 @@ class _EmployeeAddCustomerRecordPageState
         pemakaian1bulan = double.parse(_meteranSaatIniController.text) -
             (widget.transaksi?.meteranBulanLalu ?? 0);
       }
-      if (selisihBulan < 0) {
-        pengali = selisihBulan + 12 * selisihTahun;
-      }
 
       double saldo = pemakaian1bulan * _harga!.harga;
       double saldofix = saldo + saldo * _harga!.denda / 100 * pengali;
@@ -419,6 +415,7 @@ class _EmployeeAddCustomerRecordPageState
               doc.reference.update({
                 'meteran': double.parse(_meteranSaatIniController.text),
                 'saldo': saldo,
+                'tanggal': Timestamp.now().toDate().toString()
               });
             });
           });
@@ -430,13 +427,12 @@ class _EmployeeAddCustomerRecordPageState
               backgroundColor: Colors.green,
               textColor: Colors.white,
               fontSize: 16.0);
-          AutoRouter.of(context).pushAndPopUntil(HomeWrapperRoute(), predicate: (route) => false);
-          // AutoRouter.of(context).popAndPush(
-          //   EmployeeCustomerDetailRoute(
-          //     customer: widget.customer!,
-          //     employee: _employee,
-          //   ),
-          // );
+          AutoRouter.of(context).replace(
+            EmployeeCustomerDetailRoute(
+              customer: widget.customer!,
+              employee: widget.employee,
+            ),
+          );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
