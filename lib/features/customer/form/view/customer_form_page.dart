@@ -13,6 +13,7 @@ import 'package:perairan_ngale/shared/styles.dart';
 import 'package:perairan_ngale/widgets/custom_dropdown_field.dart';
 import 'package:perairan_ngale/utils/extensions.dart';
 import 'package:perairan_ngale/widgets/custom_button.dart';
+import 'package:perairan_ngale/widgets/custom_dropdown_field.dart';
 import 'package:perairan_ngale/widgets/custom_gesture_unfocus.dart';
 import 'package:perairan_ngale/widgets/custom_text_field.dart';
 import 'package:sizer/sizer.dart';
@@ -33,6 +34,16 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
   final TextEditingController _noTelponController = TextEditingController();
   String? _selectedValue = 'Bumi';
   final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,10 +71,10 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
                 key: _formKey,
                 child: Column(
                   children: [
+                    _buildTowerField(),
                     _buildNameField(),
                     _buildNomorTelpon(),
                     _buildAlamatField(),
-                    _buildTowerField(),
                     _buildRTField(),
                     _buildRWField(),
                     const SizedBox(height: Styles.defaultSpacing),
@@ -199,7 +210,8 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
               _selectedValue = value;
             });
           },
-        ));
+        ),
+      );
   }
 
   Widget _buildDoneButton() {
@@ -236,6 +248,7 @@ class _CustomerFormPageState extends State<CustomerFormPage> {
             'customer_no': _rtController.text + _rwController.text + counts,
           });
           AutoRouter.of(context).replace(HomeWrapperRoute());
+          dispose();
           print('Data pelanggan berhasil disimpan di Firestore.');
         } else {
           print('Tidak ada pengguna yang sedang login.');
