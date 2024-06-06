@@ -180,14 +180,24 @@ class _EmployeeCustomerDetailPageState
         padding: EdgeInsets.only(left: Styles.biggerPadding),
         child: ElevatedButton(
           onPressed: () {
-            AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
-                isThereTransaksi: isThereTransaksi,
-                isAdd: true,
-                isEditable: true,
-                customer: widget.customer,
-                transaksiBulanLalu: latestTransaksi[0],
-                customerId: widget.customer.uid,
-                employee: widget.employee));
+            if (latestTransaksi.isNotEmpty) {
+              AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
+                  isThereTransaksi: isThereTransaksi,
+                  isAdd: true,
+                  isEditable: true,
+                  customer: widget.customer,
+                  transaksiBulanLalu: latestTransaksi[0],
+                  customerId: widget.customer.uid,
+                  employee: widget.employee));
+            } else {
+              AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
+                  isThereTransaksi: isThereTransaksi,
+                  isAdd: true,
+                  isEditable: true,
+                  customer: widget.customer,
+                  customerId: widget.customer.uid,
+                  employee: widget.employee));
+            }
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -326,7 +336,6 @@ class _EmployeeCustomerDetailPageState
                             isEditable: true,
                             isThereTransaksi: isThereTransaksi,
                             transaksi: transaksi,
-                            customer: widget.customer,
                             employee: widget.employee,
                           );
                         } else {

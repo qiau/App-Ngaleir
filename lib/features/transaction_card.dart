@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
-import 'package:perairan_ngale/models/customer.dart';
 import 'package:perairan_ngale/models/employee.dart';
 import 'package:perairan_ngale/models/transaksi.dart';
 import 'package:perairan_ngale/routes/router.dart';
@@ -22,10 +21,8 @@ class TransactionCard extends StatelessWidget {
       this.meteranTerakhir,
       required this.isThereTransaksi,
       this.employee,
-      this.isEditable,
-      this.customer});
+      this.isEditable});
   final Transaksi transaksi;
-  final Customer? customer;
   final String? customerId;
   final double? meteranTerakhir;
   final bool isThereTransaksi;
@@ -38,11 +35,9 @@ class TransactionCard extends StatelessWidget {
       onTap: () {
         if (customerId == null) {
           if (employee != null) {
-            print('cek2');
-            AutoRouter.of(context).replace(EmployeeAddCustomerRecordRoute(
+            AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
               isAdd: true,
               isThereTransaksi: isThereTransaksi,
-              customer: customer,
               isEditable: isEditable!,
               transaksi: transaksi,
             ));
@@ -55,7 +50,7 @@ class TransactionCard extends StatelessWidget {
             ));
           }
         } else {
-          AutoRouter.of(context).replace(EmployeeAddCustomerRecordRoute(
+          AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
             isThereTransaksi: isThereTransaksi,
             isAdd: true,
             isEditable: true,
