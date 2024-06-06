@@ -415,6 +415,7 @@ class _EmployeeAddCustomerRecordPageState
               doc.reference.update({
                 'meteran': double.parse(_meteranSaatIniController.text),
                 'saldo': saldo,
+                'tanggal': Timestamp.now().toDate().toString()
               });
             });
           });

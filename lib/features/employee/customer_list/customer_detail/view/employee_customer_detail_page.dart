@@ -131,6 +131,9 @@ class _EmployeeCustomerDetailPageState
   Future<void> getLatestTransaksi(String userId) async {
     final collection = FirebaseFirestore.instance.collection('Transaksi');
     final user = FirebaseAuth.instance.currentUser;
+    setState(() {
+      loading = true;
+    });
     final querySnapshot = await collection
         .where('userId', isEqualTo: userId)
         .orderBy('tanggal', descending: true)
@@ -329,7 +332,8 @@ class _EmployeeCustomerDetailPageState
                     itemCount: listTransaksi.length,
                     itemBuilder: (context, index) {
                       Transaksi transaksi = listTransaksi[index];
-                      if (listTransaksi[index] == latestTransaksi[0]) {
+                      if (latestTransaksi.isNotEmpty &&
+                          listTransaksi[index] == latestTransaksi[0]) {
                         if (widget.employee != null) {
                           print('cek1');
                           return TransactionCard(
