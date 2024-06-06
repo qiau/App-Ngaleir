@@ -39,7 +39,7 @@ class TransactionCard extends StatelessWidget {
         if (customerId == null) {
           if (employee != null) {
             print('cek2');
-            AutoRouter.of(context).replace(EmployeeAddCustomerRecordRoute(
+            AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
               isAdd: true,
               customer: customer,
               employee: employee,
@@ -56,7 +56,7 @@ class TransactionCard extends StatelessWidget {
             ));
           }
         } else {
-          AutoRouter.of(context).replace(EmployeeAddCustomerRecordRoute(
+          AutoRouter.of(context).push(EmployeeAddCustomerRecordRoute(
             isThereTransaksi: isThereTransaksi,
             isAdd: true,
             isEditable: true,

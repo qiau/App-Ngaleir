@@ -289,9 +289,7 @@ class _EmployeeAddCustomerRecordPageState
                           width: 343,
                           child: ElevatedButton(
                             onPressed: () {
-                              isNotEmpty
-                                  ? _editTransaksi(context)
-                                  : _tambahTransaksi(context);
+                              _showLogoutConfirmationDialog(context);
                             },
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
@@ -311,6 +309,52 @@ class _EmployeeAddCustomerRecordPageState
           ),
         ),
       )),
+    );
+  }
+
+  Future<void> _showLogoutConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: MediaQuery.of(context).size.width * 0.5,
+          child: AlertDialog(
+            title: Text('Konfirmasi Keluar',
+                style: context.textTheme.bodyMediumBold),
+            content: Text(
+                'Apakah Anda yakin ingin mencatat transaksi dengan keterangan berikut:\n' +
+                    'Meteran Bulan Lalu:' +
+                    _nomorTagihanController.text +
+                    '\n' +
+                    'Meteran Saat ini:' +
+                    _meteranSaatIniController.text,
+                style: context.textTheme.bodyMedium),
+            actions: [
+              TextButton(
+                child: Text('Batal', style: context.textTheme.bodyMediumBold),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Color(0xFF0D9DF8),
+                ),
+                child: TextButton(
+                  child: Text('Simpan',
+                      style: context.textTheme.bodyMediumBoldBright),
+                  onPressed: () async {
+                    isNotEmpty
+                        ? _editTransaksi(context)
+                        : _tambahTransaksi(context);
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -366,12 +410,8 @@ class _EmployeeAddCustomerRecordPageState
               backgroundColor: Colors.green,
               textColor: Colors.white,
               fontSize: 16.0);
-          AutoRouter.of(context).replace(
-            EmployeeCustomerDetailRoute(
-              customer: widget.customer!,
-              employee: _employee,
-            ),
-          );
+          AutoRouter.of(context)
+              .pushAndPopUntil(HomeWrapperRoute(), predicate: (route) => false);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -398,6 +438,9 @@ class _EmployeeAddCustomerRecordPageState
       if (widget.transaksi != null) {
         pemakaian1bulan = double.parse(_meteranSaatIniController.text) -
             (widget.transaksi?.meteranBulanLalu ?? 0);
+      }
+      if (selisihBulan < 0) {
+        pengali = selisihBulan + 12 * selisihTahun;
       }
 
       double saldo = pemakaian1bulan * _harga!.harga;
@@ -427,12 +470,8 @@ class _EmployeeAddCustomerRecordPageState
               backgroundColor: Colors.green,
               textColor: Colors.white,
               fontSize: 16.0);
-          AutoRouter.of(context).replace(
-            EmployeeCustomerDetailRoute(
-              customer: widget.customer!,
-              employee: widget.employee,
-            ),
-          );
+          AutoRouter.of(context)
+              .pushAndPopUntil(HomeWrapperRoute(), predicate: (route) => false);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
