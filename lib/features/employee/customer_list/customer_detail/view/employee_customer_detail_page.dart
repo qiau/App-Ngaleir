@@ -338,6 +338,7 @@ class _EmployeeCustomerDetailPageState
                           print('cek1');
                           return TransactionCard(
                             isEditable: true,
+                            customer: widget.customer,
                             isThereTransaksi: isThereTransaksi,
                             transaksi: transaksi,
                             employee: widget.employee,

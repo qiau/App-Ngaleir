@@ -366,7 +366,7 @@ class _EmployeeAddCustomerRecordPageState
               backgroundColor: Colors.green,
               textColor: Colors.white,
               fontSize: 16.0);
-          AutoRouter.of(context).popAndPush(
+          AutoRouter.of(context).replace(
             EmployeeCustomerDetailRoute(
               customer: widget.customer!,
               employee: _employee,
@@ -427,8 +427,12 @@ class _EmployeeAddCustomerRecordPageState
               backgroundColor: Colors.green,
               textColor: Colors.white,
               fontSize: 16.0);
-          AutoRouter.of(context).pushAndPopUntil(EmployeeHomeRoute(),
-              predicate: (route) => false);
+          AutoRouter.of(context).replace(
+            EmployeeCustomerDetailRoute(
+              customer: widget.customer!,
+              employee: widget.employee,
+            ),
+          );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
